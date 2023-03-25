@@ -1,0 +1,49 @@
+{
+  "name": "slate-table",
+  "version": "0.1.0",
+  "description": "table plugin for slate.js",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "npm run clean && tsc",
+    "clean": "rm -rf ./dist/*",
+    "test": "echo \"run tests\"",
+    "start": "tsc -p . --watch"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nlulic/slate-table.git"
+  },
+  "keywords": [
+    "slate",
+    "table",
+    "html"
+  ],
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/nlulic/slate-table/issues"
+  },
+  "homepage": "https://github.com/nlulic/slate-table#readme",
+  "peerDependencies": {
+    "slate": ">=0.65.3"
+  },
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "5.56.0",
+    "@typescript-eslint/parser": "5.56.0",
+    "eslint": "8.36.0",
+    "eslint-plugin-import": "2.27.5",
+    "lint-staged": "13.2.0",
+    "prettier": "2.8.7",
+    "simple-git-hooks": "2.8.1",
+    "typescript": "5.0.2"
+  },
+  "simple-git-hooks": {
+    "pre-commit": "lint-staged",
+    "pre-push": "npm run test"
+  },
+  "lint-staged": {
+    "*.{css,md,js,jsx,json,ts,tsx}": [
+      "prettier --write",
+      "eslint --fix"
+    ]
+  }
+}
