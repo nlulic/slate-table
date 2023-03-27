@@ -1,6 +1,6 @@
-import { Config } from "./config";
-import { EDITOR_TO_OPTIONS } from "./with-table";
+import { EDITOR_TO_OPTIONS } from "./weak-maps";
 import { Editor, Element, Node, NodeMatch } from "slate";
+import { Options } from "./options";
 
 export const TableEditor = {
   /**
@@ -16,10 +16,10 @@ export const TableEditor = {
   },
 };
 
-/** `isOfType` returns a `NodeMatch` function which is used to match the element of a specific `type`. */
+/** @returns returns a `NodeMatch` function which is used to match the element of a specific `type`. */
 const isOfType = (
   editor: Editor,
-  type: keyof Config["blocks"]
+  type: keyof Options["blocks"]
 ): NodeMatch<Node> | undefined => {
   const options = EDITOR_TO_OPTIONS.get(editor);
   const elementType = options?.blocks?.[type];

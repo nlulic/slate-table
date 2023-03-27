@@ -1,11 +1,10 @@
-import { Editor } from "slate";
+import { EDITOR_TO_OPTIONS } from "./weak-maps";
+import { Options, DEFAULT_OPTIONS } from "./options";
 import { mergeDeep } from "./utils";
-import { Config, DEFAULT_OPTIONS } from "./config";
+import { type Editor } from "slate";
 
-export const EDITOR_TO_OPTIONS = new WeakMap<Editor, Config>();
-
-export const withTable = <T extends Editor>(editor: T, config: Config): T => {
-  EDITOR_TO_OPTIONS.set(editor, mergeDeep(DEFAULT_OPTIONS, config));
+export const withTable = <T extends Editor>(editor: T, options: Options): T => {
+  EDITOR_TO_OPTIONS.set(editor, mergeDeep(DEFAULT_OPTIONS, options));
 
   return editor;
 };

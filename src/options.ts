@@ -2,7 +2,7 @@ import { CustomTypes, ExtendedType } from "slate";
 
 export type ElementType = ExtendedType<"Element", CustomTypes>["type"];
 
-export interface Config {
+export interface Options {
   blocks: {
     table: ElementType;
     row: ElementType;
@@ -16,4 +16,4 @@ export const DEFAULT_OPTIONS = {
     row: "table-row",
     cell: "table-cell",
   },
-} as const satisfies Config;
+} as const satisfies Options;
