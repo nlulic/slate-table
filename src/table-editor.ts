@@ -34,7 +34,7 @@ export const TableEditor = {
 
     const {
       blocks: { cell, content, row, table },
-    } = EDITOR_TO_WITH_TABLE_OPTIONS.get(editor)!;
+    } = EDITOR_TO_WITH_TABLE_OPTIONS.get(editor)!; // eslint-disable-line @typescript-eslint/no-non-null-assertion
 
     const { rows, cols, at } = { ...DEFAULT_INSERT_TABLE_OPTIONS, ...options };
 

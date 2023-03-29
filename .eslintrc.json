@@ -3,12 +3,20 @@
     "browser": true,
     "es2021": true
   },
+  "ignorePatterns": ["dist/"],
   "extends": [
     "plugin:import/typescript",
     "eslint:recommended",
     "plugin:@typescript-eslint/recommended"
   ],
-  "overrides": [],
+  "overrides": [
+    {
+      "files": ["__test__/**/*.test.tsx"],
+      "rules": {
+        "@typescript-eslint/no-unused-vars": "off"
+      }
+    }
+  ],
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
     "ecmaVersion": "latest",
