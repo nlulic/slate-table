@@ -1,19 +1,33 @@
-import { CustomTypes, ExtendedType } from "slate";
+import { CustomTypes, ExtendedType, Location } from "slate";
 
 export type ElementType = ExtendedType<"Element", CustomTypes>["type"];
 
-export interface Options {
+export interface WithTableOptions {
   blocks: {
-    table: ElementType;
-    row: ElementType;
     cell: ElementType;
+    content: ElementType;
+    row: ElementType;
+    table: ElementType;
   };
 }
 
-export const DEFAULT_OPTIONS = {
+export const DEFAULT_WITH_TABLE_OPTIONS = {
   blocks: {
-    table: "table",
-    row: "table-row",
     cell: "table-cell",
+    content: "paragraph",
+    row: "table-row",
+    table: "table",
   },
-} as const satisfies Options;
+} as const satisfies WithTableOptions;
+
+export interface InsertTableOptions {
+  rows: number;
+  cols: number;
+  at: Location | undefined;
+}
+
+export const DEFAULT_INSERT_TABLE_OPTIONS = {
+  rows: 4,
+  cols: 4,
+  at: undefined,
+} as const satisfies InsertTableOptions;
