@@ -11,10 +11,10 @@ export const TableEditor = {
    * Checks if the current selection is inside a table.
    * @returns `true` if the selection is inside a table, `false` otherwise.
    */
-  isInTable(editor: Editor, at?: Location): boolean {
+  isInTable(editor: Editor, options: { at?: Location } = {}): boolean {
     const [table] = Editor.nodes(editor, {
       match: isOfType(editor, "table"),
-      at,
+      at: options.at,
     });
 
     return !!table;
@@ -28,17 +28,19 @@ export const TableEditor = {
    * @returns void
    */
   insertTable(editor: Editor, options: Partial<InsertTableOptions> = {}): void {
-    if (!EDITOR_TO_WITH_TABLE_OPTIONS.has(editor)) {
+    const editorOptions = EDITOR_TO_WITH_TABLE_OPTIONS.get(editor);
+
+    if (!editorOptions) {
       return;
     }
 
     const {
       blocks: { cell, content, row, table },
-    } = EDITOR_TO_WITH_TABLE_OPTIONS.get(editor)!; // eslint-disable-line @typescript-eslint/no-non-null-assertion
+    } = editorOptions;
 
     const { rows, cols, at } = { ...DEFAULT_INSERT_TABLE_OPTIONS, ...options };
 
-    if (this.isInTable(editor, at)) {
+    if (this.isInTable(editor, { at })) {
       return;
     }
 
@@ -64,6 +66,26 @@ export const TableEditor = {
       } as Node,
       { at }
     );
+  },
+  /**
+   * Removes a table at the specified location. If no location is specified
+   * it will remove the table at the current selection.
+   * @returns void
+   */
+  removeTable(editor: Editor, options: { at?: Location } = {}): void {
+    const [table] = Editor.nodes(editor, {
+      match: isOfType(editor, "table"),
+      at: options.at,
+    });
+
+    if (!table) {
+      return;
+    }
+
+    const [, path] = table;
+
+    Transforms.removeNodes(editor, { at: path });
+    Transforms.collapse(editor);
   },
 };
 
