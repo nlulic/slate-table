@@ -16,7 +16,7 @@ describe("insertTable", () => {
       </editor>
     );
 
-    // default options will insert a 4x4 table
+    // default options will insert a 2x2 table
     const expected = (
       <editor>
         <paragraph>
@@ -34,72 +34,8 @@ describe("insertTable", () => {
                 <text />
               </paragraph>
             </td>
-            <td>
-              <paragraph>
-                <text />
-              </paragraph>
-            </td>
-            <td>
-              <paragraph>
-                <text />
-              </paragraph>
-            </td>
           </tr>
           <tr>
-            <td>
-              <paragraph>
-                <text />
-              </paragraph>
-            </td>
-            <td>
-              <paragraph>
-                <text />
-              </paragraph>
-            </td>
-            <td>
-              <paragraph>
-                <text />
-              </paragraph>
-            </td>
-            <td>
-              <paragraph>
-                <text />
-              </paragraph>
-            </td>
-          </tr>
-          <tr>
-            <td>
-              <paragraph>
-                <text />
-              </paragraph>
-            </td>
-            <td>
-              <paragraph>
-                <text />
-              </paragraph>
-            </td>
-            <td>
-              <paragraph>
-                <text />
-              </paragraph>
-            </td>
-            <td>
-              <paragraph>
-                <text />
-              </paragraph>
-            </td>
-          </tr>
-          <tr>
-            <td>
-              <paragraph>
-                <text />
-              </paragraph>
-            </td>
-            <td>
-              <paragraph>
-                <text />
-              </paragraph>
-            </td>
             <td>
               <paragraph>
                 <text />

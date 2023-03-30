@@ -23,7 +23,7 @@ export const TableEditor = {
    * Insert a table at the specified location with the specified number of rows. If no location
    * is specified it will be inserted at the current selection.
    * @param options The options for the table insertion. The `rows` and `cols` specify the number
-   * of rows and columns in the table, if not provided, they default to 4. The `at` property can be
+   * of rows and columns in the table, if not provided, they default to 2. The `at` property can be
    * used to optionally specifiy the location at which to insert the table.
    * @returns void
    */

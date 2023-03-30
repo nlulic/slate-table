@@ -27,7 +27,7 @@ export interface InsertTableOptions {
 }
 
 export const DEFAULT_INSERT_TABLE_OPTIONS = {
-  rows: 4,
-  cols: 4,
+  rows: 2,
+  cols: 2,
   at: undefined,
 } as const satisfies InsertTableOptions;
