@@ -6,8 +6,20 @@ export const jsx = createHyperscript({
     table: {
       type: "table",
     },
+    thead: {
+      type: "table-head",
+    },
+    tbody: {
+      type: "table-body",
+    },
+    tfoot: {
+      type: "table-footer",
+    },
     tr: {
       type: "table-row",
+    },
+    th: {
+      type: "header-cell",
     },
     td: {
       type: "table-cell",

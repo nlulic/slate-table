@@ -35,7 +35,7 @@ export const TableEditor = {
     }
 
     const {
-      blocks: { cell, content, row, table },
+      blocks: { content, table, tbody, td, tr },
     } = editorOptions;
 
     const { rows, cols, at } = { ...DEFAULT_INSERT_TABLE_OPTIONS, ...options };
@@ -51,18 +51,25 @@ export const TableEditor = {
       editor,
       {
         type: table,
-        children: Array.from({ length: sanitize(rows) }).map<Node>(() => ({
-          type: row,
-          children: Array.from({ length: sanitize(cols) }).map<Node>(() => ({
-            type: cell,
-            children: [
-              {
-                type: content,
-                children: [{ text: "" }],
-              },
-            ],
-          })),
-        })),
+        children: [
+          {
+            type: tbody,
+            children: Array.from({ length: sanitize(rows) }).map<Node>(() => ({
+              type: tr,
+              children: Array.from({ length: sanitize(cols) }).map<Node>(
+                () => ({
+                  type: td,
+                  children: [
+                    {
+                      type: content,
+                      children: [{ text: "" }],
+                    },
+                  ],
+                })
+              ),
+            })),
+          } as Node,
+        ],
       } as Node,
       { at }
     );

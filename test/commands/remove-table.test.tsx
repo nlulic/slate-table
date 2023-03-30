@@ -1,10 +1,11 @@
 /** @jsxRuntime classic */
 /** @jsx jsx */
 
+import assert from "assert";
+import { DEFAULT_WITH_TABLE_OPTIONS } from "../../src/options";
+import { TableEditor } from "../../src/table-editor";
 import { jsx, withTest } from "../index";
 import { withTable } from "../../src/with-table";
-import { TableEditor } from "../../src/table-editor";
-import assert from "assert";
 
 describe("removeTable", () => {
   it("should remove the table in the current selection", () => {
@@ -12,11 +13,13 @@ describe("removeTable", () => {
       <editor>
         <paragraph />
         <table>
-          <tr>
-            <td>
-              <cursor />
-            </td>
-          </tr>
+          <tbody>
+            <tr>
+              <td>
+                <cursor />
+              </td>
+            </tr>
+          </tbody>
         </table>
       </editor>
     );
@@ -27,16 +30,7 @@ describe("removeTable", () => {
       </editor>
     );
 
-    const editor = withTest(
-      withTable(actual, {
-        blocks: {
-          table: "table",
-          row: "table-row",
-          cell: "table-cell",
-          content: "paragraph",
-        },
-      })
-    );
+    const editor = withTest(withTable(actual, DEFAULT_WITH_TABLE_OPTIONS));
 
     TableEditor.removeTable(editor);
 
@@ -51,11 +45,13 @@ describe("removeTable", () => {
           <cursor />
         </paragraph>
         <table>
-          <tr>
-            <td>
-              <cursor />
-            </td>
-          </tr>
+          <tbody>
+            <tr>
+              <td>
+                <cursor />
+              </td>
+            </tr>
+          </tbody>
         </table>
       </editor>
     );
@@ -68,16 +64,7 @@ describe("removeTable", () => {
       </editor>
     );
 
-    const editor = withTest(
-      withTable(actual, {
-        blocks: {
-          table: "table",
-          row: "table-row",
-          cell: "table-cell",
-          content: "paragraph",
-        },
-      })
-    );
+    const editor = withTest(withTable(actual, DEFAULT_WITH_TABLE_OPTIONS));
 
     TableEditor.removeTable(editor, { at: [1] });
 
@@ -92,11 +79,13 @@ describe("removeTable", () => {
           <anchor />
         </paragraph>
         <table>
-          <tr>
-            <td>
-              <focus />
-            </td>
-          </tr>
+          <tbody>
+            <tr>
+              <td>
+                <focus />
+              </td>
+            </tr>
+          </tbody>
         </table>
       </editor>
     );
@@ -109,16 +98,7 @@ describe("removeTable", () => {
       </editor>
     );
 
-    const editor = withTest(
-      withTable(actual, {
-        blocks: {
-          table: "table",
-          row: "table-row",
-          cell: "table-cell",
-          content: "paragraph",
-        },
-      })
-    );
+    const editor = withTest(withTable(actual, DEFAULT_WITH_TABLE_OPTIONS));
 
     TableEditor.removeTable(editor);
 
@@ -131,11 +111,13 @@ describe("removeTable", () => {
       <editor>
         <paragraph />
         <table>
-          <tr>
-            <td>
-              <text />
-            </td>
-          </tr>
+          <tbody>
+            <tr>
+              <td>
+                <text />
+              </td>
+            </tr>
+          </tbody>
         </table>
       </editor>
     );
@@ -144,25 +126,18 @@ describe("removeTable", () => {
       <editor>
         <paragraph />
         <table>
-          <tr>
-            <td>
-              <text />
-            </td>
-          </tr>
+          <tbody>
+            <tr>
+              <td>
+                <text />
+              </td>
+            </tr>
+          </tbody>
         </table>
       </editor>
     );
 
-    const editor = withTest(
-      withTable(actual, {
-        blocks: {
-          table: "table",
-          row: "table-row",
-          cell: "table-cell",
-          content: "paragraph",
-        },
-      })
-    );
+    const editor = withTest(withTable(actual, DEFAULT_WITH_TABLE_OPTIONS));
 
     TableEditor.removeTable(editor);
 

@@ -4,19 +4,27 @@ export type ElementType = ExtendedType<"Element", CustomTypes>["type"];
 
 export interface WithTableOptions {
   blocks: {
-    cell: ElementType;
+    td: ElementType;
+    th: ElementType;
     content: ElementType;
-    row: ElementType;
+    tr: ElementType;
     table: ElementType;
+    tbody: ElementType;
+    tfoot: ElementType;
+    thead: ElementType;
   };
 }
 
 export const DEFAULT_WITH_TABLE_OPTIONS = {
   blocks: {
-    cell: "table-cell",
+    td: "table-cell",
+    th: "header-cell",
     content: "paragraph",
-    row: "table-row",
+    tr: "table-row",
     table: "table",
+    tbody: "table-body",
+    tfoot: "table-footer",
+    thead: "table-head",
   },
 } as const satisfies WithTableOptions;
 
