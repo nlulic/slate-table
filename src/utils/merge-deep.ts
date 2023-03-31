@@ -1,5 +1,5 @@
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-const mergeDeep = <T extends Record<string, any>>(a: T, b: T): T => {
+const mergeDeep = <T extends Record<string, any>>(a: T, b: Partial<T>): T => {
   for (const key in b) {
     if (Object.prototype.hasOwnProperty.call(b, key)) {
       const value = b[key];
@@ -8,7 +8,7 @@ const mergeDeep = <T extends Record<string, any>>(a: T, b: T): T => {
         continue;
       }
 
-      a[key] = value;
+      a[key] = value as T[Extract<keyof T, string>];
     }
   }
   return a;

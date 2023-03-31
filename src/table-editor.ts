@@ -4,13 +4,18 @@ import {
   WithTableOptions,
 } from "./options";
 import { EDITOR_TO_WITH_TABLE_OPTIONS } from "./weak-maps";
-import { Editor, Element, Location, Node, NodeMatch, Transforms } from "slate";
+import {
+  Editor,
+  Element,
+  Location,
+  Node,
+  NodeMatch,
+  Path,
+  Transforms,
+} from "slate";
 
 export const TableEditor = {
-  /**
-   * Checks if the current selection is inside a table.
-   * @returns `true` if the selection is inside a table, `false` otherwise.
-   */
+  /** @returns `true` if the selection is inside a table, `false` otherwise. */
   isInTable(editor: Editor, options: { at?: Location } = {}): boolean {
     const [table] = Editor.nodes(editor, {
       match: isOfType(editor, "table"),
@@ -20,11 +25,13 @@ export const TableEditor = {
     return !!table;
   },
   /**
-   * Insert a table at the specified location with the specified number of rows. If no location
-   * is specified it will be inserted at the current selection.
-   * @param options The options for the table insertion. The `rows` and `cols` specify the number
-   * of rows and columns in the table, if not provided, they default to 2. The `at` property can be
-   * used to optionally specifiy the location at which to insert the table.
+   * Inserts a table at the specified location with the specified number of
+   * rows. If no location is specified it will be inserted at the current
+   * selection.
+   * @param options The `rows` and `cols` specify the number of rows and
+   * columns in the table, if not provided, they default to 2. The `at`
+   * property can be used to optionally specifiy the location at which
+   * to insert the table.
    * @returns void
    */
   insertTable(editor: Editor, options: Partial<InsertTableOptions> = {}): void {
@@ -94,19 +101,80 @@ export const TableEditor = {
     Transforms.removeNodes(editor, { at: path });
     Transforms.collapse(editor);
   },
+  /**
+   * Inserts a new row at the specified location. If no location
+   * is specified it will insert the row at the current selection.
+   * @param options The `at` specifies the location of the base row
+   * on which the new row will be inserted. Depending on the `above`
+   * property the row will be inserted above or below the base row.
+   * @returns void
+   */
+  insertRow(
+    editor: Editor,
+    options: { at?: Location; above?: boolean } = {}
+  ): void {
+    const editorOptions = EDITOR_TO_WITH_TABLE_OPTIONS.get(editor);
+
+    if (!editorOptions) {
+      return;
+    }
+
+    if (!this.isInTable(editor)) {
+      return;
+    }
+
+    const [current] = Editor.nodes(editor, {
+      match: isOfType(editor, "tr"),
+      at: options.at,
+    });
+
+    if (!current) {
+      return;
+    }
+
+    const [row, path] = current;
+    const {
+      blocks: { content, td, th, thead, tr },
+    } = editorOptions;
+
+    const parent = Node.parent(editor, path); // expected thead, tbody, or tfoot
+    if (!isElement(parent)) {
+      return;
+    }
+
+    Transforms.insertNodes(
+      editor,
+      {
+        type: tr,
+        children: Array.from({ length: row.children.length }).map(() => ({
+          type: parent.type === thead ? th : td,
+          children: [
+            {
+              type: content,
+              children: [{ text: "" }],
+            },
+          ],
+        })),
+      } as Node,
+      {
+        at: options.above ? path : Path.next(path),
+      }
+    );
+  },
 };
+
+type WithType<T> = T & Record<"type", unknown>;
 
 /** @returns a `NodeMatch` function which is used to match the element of a specific `type`. */
 const isOfType = (
   editor: Editor,
   type: keyof WithTableOptions["blocks"]
-): NodeMatch<Node> | undefined => {
+): NodeMatch<WithType<Element>> | undefined => {
   const options = EDITOR_TO_WITH_TABLE_OPTIONS.get(editor);
   const elementType = options?.blocks?.[type];
 
-  return (node: Node) =>
-    !Editor.isEditor(node) &&
-    Element.isElement(node) &&
-    "type" in node &&
-    node.type === elementType;
+  return (node: Node): boolean => isElement(node) && node.type === elementType;
 };
+
+const isElement = (node: Node): node is WithType<Element> =>
+  !Editor.isEditor(node) && Element.isElement(node) && "type" in node;

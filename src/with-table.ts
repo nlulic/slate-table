@@ -5,7 +5,7 @@ import { type Editor } from "slate";
 
 export const withTable = <T extends Editor>(
   editor: T,
-  options: WithTableOptions
+  options: Partial<WithTableOptions>
 ): T => {
   EDITOR_TO_WITH_TABLE_OPTIONS.set(
     editor,
