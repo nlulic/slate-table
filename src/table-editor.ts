@@ -52,7 +52,7 @@ export const TableEditor = {
     }
 
     // number of rows and cols can't be less than 1
-    const sanitize = (n: number) => (n < 1 ? 1 : n);
+    const clamp = (n: number) => (n < 1 ? 1 : n);
 
     Transforms.insertNodes(
       editor,
@@ -61,19 +61,17 @@ export const TableEditor = {
         children: [
           {
             type: tbody,
-            children: Array.from({ length: sanitize(rows) }).map<Node>(() => ({
+            children: Array.from({ length: clamp(rows) }).map<Node>(() => ({
               type: tr,
-              children: Array.from({ length: sanitize(cols) }).map<Node>(
-                () => ({
-                  type: td,
-                  children: [
-                    {
-                      type: content,
-                      children: [{ text: "" }],
-                    },
-                  ],
-                })
-              ),
+              children: Array.from({ length: clamp(cols) }).map<Node>(() => ({
+                type: td,
+                children: [
+                  {
+                    type: content,
+                    children: [{ text: "" }],
+                  },
+                ],
+              })),
             })),
           } as Node,
         ],
@@ -99,7 +97,6 @@ export const TableEditor = {
     const [, path] = table;
 
     Transforms.removeNodes(editor, { at: path });
-    Transforms.collapse(editor);
   },
   /**
    * Inserts a new row at the specified location. If no location
@@ -119,6 +116,10 @@ export const TableEditor = {
       return;
     }
 
+    const {
+      blocks: { content, td, th, thead, tr },
+    } = editorOptions;
+
     if (!this.isInTable(editor)) {
       return;
     }
@@ -133,10 +134,6 @@ export const TableEditor = {
     }
 
     const [row, path] = current;
-    const {
-      blocks: { content, td, th, thead, tr },
-    } = editorOptions;
-
     const parent = Node.parent(editor, path); // expected thead, tbody, or tfoot
     if (!isElement(parent)) {
       return;
@@ -161,20 +158,68 @@ export const TableEditor = {
       }
     );
   },
+  /**
+   * Removes the row at the specified location. If no location is specified
+   * it will remove the row at the current selection.
+   * @returns void
+   */
+  removeRow(editor: Editor, options: { at?: Location } = {}): void {
+    const [table] = Editor.nodes(editor, {
+      match: isOfType(editor, "table"),
+      at: options.at,
+    });
+
+    if (!table) {
+      return;
+    }
+
+    const [, tablePath] = table;
+    const [...tableSections] = Editor.nodes(editor, {
+      match: isOfType(editor, "thead", "tbody", "tfoot"),
+      at: tablePath,
+    });
+
+    const [rowEntry] = Editor.nodes(editor, {
+      match: isOfType(editor, "tr"),
+      at: options.at,
+    });
+
+    if (!rowEntry) {
+      return;
+    }
+
+    const [, targetPath] = rowEntry;
+    const parent = Node.parent(editor, targetPath); // thead, tbody or tfoot
+
+    const isLastRow = parent.children.length === 1,
+      isLastTableSection = tableSections.length === 1;
+
+    if (isLastRow && isLastTableSection) {
+      Transforms.removeNodes(editor, {
+        at: tablePath,
+      });
+      return;
+    }
+
+    Transforms.removeNodes(editor, {
+      at: isLastRow ? Path.parent(targetPath) : targetPath,
+    });
+  },
 };
 
 type WithType<T> = T & Record<"type", unknown>;
 
-/** @returns a `NodeMatch` function which is used to match the element of a specific `type`. */
-const isOfType = (
+/** @returns a `NodeMatch` function which is used to match the elements of a specific `type`. */
+export const isOfType = (
   editor: Editor,
-  type: keyof WithTableOptions["blocks"]
+  ...types: Array<keyof WithTableOptions["blocks"]>
 ): NodeMatch<WithType<Element>> | undefined => {
-  const options = EDITOR_TO_WITH_TABLE_OPTIONS.get(editor);
-  const elementType = options?.blocks?.[type];
+  const options = EDITOR_TO_WITH_TABLE_OPTIONS.get(editor),
+    elementTypes = types.map((type) => options?.blocks?.[type]);
 
-  return (node: Node): boolean => isElement(node) && node.type === elementType;
+  return (node: Node): boolean =>
+    isElement(node) && elementTypes.includes(node.type);
 };
 
-const isElement = (node: Node): node is WithType<Element> =>
+export const isElement = (node: Node): node is WithType<Element> =>
   !Editor.isEditor(node) && Element.isElement(node) && "type" in node;

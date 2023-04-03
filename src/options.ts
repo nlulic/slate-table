@@ -31,11 +31,10 @@ export const DEFAULT_WITH_TABLE_OPTIONS = {
 export interface InsertTableOptions {
   rows: number;
   cols: number;
-  at: Location | undefined;
+  at?: Location;
 }
 
 export const DEFAULT_INSERT_TABLE_OPTIONS = {
   rows: 2,
   cols: 2,
-  at: undefined,
 } as const satisfies InsertTableOptions;

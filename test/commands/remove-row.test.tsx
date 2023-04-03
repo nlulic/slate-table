@@ -7,8 +7,8 @@ import { TableEditor } from "../../src/table-editor";
 import { jsx, withTest } from "../index";
 import { withTable } from "../../src/with-table";
 
-describe("insertRow", () => {
-  it("should insert a row above the current selection", () => {
+describe("removeRow", () => {
+  it("should remove the row in the current selection", () => {
     const actual = (
       <editor>
         <table>
@@ -24,30 +24,6 @@ describe("insertRow", () => {
               <td>
                 <paragraph>
                   <text />
-                  <cursor />
-                </paragraph>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </editor>
-    );
-
-    const expected = (
-      <editor>
-        <table>
-          <thead>
-            <tr>
-              <th>
-                <paragraph />
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>
-                <paragraph>
-                  <text />
                 </paragraph>
               </td>
             </tr>
@@ -63,40 +39,6 @@ describe("insertRow", () => {
         </table>
       </editor>
     );
-
-    const editor = withTest(withTable(actual, DEFAULT_WITH_TABLE_OPTIONS));
-
-    TableEditor.insertRow(editor, { above: true });
-
-    assert.deepEqual(editor.children, expected.children);
-    assert.deepEqual(editor.selection, expected.selection);
-  });
-
-  it("should insert a row below the current selection", () => {
-    const actual = (
-      <editor>
-        <table>
-          <thead>
-            <tr>
-              <th>
-                <paragraph />
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>
-                <paragraph>
-                  <text />
-                  <cursor />
-                </paragraph>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </editor>
-    );
-
     const expected = (
       <editor>
         <table>
@@ -116,13 +58,6 @@ describe("insertRow", () => {
                 </paragraph>
               </td>
             </tr>
-            <tr>
-              <td>
-                <paragraph>
-                  <text />
-                </paragraph>
-              </td>
-            </tr>
           </tbody>
         </table>
       </editor>
@@ -130,13 +65,13 @@ describe("insertRow", () => {
 
     const editor = withTest(withTable(actual, DEFAULT_WITH_TABLE_OPTIONS));
 
-    TableEditor.insertRow(editor);
+    TableEditor.removeRow(editor);
 
     assert.deepEqual(editor.children, expected.children);
     assert.deepEqual(editor.selection, expected.selection);
   });
 
-  it("should insert a row at a specified location", () => {
+  it("should remove the row at a specified location", () => {
     const actual = (
       <editor>
         <table>
@@ -163,7 +98,13 @@ describe("insertRow", () => {
                 </paragraph>
               </td>
             </tr>
-            {/* should be added here  */}
+            <tr>
+              <td>
+                <paragraph>
+                  <text />
+                </paragraph>
+              </td>
+            </tr>
           </tbody>
         </table>
       </editor>
@@ -195,13 +136,6 @@ describe("insertRow", () => {
                 </paragraph>
               </td>
             </tr>
-            <tr>
-              <td>
-                <paragraph>
-                  <text />
-                </paragraph>
-              </td>
-            </tr>
           </tbody>
         </table>
       </editor>
@@ -209,13 +143,13 @@ describe("insertRow", () => {
 
     const editor = withTest(withTable(actual, DEFAULT_WITH_TABLE_OPTIONS));
 
-    TableEditor.insertRow(editor, { at: [0, 1, 1] });
+    TableEditor.removeRow(editor, { at: [0, 1, 1] });
 
     assert.deepEqual(editor.children, expected.children);
     assert.deepEqual(editor.selection, expected.selection);
   });
 
-  it("should insert a row with header-cells when inside thead", () => {
+  it("should remove thead if the last row is removed", () => {
     const actual = (
       <editor>
         <table>
@@ -243,23 +177,6 @@ describe("insertRow", () => {
     const expected = (
       <editor>
         <table>
-          <thead>
-            <tr>
-              <th>
-                <paragraph>
-                  <text />
-                  <cursor />
-                </paragraph>
-              </th>
-            </tr>
-            <tr>
-              <th>
-                <paragraph>
-                  <text />
-                </paragraph>
-              </th>
-            </tr>
-          </thead>
           <tbody>
             <tr>
               <td>
@@ -273,16 +190,23 @@ describe("insertRow", () => {
 
     const editor = withTest(withTable(actual, DEFAULT_WITH_TABLE_OPTIONS));
 
-    TableEditor.insertRow(editor);
+    TableEditor.removeRow(editor);
 
     assert.deepEqual(editor.children, expected.children);
     assert.deepEqual(editor.selection, expected.selection);
   });
 
-  it("should insert a row with td when inside tfoot", () => {
+  it("should remove tfoot if the last row is removed", () => {
     const actual = (
       <editor>
         <table>
+          <thead>
+            <tr>
+              <th>
+                <paragraph />
+              </th>
+            </tr>
+          </thead>
           <tbody>
             <tr>
               <td>
@@ -294,8 +218,8 @@ describe("insertRow", () => {
             <tr>
               <td>
                 <paragraph>
-                  <text />
                   <cursor />
+                  <text />
                 </paragraph>
               </td>
             </tr>
@@ -307,6 +231,13 @@ describe("insertRow", () => {
     const expected = (
       <editor>
         <table>
+          <thead>
+            <tr>
+              <th>
+                <paragraph />
+              </th>
+            </tr>
+          </thead>
           <tbody>
             <tr>
               <td>
@@ -314,20 +245,64 @@ describe("insertRow", () => {
               </td>
             </tr>
           </tbody>
-          <tfoot>
+        </table>
+      </editor>
+    );
+
+    const editor = withTest(withTable(actual, DEFAULT_WITH_TABLE_OPTIONS));
+
+    TableEditor.removeRow(editor);
+
+    assert.deepEqual(editor.children, expected.children);
+    assert.deepEqual(editor.selection, expected.selection);
+  });
+
+  it("should remove tbody if the last row is removed", () => {
+    const actual = (
+      <editor>
+        <table>
+          <thead>
+            <tr>
+              <th>
+                <paragraph />
+              </th>
+            </tr>
+          </thead>
+          <tbody>
             <tr>
               <td>
                 <paragraph>
-                  <text />
                   <cursor />
+                  <text />
                 </paragraph>
               </td>
             </tr>
+          </tbody>
+          <tfoot>
             <tr>
               <td>
-                <paragraph>
-                  <text />
-                </paragraph>
+                <paragraph />
+              </td>
+            </tr>
+          </tfoot>
+        </table>
+      </editor>
+    );
+
+    const expected = (
+      <editor>
+        <table>
+          <thead>
+            <tr>
+              <th>
+                <paragraph />
+              </th>
+            </tr>
+          </thead>
+          <tfoot>
+            <tr>
+              <td>
+                <paragraph />
               </td>
             </tr>
           </tfoot>
@@ -337,7 +312,45 @@ describe("insertRow", () => {
 
     const editor = withTest(withTable(actual, DEFAULT_WITH_TABLE_OPTIONS));
 
-    TableEditor.insertRow(editor);
+    TableEditor.removeRow(editor);
+
+    assert.deepEqual(editor.children, expected.children);
+    assert.deepEqual(editor.selection, expected.selection);
+  });
+
+  it("should remove table if the last row of the last parent (tbody, thead, tfoot) is deleted", () => {
+    const actual = (
+      <editor>
+        <paragraph>
+          <text />
+        </paragraph>
+        <table>
+          <tbody>
+            <tr>
+              <td>
+                <paragraph>
+                  <cursor />
+                  <text />
+                </paragraph>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </editor>
+    );
+
+    const expected = (
+      <editor>
+        <paragraph>
+          <text />
+          <cursor />
+        </paragraph>
+      </editor>
+    );
+
+    const editor = withTest(withTable(actual, DEFAULT_WITH_TABLE_OPTIONS));
+
+    TableEditor.removeRow(editor);
 
     assert.deepEqual(editor.children, expected.children);
     assert.deepEqual(editor.selection, expected.selection);
