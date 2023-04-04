@@ -164,45 +164,38 @@ export const TableEditor = {
    * @returns void
    */
   removeRow(editor: Editor, options: { at?: Location } = {}): void {
-    const [table] = Editor.nodes(editor, {
-      match: isOfType(editor, "table"),
+    const [table, tr] = Editor.nodes(editor, {
+      match: isOfType(editor, "table", "tr"),
       at: options.at,
     });
 
-    if (!table) {
+    if (!table || !tr) {
       return;
     }
 
     const [, tablePath] = table;
-    const [...tableSections] = Editor.nodes(editor, {
-      match: isOfType(editor, "thead", "tbody", "tfoot"),
+    const [, trPath] = tr;
+
+    // check if there is a sibling in the table
+    const [, globalSibling] = Editor.nodes(editor, {
+      match: isOfType(editor, "tr"),
       at: tablePath,
     });
 
-    const [rowEntry] = Editor.nodes(editor, {
+    // check if there is a sibling in the table section
+    const [, sibling] = Editor.nodes(editor, {
       match: isOfType(editor, "tr"),
-      at: options.at,
+      at: Path.parent(trPath),
     });
 
-    if (!rowEntry) {
-      return;
-    }
-
-    const [, targetPath] = rowEntry;
-    const parent = Node.parent(editor, targetPath); // thead, tbody or tfoot
-
-    const isLastRow = parent.children.length === 1,
-      isLastTableSection = tableSections.length === 1;
-
-    if (isLastRow && isLastTableSection) {
-      Transforms.removeNodes(editor, {
+    if (!globalSibling) {
+      return Transforms.removeNodes(editor, {
         at: tablePath,
       });
-      return;
     }
 
     Transforms.removeNodes(editor, {
-      at: isLastRow ? Path.parent(targetPath) : targetPath,
+      at: sibling ? trPath : Path.parent(trPath), // removes table section if there is no sibling in it
     });
   },
 };
