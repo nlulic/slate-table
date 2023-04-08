@@ -1,18 +1,7 @@
-import {
-  DEFAULT_INSERT_TABLE_OPTIONS,
-  InsertTableOptions,
-  WithTableOptions,
-} from "./options";
+import { DEFAULT_INSERT_TABLE_OPTIONS, InsertTableOptions } from "./options";
+import { isElement, isOfType } from "./utils";
 import { EDITOR_TO_WITH_TABLE_OPTIONS } from "./weak-maps";
-import {
-  Editor,
-  Element,
-  Location,
-  Node,
-  NodeMatch,
-  Path,
-  Transforms,
-} from "slate";
+import { Editor, Location, Node, Path, Transforms } from "slate";
 
 export const TableEditor = {
   /** @returns `true` if the selection is inside a table, `false` otherwise. */
@@ -199,20 +188,3 @@ export const TableEditor = {
     });
   },
 };
-
-type WithType<T> = T & Record<"type", unknown>;
-
-/** @returns a `NodeMatch` function which is used to match the elements of a specific `type`. */
-export const isOfType = (
-  editor: Editor,
-  ...types: Array<keyof WithTableOptions["blocks"]>
-): NodeMatch<WithType<Element>> | undefined => {
-  const options = EDITOR_TO_WITH_TABLE_OPTIONS.get(editor),
-    elementTypes = types.map((type) => options?.blocks?.[type]);
-
-  return (node: Node): boolean =>
-    isElement(node) && elementTypes.includes(node.type);
-};
-
-export const isElement = (node: Node): node is WithType<Element> =>
-  !Editor.isEditor(node) && Element.isElement(node) && "type" in node;
