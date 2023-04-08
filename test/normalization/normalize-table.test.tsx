@@ -182,4 +182,36 @@ describe("normalize table element", () => {
 
     assert.deepEqual(editor.children, expected.children);
   });
+
+  it("should not insert the element into a `tbody` which is not a child of the `table`", () => {
+    const actual = (
+      <editor>
+        <table>
+          <paragraph>
+            <tbody>
+              <text />
+            </tbody>
+          </paragraph>
+        </table>
+      </editor>
+    );
+
+    const expected = (
+      <editor>
+        <table>
+          <tbody>
+            <paragraph>
+              <text />
+            </paragraph>
+          </tbody>
+        </table>
+      </editor>
+    );
+
+    const editor = withTest(withTable(actual, DEFAULT_WITH_TABLE_OPTIONS));
+
+    Editor.normalize(editor, { force: true });
+
+    assert.deepEqual(editor.children, expected.children);
+  });
 });
