@@ -136,7 +136,9 @@ describe("normalize table element", () => {
         <table>
           <tbody>
             <tr>
-              <text />
+              <td>
+                <text />
+              </td>
             </tr>
             <paragraph>
               <text />
