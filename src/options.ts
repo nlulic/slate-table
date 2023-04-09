@@ -1,6 +1,6 @@
 import { CustomTypes, ExtendedType, Location } from "slate";
 
-export type ElementType = ExtendedType<"Element", CustomTypes>["type"];
+type ElementType = ExtendedType<"Element", CustomTypes>["type"];
 
 export interface WithTableOptions {
   blocks: {

@@ -14,7 +14,7 @@ export const withNormalization = <T extends Editor>(
   editor = normalizeTable(editor, blocks);
   editor = normalizeSections(editor);
   editor = normalizeTr(editor);
-  editor = normalizeTd(editor);
+  editor = normalizeTd(editor, blocks);
   editor = normalizeContent(editor, blocks);
 
   return editor;

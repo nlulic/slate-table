@@ -12,18 +12,12 @@ const normalizeContent = <T extends Editor>(
 ): T => {
   const { normalizeNode } = editor;
 
-  const FORBIDDEN_CHILDREN = new Set([
-    blocks.table,
-    blocks.thead,
-    blocks.tbody,
-    blocks.tfoot,
-    blocks.td,
-    blocks.th,
-    blocks.tr,
-  ]);
+  const { content, table, tbody, td, tfoot, th, thead, tr } = blocks;
+
+  const FORBIDDEN_CHILDREN = new Set([table, tbody, td, tfoot, th, thead, tr]);
 
   editor.normalizeNode = ([node, path]) => {
-    if (isElement(node) && node.type === blocks.content) {
+    if (isElement(node) && node.type === content) {
       for (const [child, childPath] of Node.children(editor, path)) {
         if (isElement(child) && FORBIDDEN_CHILDREN.has(child.type)) {
           Transforms.unwrapNodes(editor, { at: childPath });
