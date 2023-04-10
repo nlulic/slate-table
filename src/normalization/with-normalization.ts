@@ -8,8 +8,12 @@ import { WithTableOptions } from "../options";
 
 export const withNormalization = <T extends Editor>(
   editor: T,
-  blocks: WithTableOptions["blocks"]
+  { blocks, withNormalization }: WithTableOptions
 ): T => {
+  if (!withNormalization) {
+    return editor;
+  }
+
   editor = normalizeTable(editor, blocks);
   editor = normalizeSections(editor, blocks);
   editor = normalizeTr(editor, blocks);

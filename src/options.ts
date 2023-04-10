@@ -13,6 +13,7 @@ export interface WithTableOptions {
     tfoot: ElementType;
     thead: ElementType;
   };
+  withNormalization: boolean;
 }
 
 export const DEFAULT_WITH_TABLE_OPTIONS = {
@@ -26,6 +27,7 @@ export const DEFAULT_WITH_TABLE_OPTIONS = {
     tfoot: "table-footer",
     thead: "table-head",
   },
+  withNormalization: true,
 } as const satisfies WithTableOptions;
 
 export interface InsertTableOptions {
