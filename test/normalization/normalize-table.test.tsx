@@ -24,9 +24,19 @@ describe("normalize table element", () => {
       <editor>
         <table>
           <tbody>
-            <paragraph>
-              <text />
-            </paragraph>
+            <tr>
+              <td>
+                {/** TODO: */}
+                <text />
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <paragraph>
+                  <text />
+                </paragraph>
+              </td>
+            </tr>
           </tbody>
         </table>
       </editor>
@@ -57,9 +67,23 @@ describe("normalize table element", () => {
       <editor>
         <table>
           <tbody>
-            <paragraph>
-              <text />
-            </paragraph>
+            <tr>
+              <td>
+                {/* TODO */}
+                <paragraph>
+                  <text />
+                  <inline>1</inline>
+                  <text />
+                </paragraph>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <paragraph>
+                  <text />
+                </paragraph>
+              </td>
+            </tr>
           </tbody>
         </table>
       </editor>
@@ -94,15 +118,33 @@ describe("normalize table element", () => {
       <editor>
         <table>
           <tbody>
-            <paragraph>
-              <text>1</text>
-            </paragraph>
-            <paragraph>
-              <text>2</text>
-            </paragraph>
-            <paragraph>
-              <text>3</text>
-            </paragraph>
+            <tr>
+              <td>
+                {/* TODO: missing content node */}
+                <text />
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <paragraph>
+                  <text>1</text>
+                </paragraph>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <paragraph>
+                  <text>2</text>
+                </paragraph>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <paragraph>
+                  <text>3</text>
+                </paragraph>
+              </td>
+            </tr>
           </tbody>
         </table>
       </editor>
@@ -137,12 +179,17 @@ describe("normalize table element", () => {
           <tbody>
             <tr>
               <td>
+                {/* TODO: missing content node */}
                 <text />
               </td>
             </tr>
-            <paragraph>
-              <text />
-            </paragraph>
+            <tr>
+              <td>
+                <paragraph>
+                  <text />
+                </paragraph>
+              </td>
+            </tr>
           </tbody>
         </table>
       </editor>
@@ -170,9 +217,13 @@ describe("normalize table element", () => {
       <editor>
         <table>
           <tbody>
-            <paragraph>
-              <text />
-            </paragraph>
+            <tr>
+              <td>
+                <paragraph>
+                  <text />
+                </paragraph>
+              </td>
+            </tr>
           </tbody>
         </table>
       </editor>
@@ -202,9 +253,13 @@ describe("normalize table element", () => {
       <editor>
         <table>
           <tbody>
-            <paragraph>
-              <text />
-            </paragraph>
+            <tr>
+              <td>
+                <paragraph>
+                  <text />
+                </paragraph>
+              </td>
+            </tr>
           </tbody>
         </table>
       </editor>
