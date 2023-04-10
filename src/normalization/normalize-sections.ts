@@ -12,10 +12,10 @@ const normalizeSections = <T extends Editor>(
 ): T => {
   const { normalizeNode } = editor;
 
-  const sections = new Set([thead, tbody, tfoot]);
+  const SECTIONS = new Set([thead, tbody, tfoot]);
 
   editor.normalizeNode = ([node, path]) => {
-    if (isElement(node) && sections.has(node.type)) {
+    if (isElement(node) && SECTIONS.has(node.type)) {
       for (const [child, childPath] of Node.children(editor, path)) {
         if (!isElement(child) || child.type !== tr) {
           Transforms.wrapNodes(
