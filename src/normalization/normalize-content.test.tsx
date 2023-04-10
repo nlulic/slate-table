@@ -41,8 +41,7 @@ describe("normalize `content` node", () => {
             <tr>
               <td>
                 <paragraph>
-                  <paragraph>1</paragraph>
-                  <paragraph>8</paragraph>
+                  <text>12345678</text>
                 </paragraph>
               </td>
             </tr>

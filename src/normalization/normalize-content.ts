@@ -14,7 +14,16 @@ const normalizeContent = <T extends Editor>(
 
   const { content, table, tbody, td, tfoot, th, thead, tr } = blocks;
 
-  const FORBIDDEN_CHILDREN = new Set([table, tbody, td, tfoot, th, thead, tr]);
+  const FORBIDDEN_CHILDREN = new Set([
+    table,
+    thead,
+    tbody,
+    tfoot,
+    tr,
+    th,
+    td,
+    content,
+  ]);
 
   editor.normalizeNode = ([node, path]) => {
     if (isElement(node) && node.type === content) {

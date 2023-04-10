@@ -10,7 +10,6 @@ export const withNormalization = <T extends Editor>(
   editor: T,
   blocks: WithTableOptions["blocks"]
 ): T => {
-  // normalize elements bottom up
   editor = normalizeTable(editor, blocks);
   editor = normalizeSections(editor, blocks);
   editor = normalizeTr(editor, blocks);
