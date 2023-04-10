@@ -1,4 +1,4 @@
-import { Editor, Element, Node, Transforms, Path } from "slate";
+import { Editor, Element, Node, Transforms, Path, NodeEntry } from "slate";
 import { WithTableOptions } from "../options";
 import { isElement, isOfType } from "../utils";
 
@@ -7,57 +7,46 @@ import { isElement, isOfType } from "../utils";
  */
 const normalizeTable = <T extends Editor>(
   editor: T,
-  blocks: WithTableOptions["blocks"]
+  { table, thead, tbody, tfoot }: WithTableOptions["blocks"]
 ): T => {
-  const ALLOWED_TABLE_CHILDREN = [blocks.thead, blocks.tbody, blocks.tfoot];
+  const ALLOWED_CHILDREN = new Set([thead, tbody, tfoot]);
 
   const { normalizeNode } = editor;
 
   editor.normalizeNode = (entry) => {
     const [node, path] = entry;
 
-    if (isElement(node) && node.type === blocks.table) {
+    if (isElement(node) && node.type === table) {
       for (const [child, childPath] of Node.children(editor, path)) {
-        if (isElement(child) && ALLOWED_TABLE_CHILDREN.includes(child.type)) {
+        if (isElement(child) && ALLOWED_CHILDREN.has(child.type)) {
           continue;
         }
 
-        // todo: only immediate children?
-        const [tbody] = Editor.nodes(editor, {
-          match: isOfType(editor, "tbody"),
-          at: path,
-        });
+        const tbodyEntry = immediateTbody(editor, path);
 
-        if (!tbody) {
-          return Transforms.wrapNodes(
+        if (!tbodyEntry) {
+          Transforms.wrapNodes(
             editor,
             {
-              type: blocks.tbody,
+              type: tbody,
               children: [child],
             } as Element,
-            {
-              at: childPath,
-            }
+            { at: childPath }
           );
+          return;
         }
 
-        const [tbodyElement, tbodyPath] = tbody;
-
-        // remove tbody if it is not an immediate child of table
-        if (!Path.isChild(tbodyPath, path)) {
-          return Transforms.unwrapNodes(editor, {
-            at: tbodyPath,
-          });
-        }
+        const [tbodyElement, tbodyPath] = tbodyEntry;
 
         const elements = tbodyElement.children.filter(
           (n) => isElement(n) && !editor.isInline(n)
         );
 
-        return Transforms.moveNodes(editor, {
+        Transforms.moveNodes(editor, {
           at: childPath,
           to: [...tbodyPath, elements.length],
         });
+        return;
       }
     }
 
@@ -65,6 +54,31 @@ const normalizeTable = <T extends Editor>(
   };
 
   return editor;
+};
+
+/**
+ * @returns {NodeEntry<Element> | undefined} The immediate child `tbody` element of the `table`, or `undefined` if it does not exist.
+ */
+const immediateTbody = (
+  editor: Editor,
+  tablePath: Path
+): NodeEntry<Element> | undefined => {
+  const [tbody] = Editor.nodes(editor, {
+    match: isOfType(editor, "tbody"),
+    at: tablePath,
+  });
+
+  if (!tbody) {
+    return undefined;
+  }
+
+  const [, path] = tbody;
+
+  if (!Path.isChild(path, tablePath)) {
+    return undefined;
+  }
+
+  return tbody;
 };
 
 export default normalizeTable;
