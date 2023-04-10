@@ -12,7 +12,7 @@ export const withNormalization = <T extends Editor>(
 ): T => {
   // normalize elements bottom up
   editor = normalizeTable(editor, blocks);
-  editor = normalizeSections(editor);
+  editor = normalizeSections(editor, blocks);
   editor = normalizeTr(editor, blocks);
   editor = normalizeTd(editor, blocks);
   editor = normalizeContent(editor, blocks);

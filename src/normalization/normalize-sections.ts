@@ -1,11 +1,37 @@
-import { type Editor } from "slate";
+import { Editor, Element, Node, Transforms } from "slate";
+import { WithTableOptions } from "../options";
+import { isElement } from "../utils";
 
-// TODO:
-const normalizeSections = <T extends Editor>(editor: T): T => {
+/**
+ * Normalizes the `thead`, `tbody` and `tfoot` nodes by wrapping each of its
+ * child nodes within a `tr` element.
+ */
+const normalizeSections = <T extends Editor>(
+  editor: T,
+  { thead, tbody, tfoot, tr }: WithTableOptions["blocks"]
+): T => {
   const { normalizeNode } = editor;
 
-  editor.normalizeNode = (entry) => {
-    normalizeNode(entry);
+  const sections = new Set([thead, tbody, tfoot]);
+
+  editor.normalizeNode = ([node, path]) => {
+    if (isElement(node) && sections.has(node.type)) {
+      for (const [child, childPath] of Node.children(editor, path)) {
+        if (!isElement(child) || child.type !== tr) {
+          Transforms.wrapNodes(
+            editor,
+            {
+              type: tr,
+              children: [child],
+            } as Element,
+            { at: childPath }
+          );
+          return;
+        }
+      }
+    }
+
+    normalizeNode([node, path]);
   };
 
   return editor;

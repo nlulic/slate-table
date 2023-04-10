@@ -3,16 +3,14 @@ import { WithTableOptions } from "../options";
 import { isElement, isOfType } from "../utils";
 
 /**
- * Will normalize the `tr` node. It will wrap every node inside
- * a `td` or a `th` if the row is inside the `thead` section.
+ * Normalizes the `tr` node by wrapping each of its child nodes within a td or th
+ * element, depending on whether the row is inside the thead section or not.
  */
 const normalizeTr = <T extends Editor>(
   editor: T,
-  blocks: WithTableOptions["blocks"]
+  { tr, td, th }: WithTableOptions["blocks"]
 ): T => {
   const { normalizeNode } = editor;
-
-  const { tr, td, th } = blocks;
 
   editor.normalizeNode = ([node, path]) => {
     if (isElement(node) && node.type === tr) {
