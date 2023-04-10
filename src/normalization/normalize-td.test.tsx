@@ -17,6 +17,7 @@ describe("normalize `td` and `th` nodes", () => {
               <td>
                 <paragraph>1</paragraph>
                 <inline>2</inline>
+                <text>3</text>
               </td>
             </tr>
           </tbody>
@@ -35,6 +36,9 @@ describe("normalize `td` and `th` nodes", () => {
                   <text />
                   <inline>2</inline>
                   <text />
+                </paragraph>
+                <paragraph>
+                  <text>3</text>
                 </paragraph>
               </td>
             </tr>
