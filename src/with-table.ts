@@ -7,14 +7,14 @@ export const withTable = <T extends Editor>(
   editor: T,
   options: Partial<WithTableOptions>
 ): T => {
-  const defaultedOptions: WithTableOptions = {
+  const optionsWithDefaults: WithTableOptions = {
     ...DEFAULT_WITH_TABLE_OPTIONS,
     ...options,
   };
 
-  EDITOR_TO_WITH_TABLE_OPTIONS.set(editor, defaultedOptions);
+  EDITOR_TO_WITH_TABLE_OPTIONS.set(editor, optionsWithDefaults);
 
-  editor = withNormalization(editor, defaultedOptions);
+  editor = withNormalization(editor, optionsWithDefaults);
 
   return editor;
 };

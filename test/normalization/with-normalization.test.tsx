@@ -7,15 +7,18 @@ import { Editor } from "slate";
 import { jsx, withTest } from "../index";
 import { withTable } from "../../src/with-table";
 
-describe("normalize table element", () => {
-  it("should wrap invalid table children into existing `tbody`", () => {
+describe("withNormalization", () => {
+  it("should normalize table with missing tbody", () => {
     const actual = (
       <editor>
         <table>
-          <paragraph>
-            <text />
-          </paragraph>
-          <tbody></tbody>
+          <tr>
+            <td>
+              <paragraph>
+                <text />
+              </paragraph>
+            </td>
+          </tr>
         </table>
       </editor>
     );
@@ -24,13 +27,6 @@ describe("normalize table element", () => {
       <editor>
         <table>
           <tbody>
-            <tr>
-              <td>
-                <paragraph>
-                  <text />
-                </paragraph>
-              </td>
-            </tr>
             <tr>
               <td>
                 <paragraph>
@@ -50,15 +46,25 @@ describe("normalize table element", () => {
     assert.deepEqual(editor.children, expected.children);
   });
 
-  it("should wrap invalid table children into existing `tbody` and remove existing inline elements", () => {
+  it("should normalize table by moving children into an existing tbody", () => {
     const actual = (
       <editor>
         <table>
-          <paragraph>
-            <text />
-          </paragraph>
+          <tr>
+            <td>
+              <paragraph>
+                <text>2</text>
+              </paragraph>
+            </td>
+          </tr>
           <tbody>
-            <inline>1</inline>
+            <tr>
+              <td>
+                <paragraph>
+                  <text>1</text>
+                </paragraph>
+              </td>
+            </tr>
           </tbody>
         </table>
       </editor>
@@ -70,18 +76,15 @@ describe("normalize table element", () => {
           <tbody>
             <tr>
               <td>
-                {/* TODO */}
                 <paragraph>
-                  <text />
-                  <inline>1</inline>
-                  <text />
+                  <text>1</text>
                 </paragraph>
               </td>
             </tr>
             <tr>
               <td>
                 <paragraph>
-                  <text />
+                  <text>2</text>
                 </paragraph>
               </td>
             </tr>
@@ -97,7 +100,7 @@ describe("normalize table element", () => {
     assert.deepEqual(editor.children, expected.children);
   });
 
-  it("should wrap table children into existing `tbody` in the correct order", () => {
+  it("should normalize table by moving children into an existing tbody in the correct order", () => {
     const actual = (
       <editor>
         <table>
@@ -159,17 +162,25 @@ describe("normalize table element", () => {
     assert.deepEqual(editor.children, expected.children);
   });
 
-  it("should wrap invalid table children into existing `tbody` with multiple children", () => {
+  it("should normalize table with missing row", () => {
     const actual = (
       <editor>
         <table>
-          <paragraph>
-            <text />
-          </paragraph>
-          <tbody>
+          <thead>
             <tr>
-              <text />
+              <th>
+                <paragraph>
+                  <text />
+                </paragraph>
+              </th>
             </tr>
+          </thead>
+          <tbody>
+            <td>
+              <paragraph>
+                <text />
+              </paragraph>
+            </td>
           </tbody>
         </table>
       </editor>
@@ -178,47 +189,15 @@ describe("normalize table element", () => {
     const expected = (
       <editor>
         <table>
-          <tbody>
+          <thead>
             <tr>
-              <td>
+              <th>
                 <paragraph>
                   <text />
                 </paragraph>
-              </td>
+              </th>
             </tr>
-            <tr>
-              <td>
-                <paragraph>
-                  <text />
-                </paragraph>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </editor>
-    );
-
-    const editor = withTest(withTable(actual, DEFAULT_WITH_TABLE_OPTIONS));
-
-    Editor.normalize(editor, { force: true });
-
-    assert.deepEqual(editor.children, expected.children);
-  });
-
-  it("should create `tbody` if it doesn't exist and wrap invalid table children into it", () => {
-    const actual = (
-      <editor>
-        <table>
-          <paragraph>
-            <text />
-          </paragraph>
-        </table>
-      </editor>
-    );
-
-    const expected = (
-      <editor>
-        <table>
+          </thead>
           <tbody>
             <tr>
               <td>
@@ -239,15 +218,87 @@ describe("normalize table element", () => {
     assert.deepEqual(editor.children, expected.children);
   });
 
-  it("should not insert the element into a `tbody` which is not a child of the `table`", () => {
+  it("should normalize table with missing cells", () => {
     const actual = (
       <editor>
         <table>
-          <paragraph>
-            <tbody>
-              <text></text>
-            </tbody>
-          </paragraph>
+          <thead>
+            <tr>
+              <paragraph>
+                <text />
+              </paragraph>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <paragraph>
+                <text />
+              </paragraph>
+            </tr>
+          </tbody>
+          <tfoot>
+            <tr>
+              <paragraph>
+                <text />
+              </paragraph>
+            </tr>
+          </tfoot>
+        </table>
+      </editor>
+    );
+
+    const expected = (
+      <editor>
+        <table>
+          <thead>
+            <tr>
+              <th>
+                <paragraph>
+                  <text />
+                </paragraph>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>
+                <paragraph>
+                  <text />
+                </paragraph>
+              </td>
+            </tr>
+          </tbody>
+          <tfoot>
+            <tr>
+              <td>
+                <paragraph>
+                  <text />
+                </paragraph>
+              </td>
+            </tr>
+          </tfoot>
+        </table>
+      </editor>
+    );
+
+    const editor = withTest(withTable(actual, DEFAULT_WITH_TABLE_OPTIONS));
+
+    Editor.normalize(editor, { force: true });
+
+    assert.deepEqual(editor.children, expected.children);
+  });
+
+  it("should normalize table with missing content wrapper", () => {
+    const actual = (
+      <editor>
+        <table>
+          <tbody>
+            <tr>
+              <td>
+                <text />
+              </td>
+            </tr>
+          </tbody>
         </table>
       </editor>
     );
@@ -259,7 +310,7 @@ describe("normalize table element", () => {
             <tr>
               <td>
                 <paragraph>
-                  <text></text>
+                  <text />
                 </paragraph>
               </td>
             </tr>
