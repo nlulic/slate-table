@@ -2,11 +2,11 @@
 /** @jsx jsx */
 
 import assert from "assert";
-import normalizeTable from "./normalize-table";
-import { DEFAULT_WITH_TABLE_OPTIONS } from "../options";
+import normalizeTable from "../../src/normalization/normalize-table";
+import { DEFAULT_WITH_TABLE_OPTIONS } from "../../src/options";
 import { Editor } from "slate";
-import { jsx, withTest } from "../../test";
-import { EDITOR_TO_WITH_TABLE_OPTIONS } from "../weak-maps";
+import { jsx, withTest } from "..";
+import { EDITOR_TO_WITH_TABLE_OPTIONS } from "../../src/weak-maps";
 
 describe("normalize `table` node", () => {
   it("should wrap invalid nodes into a `tbody` node", () => {

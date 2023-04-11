@@ -2,10 +2,10 @@
 /** @jsx jsx */
 
 import assert from "assert";
-import normalizeSections from "./normalize-sections";
-import { DEFAULT_WITH_TABLE_OPTIONS } from "../options";
+import normalizeSections from "../../src/normalization/normalize-sections";
+import { DEFAULT_WITH_TABLE_OPTIONS } from "../../src/options";
 import { Editor } from "slate";
-import { jsx, withTest } from "../../test";
+import { jsx, withTest } from "..";
 
 describe("normalize `thead`, `tbody` and `tfoot` nodes", () => {
   it("should wrap every node in a `tr` node", () => {

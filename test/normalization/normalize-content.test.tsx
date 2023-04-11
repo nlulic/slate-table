@@ -2,10 +2,10 @@
 /** @jsx jsx */
 
 import assert from "assert";
-import normalizeContent from "./normalize-content";
-import { DEFAULT_WITH_TABLE_OPTIONS } from "../options";
+import normalizeContent from "../../src/normalization/normalize-content";
+import { DEFAULT_WITH_TABLE_OPTIONS } from "../../src/options";
 import { Editor } from "slate";
-import { jsx, withTest } from "../../test";
+import { jsx, withTest } from "..";
 
 describe("normalize `content` node", () => {
   it("should remove other table nodes from content", () => {

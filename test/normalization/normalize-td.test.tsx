@@ -2,10 +2,10 @@
 /** @jsx jsx */
 
 import assert from "assert";
-import normalizeTd from "./normalize-td";
-import { DEFAULT_WITH_TABLE_OPTIONS } from "../options";
+import normalizeTd from "../../src/normalization/normalize-td";
+import { DEFAULT_WITH_TABLE_OPTIONS } from "../../src/options";
 import { Editor } from "slate";
-import { jsx, withTest } from "../../test";
+import { jsx, withTest } from "..";
 
 describe("normalize `td` and `th` nodes", () => {
   it("should wrap every inline node in a `content` node", () => {

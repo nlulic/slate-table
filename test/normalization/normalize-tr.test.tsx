@@ -2,11 +2,11 @@
 /** @jsx jsx */
 
 import assert from "assert";
-import normalizeTr from "./normalize-tr";
-import { DEFAULT_WITH_TABLE_OPTIONS } from "../options";
+import normalizeTr from "../../src/normalization/normalize-tr";
+import { DEFAULT_WITH_TABLE_OPTIONS } from "../../src/options";
 import { Editor } from "slate";
-import { jsx, withTest } from "../../test";
-import { EDITOR_TO_WITH_TABLE_OPTIONS } from "../weak-maps";
+import { jsx, withTest } from "..";
+import { EDITOR_TO_WITH_TABLE_OPTIONS } from "../../src/weak-maps";
 
 describe("normalize `tr` node", () => {
   it("should wrap every inline node in a `content` node", () => {
