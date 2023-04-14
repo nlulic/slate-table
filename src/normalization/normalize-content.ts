@@ -1,6 +1,6 @@
 import { WithTableOptions } from "../options";
 import { isElement } from "../utils";
-import { type Editor, Node, Transforms } from "slate";
+import { Editor, Node, Transforms } from "slate";
 
 /**
  * Will normalize the `content` node. It will remove

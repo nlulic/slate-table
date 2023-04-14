@@ -1,7 +1,7 @@
 import { DEFAULT_INSERT_TABLE_OPTIONS, InsertTableOptions } from "./options";
-import { isElement, isOfType } from "./utils";
+import { WithType, isElement, isOfType } from "./utils";
 import { EDITOR_TO_WITH_TABLE_OPTIONS } from "./weak-maps";
-import { Editor, Location, Node, Path, Transforms } from "slate";
+import { Editor, Element, Location, Node, Path, Transforms } from "slate";
 
 export const TableEditor = {
   /** @returns `true` if the selection is inside a table, `false` otherwise. */
@@ -109,7 +109,7 @@ export const TableEditor = {
       blocks: { content, td, th, thead, tr },
     } = editorOptions;
 
-    if (!this.isInTable(editor)) {
+    if (!this.isInTable(editor, { at: options.at })) {
       return;
     }
 
@@ -185,6 +185,61 @@ export const TableEditor = {
 
     Transforms.removeNodes(editor, {
       at: sibling ? trPath : Path.parent(trPath), // removes table section if there is no sibling in it
+    });
+  },
+  insertColumn(
+    editor: Editor,
+    options: { at?: Location; left?: boolean } = {}
+  ) {
+    const editorOptions = EDITOR_TO_WITH_TABLE_OPTIONS.get(editor);
+
+    if (!editorOptions) {
+      return;
+    }
+
+    const {
+      blocks: { td, th, thead },
+    } = editorOptions;
+
+    const [table, cell] = Editor.nodes(editor, {
+      match: isOfType(editor, "table", "th", "td"),
+      at: options.at,
+    });
+
+    if (!table || !cell) {
+      return;
+    }
+
+    const [, tablePath] = table;
+    const rows = Editor.nodes(editor, {
+      match: isOfType(editor, "tr"),
+      at: tablePath,
+    });
+    const [, targetCellPath] = cell;
+
+    Editor.withoutNormalizing(editor, () => {
+      for (const [, path] of rows) {
+        const { type: parentType } = Node.parent(
+          editor,
+          path
+        ) as WithType<Element>;
+
+        const insertPath: Path = [
+          ...path,
+          targetCellPath[targetCellPath.length - 1],
+        ];
+
+        Transforms.insertNodes(
+          editor,
+          {
+            type: parentType === thead ? th : td,
+            children: [{ text: "" }],
+          } as Node,
+          {
+            at: options.left ? insertPath : Path.next(insertPath),
+          }
+        );
+      }
     });
   },
 };

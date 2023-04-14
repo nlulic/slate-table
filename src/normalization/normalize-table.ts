@@ -1,9 +1,10 @@
-import { Editor, Element, Node, Transforms, Path, NodeEntry } from "slate";
+import { Editor, Element, Node, NodeEntry, Path, Transforms } from "slate";
 import { WithTableOptions } from "../options";
 import { isElement, isOfType } from "../utils";
 
 /**
- * Will normalize the `table` element.
+ * Normalizes the given `table` node by wrapping invalid
+ * nodes into a `tbody`.
  */
 const normalizeTable = <T extends Editor>(
   editor: T,
@@ -50,7 +51,7 @@ const normalizeTable = <T extends Editor>(
       }
     }
 
-    return normalizeNode(entry);
+    normalizeNode(entry);
   };
 
   return editor;
