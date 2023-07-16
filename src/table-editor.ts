@@ -247,10 +247,7 @@ export const TableEditor = {
       }
     });
   },
-  removeColumn(
-    editor: Editor,
-    options: { at?: Location; left?: boolean } = {}
-  ): void {
+  removeColumn(editor: Editor, options: { at?: Location } = {}): void {
     const [table, cell] = Editor.nodes(editor, {
       match: isOfType(editor, "table", "th", "td"),
       at: options.at,

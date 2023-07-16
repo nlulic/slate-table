@@ -321,9 +321,6 @@ describe("removeRow", () => {
   it("should remove table if the last row of the last parent (tbody, thead, tfoot) is deleted", () => {
     const actual = (
       <editor>
-        <paragraph>
-          <text />
-        </paragraph>
         <table>
           <tbody>
             <tr>
@@ -339,14 +336,7 @@ describe("removeRow", () => {
       </editor>
     );
 
-    const expected = (
-      <editor>
-        <paragraph>
-          <text />
-          <cursor />
-        </paragraph>
-      </editor>
-    );
+    const expected = <editor />;
 
     const editor = withTest(withTable(actual, DEFAULT_WITH_TABLE_OPTIONS));
 
