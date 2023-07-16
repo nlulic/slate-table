@@ -247,6 +247,11 @@ export const TableEditor = {
       }
     });
   },
+  /**
+   * Removes the column at the specified location. If no location is specified
+   * it will remove the column at the current selection.
+   * @returns void
+   */
   removeColumn(editor: Editor, options: { at?: Location } = {}): void {
     const [table, cell] = Editor.nodes(editor, {
       match: isOfType(editor, "table", "th", "td"),
