@@ -187,10 +187,15 @@ export const TableEditor = {
       at: sibling ? trPath : Path.parent(trPath), // removes table section if there is no sibling in it
     });
   },
+  /**
+   * Inserts a new column at the specified location. If no location
+   * is specified it will insert the column at the current selection.
+   * @returns void
+   */
   insertColumn(
     editor: Editor,
     options: { at?: Location; left?: boolean } = {}
-  ) {
+  ): void {
     const editorOptions = EDITOR_TO_WITH_TABLE_OPTIONS.get(editor);
 
     if (!editorOptions) {
@@ -239,6 +244,45 @@ export const TableEditor = {
             at: options.left ? insertPath : Path.next(insertPath),
           }
         );
+      }
+    });
+  },
+  removeColumn(
+    editor: Editor,
+    options: { at?: Location; left?: boolean } = {}
+  ): void {
+    const [table, cell] = Editor.nodes(editor, {
+      match: isOfType(editor, "table", "th", "td"),
+      at: options.at,
+    });
+
+    if (!table || !cell) {
+      return;
+    }
+
+    const [, tablePath] = table;
+
+    const rows = Editor.nodes(editor, {
+      match: isOfType(editor, "tr"),
+      at: tablePath,
+    });
+
+    const [, targetCellPath] = cell;
+    const [, sibling] = Node.children(editor, Path.parent(targetCellPath));
+
+    // Remove table if it is the last column in the table
+    if (!sibling) {
+      return this.removeTable(editor, { at: options.at });
+    }
+
+    Editor.withoutNormalizing(editor, () => {
+      for (const [, path] of rows) {
+        const deletionPath: Path = [
+          ...path,
+          targetCellPath[targetCellPath.length - 1],
+        ];
+
+        Transforms.removeNodes(editor, { at: deletionPath });
       }
     });
   },
