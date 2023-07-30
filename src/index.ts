@@ -1,2 +1,3 @@
-export * from "./with-table";
+export * from "./table-cursor";
 export * from "./table-editor";
+export * from "./with-table";
