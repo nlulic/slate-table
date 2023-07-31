@@ -142,7 +142,7 @@ export const TableCursor = {
     Transforms.select(editor, Editor.end(editor, targetCellPath));
   },
   /**
-   * Moves the cursor to the cell next of the current selection.
+   * Moves the cursor to the cell after the current selection.
    * @param {Edge} [options.edge] - When specified, the cursor will move to another cell only if the
    * selection is positioned at a specific "edge". If the "edge" is set to `right`, the cursor will only
    * move if the selection is at the end of the cell's content.
