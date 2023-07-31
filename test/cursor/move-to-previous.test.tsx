@@ -91,7 +91,7 @@ describe("move to the previous column", () => {
     const editor = withTest(withTable(actual, DEFAULT_WITH_TABLE_OPTIONS));
 
     const fakeEvent = { preventDefault: jest.fn() };
-    TableCursor.previous(editor, fakeEvent);
+    TableCursor.previous(editor, fakeEvent, { edge: "left" });
 
     expect(fakeEvent.preventDefault).toHaveBeenCalledTimes(1);
     assert.deepEqual(editor.children, expected.children);
@@ -180,9 +180,98 @@ describe("move to the previous column", () => {
     const editor = withTest(withTable(actual, DEFAULT_WITH_TABLE_OPTIONS));
 
     const fakeEvent = { preventDefault: jest.fn() };
-    TableCursor.previous(editor, fakeEvent);
+    TableCursor.previous(editor, fakeEvent, { edge: "left" });
 
     expect(fakeEvent.preventDefault).toHaveBeenCalledTimes(0);
+    assert.deepEqual(editor.children, expected.children);
+    assert.deepEqual(editor.selection, expected.selection);
+  });
+
+  it("should move the cursor if the cursor is not at the start of the last text node if no edge option is passed", () => {
+    const actual = (
+      <editor>
+        <table>
+          <thead>
+            <tr>
+              <th>
+                <paragraph />
+              </th>
+              <th>
+                <paragraph />
+              </th>
+              <th>
+                <paragraph />
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>
+                <paragraph />
+              </td>
+              <td>
+                <paragraph>
+                  <text>text 1</text>
+                </paragraph>
+              </td>
+              <td>
+                <paragraph>
+                  <text>
+                    text 2<cursor />
+                  </text>
+                </paragraph>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </editor>
+    );
+
+    const expected = (
+      <editor>
+        <table>
+          <thead>
+            <tr>
+              <th>
+                <paragraph />
+              </th>
+              <th>
+                <paragraph />
+              </th>
+              <th>
+                <paragraph />
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>
+                <paragraph />
+              </td>
+              <td>
+                <paragraph>
+                  <text>
+                    text 1<cursor />
+                  </text>
+                </paragraph>
+              </td>
+              <td>
+                <paragraph>
+                  <text>text 2</text>
+                </paragraph>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </editor>
+    );
+
+    const editor = withTest(withTable(actual, DEFAULT_WITH_TABLE_OPTIONS));
+
+    const fakeEvent = { preventDefault: jest.fn() };
+    TableCursor.previous(editor, fakeEvent);
+
+    expect(fakeEvent.preventDefault).toHaveBeenCalledTimes(1);
     assert.deepEqual(editor.children, expected.children);
     assert.deepEqual(editor.selection, expected.selection);
   });
@@ -270,7 +359,7 @@ describe("move to the previous column", () => {
     const editor = withTest(withTable(actual, DEFAULT_WITH_TABLE_OPTIONS));
 
     const fakeEvent = { preventDefault: jest.fn() };
-    TableCursor.previous(editor, fakeEvent);
+    TableCursor.previous(editor, fakeEvent, { edge: "left" });
 
     expect(fakeEvent.preventDefault).toHaveBeenCalledTimes(1);
     assert.deepEqual(editor.children, expected.children);
@@ -358,7 +447,7 @@ describe("move to the previous column", () => {
     const editor = withTest(withTable(actual, DEFAULT_WITH_TABLE_OPTIONS));
 
     const fakeEvent = { preventDefault: jest.fn() };
-    TableCursor.previous(editor, fakeEvent);
+    TableCursor.previous(editor, fakeEvent, { edge: "left" });
 
     expect(fakeEvent.preventDefault).toHaveBeenCalledTimes(1);
     assert.deepEqual(editor.children, expected.children);

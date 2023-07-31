@@ -94,7 +94,7 @@ describe("move to the above row", () => {
     const editor = withTest(withTable(actual, DEFAULT_WITH_TABLE_OPTIONS));
 
     const fakeEvent = { preventDefault: jest.fn() };
-    TableCursor.above(editor, fakeEvent);
+    TableCursor.above(editor, fakeEvent, { edge: "top" });
 
     expect(fakeEvent.preventDefault).toHaveBeenCalledTimes(1);
     assert.deepEqual(editor.children, expected.children);
@@ -121,9 +121,7 @@ describe("move to the above row", () => {
           <tbody>
             <tr>
               <td>
-                <paragraph>
-                  <text />
-                </paragraph>
+                <paragraph />
               </td>
               <td>
                 <paragraph>
@@ -162,9 +160,7 @@ describe("move to the above row", () => {
           <tbody>
             <tr>
               <td>
-                <paragraph>
-                  <text />
-                </paragraph>
+                <paragraph />
               </td>
               <td>
                 <paragraph>
@@ -187,9 +183,101 @@ describe("move to the above row", () => {
     const editor = withTest(withTable(actual, DEFAULT_WITH_TABLE_OPTIONS));
 
     const fakeEvent = { preventDefault: jest.fn() };
-    TableCursor.above(editor, fakeEvent);
+    TableCursor.above(editor, fakeEvent, { edge: "top" });
 
     expect(fakeEvent.preventDefault).toHaveBeenCalledTimes(0);
+    assert.deepEqual(editor.children, expected.children);
+    assert.deepEqual(editor.selection, expected.selection);
+  });
+
+  it("should move the cursor if the cursor is not at the start path if no edge option is passed", () => {
+    const actual = (
+      <editor>
+        <table>
+          <thead>
+            <tr>
+              <th>
+                <paragraph />
+              </th>
+              <th>
+                <paragraph>
+                  <text>text 1</text>
+                </paragraph>
+              </th>
+              <th>
+                <paragraph />
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>
+                <paragraph />
+              </td>
+              <td>
+                <paragraph>
+                  <text>text 2</text>
+                  <text>
+                    <cursor />
+                    text 3
+                  </text>
+                </paragraph>
+              </td>
+              <td>
+                <paragraph />
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </editor>
+    );
+
+    const expected = (
+      <editor>
+        <table>
+          <thead>
+            <tr>
+              <th>
+                <paragraph />
+              </th>
+              <th>
+                <paragraph>
+                  <text>
+                    text 1<cursor />
+                  </text>
+                </paragraph>
+              </th>
+              <th>
+                <paragraph />
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>
+                <paragraph />
+              </td>
+              <td>
+                <paragraph>
+                  <text>text 2</text>
+                  <text>text 3</text>
+                </paragraph>
+              </td>
+              <td>
+                <paragraph />
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </editor>
+    );
+
+    const editor = withTest(withTable(actual, DEFAULT_WITH_TABLE_OPTIONS));
+
+    const fakeEvent = { preventDefault: jest.fn() };
+    TableCursor.above(editor, fakeEvent);
+
+    expect(fakeEvent.preventDefault).toHaveBeenCalledTimes(1);
     assert.deepEqual(editor.children, expected.children);
     assert.deepEqual(editor.selection, expected.selection);
   });
@@ -274,7 +362,7 @@ describe("move to the above row", () => {
     const editor = withTest(withTable(actual, DEFAULT_WITH_TABLE_OPTIONS));
 
     const fakeEvent = { preventDefault: jest.fn() };
-    TableCursor.above(editor, fakeEvent);
+    TableCursor.above(editor, fakeEvent, { edge: "top" });
 
     expect(fakeEvent.preventDefault).toHaveBeenCalledTimes(1);
     assert.deepEqual(editor.children, expected.children);

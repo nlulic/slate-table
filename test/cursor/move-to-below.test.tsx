@@ -94,6 +94,97 @@ describe("move to the below row", () => {
     const editor = withTest(withTable(actual, DEFAULT_WITH_TABLE_OPTIONS));
 
     const fakeEvent = { preventDefault: jest.fn() };
+    TableCursor.below(editor, fakeEvent, { edge: "bottom" });
+
+    expect(fakeEvent.preventDefault).toHaveBeenCalledTimes(1);
+    assert.deepEqual(editor.children, expected.children);
+    assert.deepEqual(editor.selection, expected.selection);
+  });
+
+  it("should move the cursor if the cursor is not at the end path if no edge option is passed", () => {
+    const actual = (
+      <editor>
+        <table>
+          <thead>
+            <tr>
+              <th>
+                <paragraph />
+              </th>
+              <th>
+                <paragraph>
+                  <text>
+                    text 1<cursor />
+                  </text>
+                  <text>text 2</text>
+                </paragraph>
+              </th>
+              <th>
+                <paragraph />
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>
+                <paragraph />
+              </td>
+              <td>
+                <paragraph>
+                  <text>text 3</text>
+                </paragraph>
+              </td>
+              <td>
+                <paragraph />
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </editor>
+    );
+
+    const expected = (
+      <editor>
+        <table>
+          <thead>
+            <tr>
+              <th>
+                <paragraph />
+              </th>
+              <th>
+                <paragraph>
+                  <text>text 1</text>
+                  <text>text 2</text>
+                </paragraph>
+              </th>
+              <th>
+                <paragraph />
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>
+                <paragraph />
+              </td>
+              <td>
+                <paragraph>
+                  <text>
+                    text 3<cursor />
+                  </text>
+                </paragraph>
+              </td>
+              <td>
+                <paragraph />
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </editor>
+    );
+
+    const editor = withTest(withTable(actual, DEFAULT_WITH_TABLE_OPTIONS));
+
+    const fakeEvent = { preventDefault: jest.fn() };
     TableCursor.below(editor, fakeEvent);
 
     expect(fakeEvent.preventDefault).toHaveBeenCalledTimes(1);
@@ -181,7 +272,7 @@ describe("move to the below row", () => {
     const editor = withTest(withTable(actual, DEFAULT_WITH_TABLE_OPTIONS));
 
     const fakeEvent = { preventDefault: jest.fn() };
-    TableCursor.below(editor, fakeEvent);
+    TableCursor.below(editor, fakeEvent, { edge: "bottom" });
 
     expect(fakeEvent.preventDefault).toHaveBeenCalledTimes(0);
     assert.deepEqual(editor.children, expected.children);
@@ -269,7 +360,7 @@ describe("move to the below row", () => {
     const editor = withTest(withTable(actual, DEFAULT_WITH_TABLE_OPTIONS));
 
     const fakeEvent = { preventDefault: jest.fn() };
-    TableCursor.below(editor, fakeEvent);
+    TableCursor.below(editor, fakeEvent, { edge: "bottom" });
 
     expect(fakeEvent.preventDefault).toHaveBeenCalledTimes(1);
     assert.deepEqual(editor.children, expected.children);
