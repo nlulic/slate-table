@@ -111,7 +111,12 @@ describe("move to the below row", () => {
                 <paragraph />
               </th>
               <th>
-                <paragraph />
+                <paragraph>
+                  <text>
+                    text 1<cursor />
+                  </text>
+                  <text>text 2</text>
+                </paragraph>
               </th>
               <th>
                 <paragraph />
@@ -121,17 +126,10 @@ describe("move to the below row", () => {
           <tbody>
             <tr>
               <td>
-                <paragraph>
-                  <text />
-                </paragraph>
+                <paragraph />
               </td>
               <td>
-                <paragraph>
-                  <text>
-                    text 1<cursor />
-                  </text>
-                  <text>text 2</text>
-                </paragraph>
+                <paragraph />
               </td>
               <td>
                 <paragraph />
@@ -151,7 +149,12 @@ describe("move to the below row", () => {
                 <paragraph />
               </th>
               <th>
-                <paragraph />
+                <paragraph>
+                  <text>
+                    text 1<cursor />
+                  </text>
+                  <text>text 2</text>
+                </paragraph>
               </th>
               <th>
                 <paragraph />
@@ -161,17 +164,10 @@ describe("move to the below row", () => {
           <tbody>
             <tr>
               <td>
-                <paragraph>
-                  <text />
-                </paragraph>
+                <paragraph />
               </td>
               <td>
-                <paragraph>
-                  <text>
-                    text 1<cursor />
-                  </text>
-                  <text>text 2</text>
-                </paragraph>
+                <paragraph />
               </td>
               <td>
                 <paragraph />
