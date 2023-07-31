@@ -12,7 +12,13 @@ import { isOfType, matrix } from "./utils";
 
 export const TableCursor = {
   /**
-   * Moves the cursor to the cell above the current cell in the table.
+   * Moves the cursor to the cell above the current selection.
+   * @param {Edge} [options.edge] - When specified, the cursor will move to another cell only if the
+   * selection is positioned at a specific "edge". If the "edge" is set to `top`, the cursor will only
+   * move if the selection is at the first element of the cell's content.
+   *
+   * Possible values: `left`, `right`, `top`, `bottom`.
+   * @returns void
    */
   above(
     editor: Editor,
@@ -70,7 +76,13 @@ export const TableCursor = {
     Transforms.select(editor, Editor.end(editor, targetCellPath));
   },
   /**
-   * Moves the cursor to the cell below the current cell in the table.
+   * Moves the cursor to the cell above the current selection.
+   * @param {Edge} [options.edge] - When specified, the cursor will move to another cell only if the
+   * selection is positioned at a specific "edge". If the "edge" is set to `bottom`, the cursor will only
+   * move if the selection is at the last element of the cell's content.
+   *
+   * Possible values: `left`, `right`, `top`, `bottom`.
+   * @returns void
    */
   below(
     editor: Editor,
@@ -130,7 +142,13 @@ export const TableCursor = {
     Transforms.select(editor, Editor.end(editor, targetCellPath));
   },
   /**
-   * Moves the cursor to the next cell in the table.
+   * Moves the cursor to the cell above the current selection.
+   * @param {Edge} [options.edge] - When specified, the cursor will move to another cell only if the
+   * selection is positioned at a specific "edge". If the "edge" is set to `right`, the cursor will only
+   * move if the selection is at the end of the cell's content.
+   *
+   * Possible values: `left`, `right`, `top`, `bottom`.
+   * @returns void
    */
   next(
     editor: Editor,
@@ -191,7 +209,13 @@ export const TableCursor = {
     Transforms.select(editor, Editor.end(editor, targetCellPath));
   },
   /**
-   * Moves the cursor to the previous cell in the table.
+   * Moves the cursor to the cell above the current selection.
+   * @param {Edge} [options.edge] - When specified, the cursor will move to another cell only if the
+   * selection is positioned at a specific "edge". If the "edge" is set to `left`, the cursor will only
+   * move if the selection is at the start of the cell's content.
+   *
+   * Possible values: `left`, `right`, `top`, `bottom`.
+   * @returns void
    */
   previous(
     editor: Editor,
