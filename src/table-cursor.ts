@@ -1,11 +1,24 @@
-import { Editor, NodeEntry, Path, Transforms, Range, Point, Node } from "slate";
+import {
+  Editor,
+  NodeEntry,
+  Path,
+  Transforms,
+  Range,
+  Point,
+  Node,
+  BasePoint,
+} from "slate";
 import { isOfType, matrix } from "./utils";
 
 export const TableCursor = {
   /**
    * Moves the cursor to the cell above the current cell in the table.
    */
-  above(editor: Editor, event: PreventableEvent): void {
+  above(
+    editor: Editor,
+    event: PreventableEvent,
+    options: { edge?: Edge } = {}
+  ): void {
     const { selection } = editor;
 
     if (!selection || !Range.isCollapsed(selection)) {
@@ -24,10 +37,8 @@ export const TableCursor = {
     const [, selectedCellPath] = selectedCell;
 
     if (
-      !Path.equals(
-        selection.anchor.path,
-        Editor.start(editor, selectedCellPath).path
-      )
+      options.edge &&
+      !isOnEdge(editor, selection.anchor, selectedCellPath, options.edge)
     ) {
       return;
     }
@@ -61,7 +72,11 @@ export const TableCursor = {
   /**
    * Moves the cursor to the cell below the current cell in the table.
    */
-  below(editor: Editor, event: PreventableEvent): void {
+  below(
+    editor: Editor,
+    event: PreventableEvent,
+    options: { edge?: Edge } = {}
+  ): void {
     const { selection } = editor;
 
     if (!selection || !Range.isCollapsed(selection)) {
@@ -80,10 +95,8 @@ export const TableCursor = {
     const [, selectedCellPath] = selectedCell;
 
     if (
-      !Path.equals(
-        selection.anchor.path,
-        Editor.end(editor, selectedCellPath).path
-      )
+      options.edge &&
+      !isOnEdge(editor, selection.anchor, selectedCellPath, options.edge)
     ) {
       return;
     }
@@ -119,7 +132,11 @@ export const TableCursor = {
   /**
    * Moves the cursor to the next cell in the table.
    */
-  next(editor: Editor, event: PreventableEvent): void {
+  next(
+    editor: Editor,
+    event: PreventableEvent,
+    options: { edge?: Edge } = {}
+  ): void {
     const { selection } = editor;
 
     if (!selection || !Range.isCollapsed(selection)) {
@@ -137,7 +154,10 @@ export const TableCursor = {
     const [, tablePath] = table;
     const [, selectedCellPath] = selectedCell;
 
-    if (!Point.equals(selection.anchor, Editor.end(editor, selectedCellPath))) {
+    if (
+      options.edge &&
+      !isOnEdge(editor, selection.anchor, selectedCellPath, options.edge)
+    ) {
       return;
     }
 
@@ -173,7 +193,11 @@ export const TableCursor = {
   /**
    * Moves the cursor to the previous cell in the table.
    */
-  previous(editor: Editor, event: PreventableEvent): void {
+  previous(
+    editor: Editor,
+    event: PreventableEvent,
+    options: { edge?: Edge } = {}
+  ): void {
     const { selection } = editor;
 
     if (!selection || !Range.isCollapsed(selection)) {
@@ -192,7 +216,8 @@ export const TableCursor = {
     const [, selectedCellPath] = selectedCell;
 
     if (
-      !Point.equals(selection.anchor, Editor.start(editor, selectedCellPath))
+      options.edge &&
+      !isOnEdge(editor, selection.anchor, selectedCellPath, options.edge)
     ) {
       return;
     }
@@ -229,4 +254,26 @@ export const TableCursor = {
 
 interface PreventableEvent {
   preventDefault(): void;
+}
+
+type Edge = "left" | "right" | "top" | "bottom";
+
+function isOnEdge(
+  editor: Editor,
+  point: BasePoint,
+  nodePath: Path,
+  edge: Edge
+): boolean {
+  switch (edge) {
+    case "top":
+      return Path.equals(point.path, Editor.start(editor, nodePath).path);
+    case "bottom":
+      return Path.equals(point.path, Editor.end(editor, nodePath).path);
+    case "right":
+      return Point.equals(point, Editor.end(editor, nodePath));
+    case "left":
+      return Point.equals(point, Editor.start(editor, nodePath));
+    default:
+      return false;
+  }
 }
