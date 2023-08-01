@@ -7,7 +7,7 @@ import { isElement, WithType } from "./is-element";
 export const isOfType = (
   editor: Editor,
   ...types: Array<keyof WithTableOptions["blocks"]>
-): NodeMatch<WithType<Element>> | undefined => {
+): NodeMatch<WithType<Element>> => {
   const options = EDITOR_TO_WITH_TABLE_OPTIONS.get(editor),
     elementTypes = types.map((type) => options?.blocks?.[type]);
 

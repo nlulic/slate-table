@@ -2,6 +2,7 @@ import { EDITOR_TO_WITH_TABLE_OPTIONS } from "./weak-maps";
 import { Editor } from "slate";
 import { WithTableOptions, DEFAULT_WITH_TABLE_OPTIONS } from "./options";
 import { withNormalization } from "./normalization";
+import { withSelection } from "./selection";
 
 export const withTable = <T extends Editor>(
   editor: T,
@@ -15,6 +16,7 @@ export const withTable = <T extends Editor>(
   EDITOR_TO_WITH_TABLE_OPTIONS.set(editor, optionsWithDefaults);
 
   editor = withNormalization(editor, optionsWithDefaults);
+  editor = withSelection(editor, optionsWithDefaults);
 
   return editor;
 };

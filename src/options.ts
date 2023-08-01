@@ -14,6 +14,7 @@ export interface WithTableOptions {
     thead: ElementType;
   };
   withNormalization: boolean;
+  withSelection: boolean;
 }
 
 export const DEFAULT_WITH_TABLE_OPTIONS = {
@@ -28,6 +29,7 @@ export const DEFAULT_WITH_TABLE_OPTIONS = {
     thead: "table-head",
   },
   withNormalization: true,
+  withSelection: true,
 } as const satisfies WithTableOptions;
 
 export interface InsertTableOptions {
