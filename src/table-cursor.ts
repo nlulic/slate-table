@@ -1,6 +1,7 @@
 import {
   BasePoint,
   Editor,
+  Element,
   Node,
   NodeEntry,
   Path,
@@ -9,6 +10,11 @@ import {
   Transforms,
 } from "slate";
 import { isOfType, matrix } from "./utils";
+import {
+  EDITOR_TO_SELECTION,
+  EDITOR_TO_SELECTION_SET,
+  EDITOR_TO_WITH_TABLE_OPTIONS,
+} from "./weak-maps";
 
 export const TableCursor = {
   /**
@@ -273,6 +279,46 @@ export const TableCursor = {
     const [, targetCellPath] = targetCell;
     event.preventDefault();
     Transforms.select(editor, Editor.end(editor, targetCellPath));
+  },
+  /**
+   * Retrieves a matrix representing the selected cells within a table.
+   * @returns {NodeEntry<T>[][]} A matrix containing the selected cells.
+   */
+  selection<T extends Element>(editor: Editor): NodeEntry<T>[][] {
+    const editorOptions = EDITOR_TO_WITH_TABLE_OPTIONS.get(editor);
+    if (!editorOptions?.withSelection) {
+      throw new Error(
+        "The `selection` command must be used with the `withSelection` option."
+      );
+    }
+
+    const matrix = EDITOR_TO_SELECTION.get(editor);
+
+    if (!matrix) {
+      return [];
+    }
+
+    return matrix as NodeEntry<T>[][];
+  },
+  /**
+   * Checks whether a given cell is part of the current table selection.
+   * @returns {boolean} - Returns true if the cell is selected, otherwise false.
+   */
+  isSelected<T extends Element>(editor: Editor, element: T): boolean {
+    const editorOptions = EDITOR_TO_WITH_TABLE_OPTIONS.get(editor);
+    if (!editorOptions?.withSelection) {
+      throw new Error(
+        "The `isSelected` command must be used with the `withSelection` option."
+      );
+    }
+
+    const selectedElements = EDITOR_TO_SELECTION_SET.get(editor);
+
+    if (!selectedElements) {
+      return false;
+    }
+
+    return selectedElements.has(element);
   },
 };
 

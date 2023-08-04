@@ -1,4 +1,4 @@
-import { EDITOR_TO_TABLE_SELECTION } from "../weak-maps";
+import { EDITOR_TO_SELECTION, EDITOR_TO_SELECTION_SET } from "../weak-maps";
 import {
   Editor,
   Element,
@@ -22,9 +22,10 @@ export const withSelection = <T extends Editor>(
   const { apply } = editor;
 
   editor.apply = (op: Operation): void => {
-    EDITOR_TO_TABLE_SELECTION.delete(editor); // TODO: test
+    EDITOR_TO_SELECTION.delete(editor);
+    EDITOR_TO_SELECTION_SET.delete(editor);
 
-    if (!Operation.isSelectionOperation(op)) {
+    if (!Operation.isSelectionOperation(op) || !op.newProperties) {
       return apply(op);
     }
 
@@ -81,26 +82,32 @@ export const withSelection = <T extends Editor>(
       }
     }
 
+    const selectedSet = new WeakSet<Element>();
     const selected: NodeEntry<Element>[][] = [];
+
+    // if fromIdx is less than toIdx
+    const minIdx = Math.min(fromIdx, toIdx);
+    const maxIdx = Math.max(fromIdx, toIdx);
+
     for (const row of rows) {
       const cells: NodeEntry<Element>[] = [];
-      for (let i = fromIdx; i <= toIdx; i++) {
+      for (let i = minIdx; i <= maxIdx; i++) {
+        const [element] = row[i];
+        selectedSet.add(element);
         cells.push(row[i]);
       }
       selected.push(cells);
     }
 
-    EDITOR_TO_TABLE_SELECTION.set(editor, selected);
+    EDITOR_TO_SELECTION.set(editor, selected);
+    EDITOR_TO_SELECTION_SET.set(editor, selectedSet);
     apply(op);
   };
 
   return editor;
 };
 
-/**
- * Retrieves the common table element of two paths. If the paths are not in a
- * common table it will return `undefined`
- */
+/** Determines whether two paths belong to the same table by checking if they share a common ancestor node of type table */
 function hasCommonTable(editor: Editor, path: Path, another: Path): boolean {
   const [commonNode, commonPath] = Node.common(editor, path, another);
 

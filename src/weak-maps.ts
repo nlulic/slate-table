@@ -7,8 +7,11 @@ export const EDITOR_TO_WITH_TABLE_OPTIONS = new WeakMap<
   WithTableOptions
 >();
 
-/** Weak reference between the `Editor` and the table selection */
-export const EDITOR_TO_TABLE_SELECTION = new WeakMap<
+/** Weak reference between the `Editor` and the selected elements */
+export const EDITOR_TO_SELECTION = new WeakMap<
   Editor,
   NodeEntry<Element>[][]
 >();
+
+/** Weak reference between the `Editor` and a set of the selected elements */
+export const EDITOR_TO_SELECTION_SET = new WeakMap<Editor, WeakSet<Element>>();
