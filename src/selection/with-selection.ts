@@ -22,8 +22,8 @@ export const withSelection = <T extends Editor>(
   const { apply } = editor;
 
   editor.apply = (op: Operation): void => {
-    EDITOR_TO_SELECTION.delete(editor);
     EDITOR_TO_SELECTION_SET.delete(editor);
+    EDITOR_TO_SELECTION.delete(editor);
 
     if (!Operation.isSelectionOperation(op) || !op.newProperties) {
       return apply(op);
@@ -56,8 +56,8 @@ export const withSelection = <T extends Editor>(
     const [, toPath] = to;
 
     if (
-      Path.equals(fromPath, toPath) || // TODO: test
-      !hasCommonTable(editor, fromPath, toPath) // TODO: test
+      Path.equals(fromPath, toPath) ||
+      !hasCommonTable(editor, fromPath, toPath)
     ) {
       return apply(op);
     }
@@ -99,8 +99,9 @@ export const withSelection = <T extends Editor>(
       selected.push(cells);
     }
 
-    EDITOR_TO_SELECTION.set(editor, selected);
     EDITOR_TO_SELECTION_SET.set(editor, selectedSet);
+    EDITOR_TO_SELECTION.set(editor, selected);
+
     apply(op);
   };
 
@@ -110,14 +111,12 @@ export const withSelection = <T extends Editor>(
 /** Determines whether two paths belong to the same table by checking if they share a common ancestor node of type table */
 function hasCommonTable(editor: Editor, path: Path, another: Path): boolean {
   const [commonNode, commonPath] = Node.common(editor, path, another);
-
   if (isOfType(editor, "table")(commonNode, commonPath)) {
     return true;
   }
 
   // Warning: returns the common ancestor but will return `undefined` if the
   // `commonPath` is equal to the table's path
-  // TODO: write a test for this case
   return !!Editor.above(editor, {
     match: isOfType(editor, "table"),
     at: commonPath,
