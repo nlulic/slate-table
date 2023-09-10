@@ -9,12 +9,13 @@ import {
   Range,
   Transforms,
 } from "slate";
-import { isOfType, matrix } from "./utils";
 import {
   EDITOR_TO_SELECTION,
   EDITOR_TO_SELECTION_SET,
   EDITOR_TO_WITH_TABLE_OPTIONS,
 } from "./weak-maps";
+import { Edge, PreventableEvent } from "./utils/types";
+import { isOfType, matrix } from "./utils";
 
 export const TableCursor = {
   /**
@@ -321,12 +322,6 @@ export const TableCursor = {
     return selectedElements.has(element);
   },
 };
-
-interface PreventableEvent {
-  preventDefault(): void;
-}
-
-type Edge = "left" | "right" | "top" | "bottom";
 
 function isOnEdge(
   editor: Editor,

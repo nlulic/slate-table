@@ -940,6 +940,580 @@ describe("cell selection", () => {
     assert.deepEqual(editor.selection, expected.selection);
   });
 
+  /*
+   * Actual:             Expected:
+   * +---+---+---+       +---+---+---+
+   * | 1 | 2 | 3 |  =>   | X | X | X |
+   * +---+---+---+       +---+---+---+
+   * | 4 |   5   |       | X |   X   |
+   * +---+---+---+       +---+---+---+
+   * | 7 | 8 | 9 |       | 7 | 8 | 9 |
+   * +---+---+---+       +---+---+---+
+   * anchor: 5
+   * focus:  1
+   */
+  it("should select the correct cells with colspan from rtl", () => {
+    const actual = (
+      <editor>
+        <table>
+          <thead>
+            <tr>
+              <th>
+                <paragraph>
+                  <text>
+                    1<focus />
+                  </text>
+                </paragraph>
+              </th>
+              <th>
+                <paragraph>
+                  <text>2</text>
+                </paragraph>
+              </th>
+              <th>
+                <paragraph>
+                  <text>3</text>
+                </paragraph>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>
+                <paragraph>
+                  <text>4</text>
+                </paragraph>
+              </td>
+              <td colSpan={2}>
+                <paragraph>
+                  <text>
+                    <anchor />5
+                  </text>
+                </paragraph>
+              </td>
+            </tr>
+          </tbody>
+          <tfoot>
+            <tr>
+              <td>
+                <paragraph>
+                  <text></text>
+                </paragraph>
+              </td>
+              <td>
+                <paragraph>
+                  <text>8</text>
+                </paragraph>
+              </td>
+              <td>
+                <paragraph>
+                  <text>9</text>
+                </paragraph>
+              </td>
+            </tr>
+          </tfoot>
+        </table>
+      </editor>
+    );
+
+    const expected = (
+      <editor>
+        <table>
+          <thead>
+            <tr>
+              <th data={{ selected: true }}>
+                <paragraph>
+                  <text>
+                    1<focus />
+                  </text>
+                </paragraph>
+              </th>
+              <th data={{ selected: true }}>
+                <paragraph>
+                  <text>2</text>
+                </paragraph>
+              </th>
+              <th data={{ selected: true }}>
+                <paragraph>
+                  <text>3</text>
+                </paragraph>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td data={{ selected: true }}>
+                <paragraph>
+                  <text>4</text>
+                </paragraph>
+              </td>
+              <td colSpan={2} data={{ selected: true }}>
+                <paragraph>
+                  <text>
+                    <anchor />5
+                  </text>
+                </paragraph>
+              </td>
+            </tr>
+          </tbody>
+          <tfoot>
+            <tr>
+              <td>
+                <paragraph>
+                  <text></text>
+                </paragraph>
+              </td>
+              <td>
+                <paragraph>
+                  <text>8</text>
+                </paragraph>
+              </td>
+              <td>
+                <paragraph>
+                  <text>9</text>
+                </paragraph>
+              </td>
+            </tr>
+          </tfoot>
+        </table>
+      </editor>
+    );
+
+    const editor = withTest(withTable(actual, DEFAULT_WITH_TABLE_OPTIONS));
+
+    applySelection(editor);
+
+    assert.deepEqual(editor.children, expected.children);
+    assert.deepEqual(editor.selection, expected.selection);
+  });
+
+  /*
+   * Actual:                Expected:
+   * +---+---+---+---+      +---+---+---+---+
+   * | 1 | 2 |   3   |  =>  | X | X |   X   |
+   * +---+---+---+---+      +---+---+---+---+
+   * |     4     | 5 |      |     X     | X |
+   * +---+---+---+---+      +---+---+---+---+
+   * | 6 | 7 | 8 | 9 |      | 6 | 7 | 8 | 9 |
+   * +---+---+---+---+      +---+---+---+---+
+   * anchor: 1
+   * focus:  4
+   */
+  it("should select the correct cells with colspan from ltr", () => {
+    const actual = (
+      <editor>
+        <table>
+          <thead>
+            <tr>
+              <th>
+                <paragraph>
+                  <text>
+                    <anchor />1
+                  </text>
+                </paragraph>
+              </th>
+              <th>
+                <paragraph>
+                  <text>2</text>
+                </paragraph>
+              </th>
+              <th colSpan={2}>
+                <paragraph>
+                  <text>3</text>
+                </paragraph>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td colSpan={3}>
+                <paragraph>
+                  <text>
+                    4<focus />
+                  </text>
+                </paragraph>
+              </td>
+              <td>
+                <paragraph>
+                  <text>5</text>
+                </paragraph>
+              </td>
+            </tr>
+          </tbody>
+          <tfoot>
+            <tr>
+              <td>
+                <paragraph>
+                  <text>6</text>
+                </paragraph>
+              </td>
+              <td>
+                <paragraph>
+                  <text>7</text>
+                </paragraph>
+              </td>
+              <td>
+                <paragraph>
+                  <text>8</text>
+                </paragraph>
+              </td>
+              <td>
+                <paragraph>
+                  <text>9</text>
+                </paragraph>
+              </td>
+            </tr>
+          </tfoot>
+        </table>
+      </editor>
+    );
+
+    const expected = (
+      <editor>
+        <table>
+          <thead>
+            <tr>
+              <th data={{ selected: true }}>
+                <paragraph>
+                  <text>
+                    <anchor />1
+                  </text>
+                </paragraph>
+              </th>
+              <th data={{ selected: true }}>
+                <paragraph>
+                  <text>2</text>
+                </paragraph>
+              </th>
+              <th colSpan={2} data={{ selected: true }}>
+                <paragraph>
+                  <text>3</text>
+                </paragraph>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td colSpan={3} data={{ selected: true }}>
+                <paragraph>
+                  <text>
+                    4<focus />
+                  </text>
+                </paragraph>
+              </td>
+              <td data={{ selected: true }}>
+                <paragraph>
+                  <text>5</text>
+                </paragraph>
+              </td>
+            </tr>
+          </tbody>
+          <tfoot>
+            <tr>
+              <td>
+                <paragraph>
+                  <text>6</text>
+                </paragraph>
+              </td>
+              <td>
+                <paragraph>
+                  <text>7</text>
+                </paragraph>
+              </td>
+              <td>
+                <paragraph>
+                  <text>8</text>
+                </paragraph>
+              </td>
+              <td>
+                <paragraph>
+                  <text>9</text>
+                </paragraph>
+              </td>
+            </tr>
+          </tfoot>
+        </table>
+      </editor>
+    );
+
+    const editor = withTest(withTable(actual, DEFAULT_WITH_TABLE_OPTIONS));
+
+    applySelection(editor);
+
+    assert.deepEqual(editor.children, expected.children);
+    assert.deepEqual(editor.selection, expected.selection);
+  });
+
+  /*
+   * Actual:            Expected:
+   * +---+---+---+      +---+---+---+
+   * |   | 2 | 3 |  =>  |   | X | 3 |
+   * + 1 +---+---+      + X +---+---+
+   * |   |   | 6 |      |   |   | 6 |
+   * +---+ 5 +---+      +---+ X +---+
+   * | 7 |   | 9 |      | X |   | 9 |
+   * +---+---+---+      +---+---+---+
+   * anchor: 1
+   * focus:  2
+   */
+  it("should select the correct cells with rowspan", () => {
+    const actual = (
+      <editor>
+        <table>
+          <thead>
+            <tr>
+              <th rowSpan={2}>
+                <paragraph>
+                  <text>
+                    <anchor />1
+                  </text>
+                </paragraph>
+              </th>
+              <th>
+                <paragraph>
+                  <text>
+                    2<focus />
+                  </text>
+                </paragraph>
+              </th>
+              <th>
+                <paragraph>
+                  <text>3</text>
+                </paragraph>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td rowSpan={2}>
+                <paragraph>
+                  <text>5</text>
+                </paragraph>
+              </td>
+              <td>
+                <paragraph>
+                  <text>6</text>
+                </paragraph>
+              </td>
+            </tr>
+          </tbody>
+          <tfoot>
+            <tr>
+              <td>
+                <paragraph>
+                  <text>7</text>
+                </paragraph>
+              </td>
+              <td>
+                <paragraph>
+                  <text>9</text>
+                </paragraph>
+              </td>
+            </tr>
+          </tfoot>
+        </table>
+      </editor>
+    );
+
+    const expected = (
+      <editor>
+        <table>
+          <thead>
+            <tr>
+              <th rowSpan={2} data={{ selected: true }}>
+                <paragraph>
+                  <text>
+                    <anchor />1
+                  </text>
+                </paragraph>
+              </th>
+              <th data={{ selected: true }}>
+                <paragraph>
+                  <text>
+                    2<focus />
+                  </text>
+                </paragraph>
+              </th>
+              <th>
+                <paragraph>
+                  <text>3</text>
+                </paragraph>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td rowSpan={2} data={{ selected: true }}>
+                <paragraph>
+                  <text>5</text>
+                </paragraph>
+              </td>
+              <td>
+                <paragraph>
+                  <text>6</text>
+                </paragraph>
+              </td>
+            </tr>
+          </tbody>
+          <tfoot>
+            <tr>
+              <td data={{ selected: true }}>
+                <paragraph>
+                  <text>7</text>
+                </paragraph>
+              </td>
+              <td>
+                <paragraph>
+                  <text>9</text>
+                </paragraph>
+              </td>
+            </tr>
+          </tfoot>
+        </table>
+      </editor>
+    );
+
+    const editor = withTest(withTable(actual, DEFAULT_WITH_TABLE_OPTIONS));
+
+    applySelection(editor);
+
+    assert.deepEqual(editor.children, expected.children);
+    assert.deepEqual(editor.selection, expected.selection);
+  });
+
+  /*
+   * Actual:            Expected:
+   * +---+---+---+      +---+---+---+
+   * |   | 2 | 3 |  =>  |   | X | X |
+   * + 1 +---+---+      + X +---+---+
+   * |   |   5   |      |   |   X   |
+   * +---+---+---+      +---+---+---+
+   * | 6 | 7 | 8 |      | 6 | 7 | 8 |
+   * +---+---+---+      +---+---+---+
+   * anchor: 1
+   * focus:  2
+   */
+  it("should select the correct cells with rowspan and colspan", () => {
+    const actual = (
+      <editor>
+        <table>
+          <tbody>
+            <tr>
+              <td rowSpan={2}>
+                <paragraph>
+                  <text>
+                    <anchor />1
+                  </text>
+                </paragraph>
+              </td>
+              <td>
+                <paragraph>
+                  <text>
+                    2<focus />
+                  </text>
+                </paragraph>
+              </td>
+              <td>
+                <paragraph>
+                  <text>3</text>
+                </paragraph>
+              </td>
+            </tr>
+            <tr>
+              <td colSpan={2}>
+                <paragraph>
+                  <text>5</text>
+                </paragraph>
+              </td>
+            </tr>
+          </tbody>
+          <tfoot>
+            <tr>
+              <td>
+                <paragraph>
+                  <text>6</text>
+                </paragraph>
+              </td>
+              <td>
+                <paragraph>
+                  <text>7</text>
+                </paragraph>
+              </td>
+              <td>
+                <paragraph>
+                  <text>8</text>
+                </paragraph>
+              </td>
+            </tr>
+          </tfoot>
+        </table>
+      </editor>
+    );
+
+    const expected = (
+      <editor>
+        <table>
+          <tbody>
+            <tr>
+              <td rowSpan={2} data={{ selected: true }}>
+                <paragraph>
+                  <text>
+                    <anchor />1
+                  </text>
+                </paragraph>
+              </td>
+              <td data={{ selected: true }}>
+                <paragraph>
+                  <text>
+                    2<focus />
+                  </text>
+                </paragraph>
+              </td>
+              <td data={{ selected: true }}>
+                <paragraph>
+                  <text>3</text>
+                </paragraph>
+              </td>
+            </tr>
+            <tr>
+              <td colSpan={2} data={{ selected: true }}>
+                <paragraph>
+                  <text>5</text>
+                </paragraph>
+              </td>
+            </tr>
+          </tbody>
+          <tfoot>
+            <tr>
+              <td>
+                <paragraph>
+                  <text>6</text>
+                </paragraph>
+              </td>
+              <td>
+                <paragraph>
+                  <text>7</text>
+                </paragraph>
+              </td>
+              <td>
+                <paragraph>
+                  <text>8</text>
+                </paragraph>
+              </td>
+            </tr>
+          </tfoot>
+        </table>
+      </editor>
+    );
+
+    const editor = withTest(withTable(actual, DEFAULT_WITH_TABLE_OPTIONS));
+
+    applySelection(editor);
+
+    assert.deepEqual(editor.children, expected.children);
+    assert.deepEqual(editor.selection, expected.selection);
+  });
+
   it("should have no selection if the range is in a single cell", () => {
     const actual = (
       <editor>
@@ -1120,7 +1694,9 @@ describe("cell selection", () => {
     expect(TableCursor.isSelected(editor, cell3)).toBeFalsy();
   });
 
-  // utility function to trigger the `selection` operation and add a `selected` flag to the cells.
+  /**
+   * Utility function to trigger the `selection` operation and add a `selected` flag to the cells.
+   */
   function applySelection(editor: Editor): void {
     const { selection } = editor;
 

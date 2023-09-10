@@ -1,11 +1,12 @@
-import { Editor, Element, Location, Node, NodeEntry, Span } from "slate";
-import { isElement, WithType } from "./is-element";
+import { CellElement } from "./types";
+import { Editor, Location, Node, NodeEntry, Span } from "slate";
+import { isElement } from "./is-element";
 import { isOfType } from "./is-of-type";
 
 export function* matrix(
   editor: Editor,
   options: { at?: Location | Span } = {}
-): Generator<NodeEntry<WithType<Element>>[], undefined> {
+): Generator<NodeEntry<CellElement>[], undefined> {
   const [table] = Editor.nodes(editor, {
     match: isOfType(editor, "table"),
     at: options.at,
@@ -21,10 +22,10 @@ export function* matrix(
     at: Span.isSpan(options.at) ? options.at : tablePath,
     match: isOfType(editor, "tr"),
   })) {
-    const cells: NodeEntry<WithType<Element>>[] = [];
+    const cells: NodeEntry<CellElement>[] = [];
 
     for (const [cell, path] of Node.children(editor, rowPath)) {
-      if (isElement(cell)) {
+      if (isElement<CellElement>(cell)) {
         cells.push([cell, path]);
       }
     }

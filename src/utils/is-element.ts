@@ -1,6 +1,5 @@
 import { Editor, Element, Node } from "slate";
+import { WithType } from "./types";
 
-export type WithType<T> = T & Record<"type", unknown>;
-
-export const isElement = (node: Node): node is WithType<Element> =>
+export const isElement = <T extends Element>(node: Node): node is WithType<T> =>
   !Editor.isEditor(node) && Element.isElement(node) && "type" in node;

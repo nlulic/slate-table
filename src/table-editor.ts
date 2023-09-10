@@ -1,7 +1,8 @@
 import { DEFAULT_INSERT_TABLE_OPTIONS, InsertTableOptions } from "./options";
-import { WithType, isElement, isOfType } from "./utils";
+import { isElement, isOfType } from "./utils";
 import { EDITOR_TO_WITH_TABLE_OPTIONS } from "./weak-maps";
 import { Editor, Element, Location, Node, Path, Transforms } from "slate";
+import { WithType } from "./utils/types";
 
 export const TableEditor = {
   /** @returns `true` if the selection is inside a table, `false` otherwise. */
