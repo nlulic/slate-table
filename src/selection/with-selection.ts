@@ -11,6 +11,7 @@ import {
 import { WithTableOptions } from "../options";
 import { isOfType, matrix as matrixGenerator } from "../utils";
 import { CellElement } from "../utils/types";
+import { TableCursor } from "../table-cursor";
 
 export const withSelection = <T extends Editor>(
   editor: T,
@@ -23,9 +24,7 @@ export const withSelection = <T extends Editor>(
   const { apply } = editor;
 
   editor.apply = (op: Operation): void => {
-    // TODO: fix...
-    EDITOR_TO_SELECTION_SET.delete(editor);
-    EDITOR_TO_SELECTION.delete(editor);
+    TableCursor.unselect(editor);
 
     if (!Operation.isSelectionOperation(op) || !op.newProperties) {
       return apply(op);
@@ -181,6 +180,11 @@ export const withSelection = <T extends Editor>(
       for (let j = startCol; j <= endCol; j++) {
         const [entry, { ltr: colSpan }] = filled[i][j];
         const [element] = entry;
+
+        // prevent duplicate's from the filled matrix
+        if (selectedSet.has(element)) {
+          continue;
+        }
 
         selectedSet.add(element);
         cells.push(entry);

@@ -4,6 +4,7 @@ import {
   Element,
   Node,
   NodeEntry,
+  Operation,
   Path,
   Point,
   Range,
@@ -300,6 +301,31 @@ export const TableCursor = {
     }
 
     return matrix as NodeEntry<T>[][];
+  },
+  /** Clears the selection from the table */
+  unselect(editor: Editor): void {
+    const matrix = EDITOR_TO_SELECTION.get(editor);
+
+    if (!matrix?.length) {
+      return;
+    }
+
+    // Hacky fix to trigger change detection on selected
+    // cells by invoking a no-op operation on the paths
+    for (const row of matrix) {
+      for (const [, path] of row) {
+        // no-op since the paths are the same
+        const noop: Operation = {
+          type: "move_node",
+          newPath: path,
+          path: path,
+        };
+        Transforms.transform(editor, noop);
+      }
+    }
+
+    EDITOR_TO_SELECTION_SET.delete(editor);
+    EDITOR_TO_SELECTION.delete(editor);
   },
   /**
    * Checks whether a given cell is part of the current table selection.
