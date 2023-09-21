@@ -1,19 +1,11 @@
 import { DEFAULT_INSERT_TABLE_OPTIONS, InsertTableOptions } from "./options";
-import { isElement, isOfType } from "./utils";
 import { EDITOR_TO_WITH_TABLE_OPTIONS } from "./weak-maps";
 import { Editor, Element, Location, Node, Path, Transforms } from "slate";
-import { WithType } from "./utils/types";
+import { TableCursor } from "./table-cursor";
+import { CellElement, WithType } from "./utils/types";
+import { filledMatrix, isOfType } from "./utils";
 
 export const TableEditor = {
-  /** @returns `true` if the selection is inside a table, `false` otherwise. */
-  isInTable(editor: Editor, options: { at?: Location } = {}): boolean {
-    const [table] = Editor.nodes(editor, {
-      match: isOfType(editor, "table"),
-      at: options.at,
-    });
-
-    return !!table;
-  },
   /**
    * Inserts a table at the specified location with the specified number of
    * rows. If no location is specified it will be inserted at the current
@@ -37,7 +29,7 @@ export const TableEditor = {
 
     const { rows, cols, at } = { ...DEFAULT_INSERT_TABLE_OPTIONS, ...options };
 
-    if (this.isInTable(editor, { at })) {
+    if (TableCursor.isInTable(editor, { at })) {
       return;
     }
 
@@ -106,47 +98,102 @@ export const TableEditor = {
       return;
     }
 
-    const {
-      blocks: { content, td, th, thead, tr },
-    } = editorOptions;
-
-    if (!this.isInTable(editor, { at: options.at })) {
-      return;
-    }
-
-    const [current] = Editor.nodes(editor, {
-      match: isOfType(editor, "tr"),
+    const [table, currentSection, currentTr, currentTd] = Editor.nodes(editor, {
+      match: isOfType(
+        editor,
+        "table", // current table
+        "thead", // current section
+        "tbody",
+        "tfoot",
+        "tr", // current row
+        "td", // current cell
+        "th"
+      ),
       at: options.at,
     });
 
-    if (!current) {
+    if (!table || !currentSection || !currentTr || !currentTd) {
       return;
     }
 
-    const [row, path] = current;
-    const parent = Node.parent(editor, path); // expected thead, tbody, or tfoot
-    if (!isElement(parent)) {
-      return;
-    }
+    const matrix = filledMatrix(editor, { at: options.at });
 
-    Transforms.insertNodes(
-      editor,
-      {
-        type: tr,
-        children: Array.from({ length: row.children.length }).map(() => ({
-          type: parent.type === thead ? th : td,
-          children: [
-            {
-              type: content,
-              children: [{ text: "" }],
-            },
-          ],
-        })),
-      } as Node,
-      {
-        at: options.above ? path : Path.next(path),
+    let currentTrIndex = 0;
+    outer: for (let x = 0; x < matrix.length; x++) {
+      const [, currentTdPath] = currentTd;
+      for (let y = 0; y < matrix[x].length; y++) {
+        const [[, path], { btt }] = matrix[x][y];
+        if (!Path.equals(currentTdPath, path)) {
+          continue;
+        }
+
+        currentTrIndex = x;
+
+        // When determining the exit condition, we consider two scenarios:
+        // 1. If a row will be added above the current selection, we seek the first match.
+        // 2. Otherwise, if cells have a rowspan, we aim to find the last match.
+        if (options.above || btt < 2) {
+          break outer;
+        }
       }
-    );
+    }
+
+    const [...tableRows] = Editor.nodes(editor, {
+      match: isOfType(editor, "tr"),
+      at: table[1],
+    });
+
+    Editor.withoutNormalizing(editor, () => {
+      const destIndex = options.above ? currentTrIndex - 1 : currentTrIndex + 1;
+      const isWithinBounds = destIndex >= 0 && destIndex < matrix.length;
+
+      let increasedRowspan = 0;
+      for (let y = 0; isWithinBounds && y < matrix[destIndex].length; y++) {
+        const [[element, path], { ltr, ttb, btt }] = matrix[destIndex][y];
+        const rowSpan = element.rowSpan || 1;
+
+        if (options.above ? btt > 1 : ttb > 1) {
+          increasedRowspan += ltr;
+
+          Transforms.setNodes<CellElement>(
+            editor,
+            {
+              rowSpan: rowSpan + 1,
+            },
+            { at: path }
+          );
+        }
+
+        y += ltr - 1;
+      }
+
+      const { length: colLen } = isWithinBounds ? matrix[destIndex] : matrix[0];
+      const { blocks } = editorOptions;
+
+      const [, currentPath] = tableRows[currentTrIndex];
+      const [section] = currentSection;
+
+      Transforms.insertNodes(
+        editor,
+        {
+          type: blocks.tr,
+          children: Array.from({ length: colLen - increasedRowspan }).map(
+            () => ({
+              type: section.type === blocks.thead ? blocks.th : blocks.td,
+              children: [
+                {
+                  type: blocks.content,
+                  children: [{ text: "" }],
+                },
+              ],
+            })
+          ),
+        } as Node,
+        {
+          at: options.above ? currentPath : Path.next(currentPath),
+        }
+      );
+    });
   },
   /**
    * Removes the row at the specified location. If no location is specified

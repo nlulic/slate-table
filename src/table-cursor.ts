@@ -2,6 +2,7 @@ import {
   BasePoint,
   Editor,
   Element,
+  Location,
   Node,
   NodeEntry,
   Operation,
@@ -19,6 +20,15 @@ import { Edge, PreventableEvent } from "./utils/types";
 import { isOfType, matrix } from "./utils";
 
 export const TableCursor = {
+  /** @returns `true` if the selection is inside a table, `false` otherwise. */
+  isInTable(editor: Editor, options: { at?: Location } = {}): boolean {
+    const [table] = Editor.nodes(editor, {
+      match: isOfType(editor, "table"),
+      at: options.at,
+    });
+
+    return !!table;
+  },
   /**
    * Moves the cursor to the cell above the current selection.
    * @param {Edge} [options.edge] - When specified, the cursor will move to another cell only if the

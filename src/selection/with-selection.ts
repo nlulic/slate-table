@@ -10,7 +10,7 @@ import {
 } from "slate";
 import { WithTableOptions } from "../options";
 import { isOfType, matrix as matrixGenerator } from "../utils";
-import { CellElement } from "../utils/types";
+import { CellElement, NodeEntryWithContext } from "../utils/types";
 import { TableCursor } from "../table-cursor";
 
 export const withSelection = <T extends Editor>(
@@ -64,16 +64,6 @@ export const withSelection = <T extends Editor>(
     }
 
     const [...matrix] = matrixGenerator(editor, { at: fromPath });
-
-    type NodeEntryWithContext = [
-      NodeEntry<CellElement>,
-      {
-        rtl: number; // right-to-left (colspan)
-        ltr: number; // left-to-right (colspan)
-        ttb: number; // top-to-bottom (rowspan)
-        btt: number; // bottom-to-top (rowspan)
-      }
-    ];
 
     const rowLen = matrix.length;
     const colLen = colLength(matrix);
@@ -218,7 +208,8 @@ function hasCommonTable(editor: Editor, path: Path, another: Path): boolean {
   });
 }
 
-function colLength(rows: NodeEntry<CellElement>[][]): number {
+// TODO: move to "filled matrix"
+export function colLength(rows: NodeEntry<CellElement>[][]): number {
   let length = 0;
 
   for (const [{ colSpan = 1 }] of rows[0]) {
