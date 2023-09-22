@@ -1,3 +1,4 @@
+import { CellElement, NodeEntryWithContext } from "../utils/types";
 import { EDITOR_TO_SELECTION, EDITOR_TO_SELECTION_SET } from "../weak-maps";
 import {
   Editor,
@@ -8,10 +9,9 @@ import {
   Path,
   Range,
 } from "slate";
-import { WithTableOptions } from "../options";
-import { isOfType, matrix as matrixGenerator } from "../utils";
-import { CellElement, NodeEntryWithContext } from "../utils/types";
+import { Point, isOfType, matrix as matrixGenerator } from "../utils";
 import { TableCursor } from "../table-cursor";
+import { WithTableOptions } from "../options";
 
 export const withSelection = <T extends Editor>(
   editor: T,
@@ -39,22 +39,22 @@ export const withSelection = <T extends Editor>(
       return apply(op);
     }
 
-    const [from] = Editor.nodes(editor, {
+    const [fromEntry] = Editor.nodes(editor, {
       match: isOfType(editor, "th", "td"),
       at: Range.start(selection),
     });
 
-    const [to] = Editor.nodes(editor, {
+    const [toEntry] = Editor.nodes(editor, {
       match: isOfType(editor, "th", "td"),
       at: Range.end(selection),
     });
 
-    if (!from || !to) {
+    if (!fromEntry || !toEntry) {
       return apply(op);
     }
 
-    const [, fromPath] = from;
-    const [, toPath] = to;
+    const [, fromPath] = fromEntry;
+    const [, toPath] = toEntry;
 
     if (
       Path.equals(fromPath, toPath) ||
@@ -103,71 +103,60 @@ export const withSelection = <T extends Editor>(
     }
 
     // find initial bounds
-    let [fromRow, toRow, fromCol, toCol] = [0, 0, 0, 0];
-    x: for (let x = 0; x < filled.length; x++) {
+    const from = Point.valueOf(0, 0);
+    const to = Point.valueOf(0, 0);
+    outer: for (let x = 0; x < filled.length; x++) {
       for (let y = 0; y < filled[x].length; y++) {
         const [[, path]] = filled[x][y];
 
         if (Path.equals(fromPath, path)) {
-          fromRow = x;
-          fromCol = y;
+          from.x = x;
+          from.y = y;
         }
 
         if (Path.equals(toPath, path)) {
-          toRow = x;
-          toCol = y;
-          break x;
+          to.x = x;
+          to.y = y;
+          break outer;
         }
       }
     }
 
-    let startRow = Math.min(fromRow, toRow);
-    let endRow = Math.max(fromRow, toRow);
-
-    let startCol = Math.min(fromCol, toCol);
-    let endCol = Math.max(fromCol, toCol);
+    let start = Point.valueOf(Math.min(from.x, to.x), Math.min(from.y, to.y));
+    let end = Point.valueOf(Math.max(from.x, to.x), Math.max(from.y, to.y));
 
     // expand the selection based on rowspan and colspan
     for (;;) {
-      let minX = startRow;
-      let minY = startCol;
-      let maxX = endRow;
-      let maxY = endCol;
+      const nextStart = Point.valueOf(start.x, start.y);
+      const nextEnd = Point.valueOf(end.x, end.y);
 
-      for (let x = minX; x <= maxX; x++) {
-        for (let y = minY; y <= maxY; y++) {
+      for (let x = nextStart.x; x <= nextEnd.x; x++) {
+        for (let y = nextStart.y; y <= nextEnd.y; y++) {
           const [, { rtl, ltr, btt, ttb }] = filled[x][y];
 
-          minX = Math.min(minX, x - (ttb - 1));
-          maxX = Math.max(maxX, x + (btt - 1));
+          nextStart.x = Math.min(nextStart.x, x - (ttb - 1));
+          nextStart.y = Math.min(nextStart.y, y - (rtl - 1));
 
-          minY = Math.min(minY, y - (rtl - 1));
-          maxY = Math.max(maxY, y + (ltr - 1));
+          nextEnd.x = Math.max(nextEnd.x, x + (btt - 1));
+          nextEnd.y = Math.max(nextEnd.y, y + (ltr - 1));
         }
       }
 
-      if (
-        startRow === minX &&
-        startCol === minY &&
-        endRow === maxX &&
-        endCol === maxY
-      ) {
+      if (Point.equals(start, nextStart) && Point.equals(end, nextEnd)) {
         break;
       }
 
-      startRow = minX;
-      startCol = minY;
-      endRow = maxX;
-      endCol = maxY;
+      start = nextStart;
+      end = nextEnd;
     }
 
     const selectedSet = new WeakSet<Element>();
     const selected: NodeEntry<Element>[][] = [];
 
-    for (let i = startRow; i <= endRow; i++) {
+    for (let i = start.x; i <= end.x; i++) {
       const cells: NodeEntry<Element>[] = [];
 
-      for (let j = startCol; j <= endCol; j++) {
+      for (let j = start.y; j <= end.y; j++) {
         const [entry, { ltr: colSpan }] = filled[i][j];
         const [element] = entry;
 
