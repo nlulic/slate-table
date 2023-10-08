@@ -1,7 +1,6 @@
-import { Editor, Location } from "slate";
+import { CellElement, NodeEntryWithContext } from "./types";
+import { Editor, Location, NodeEntry } from "slate";
 import { matrix as matrixGenerator } from "./matrix";
-import { colLength } from "../selection/with-selection";
-import { NodeEntryWithContext } from "./types";
 
 // TODO: should replace the current `matrix` function
 export function filledMatrix(
@@ -20,19 +19,19 @@ export function filledMatrix(
 
   // fill matrix
   for (let x = 0; x < matrix.length; x++) {
-    for (let y = 0, offsetX = 0; y < matrix[x].length; y++) {
+    for (let y = 0, offset = 0; y < matrix[x].length; y++) {
       const [element] = matrix[x][y];
       const rowSpan = element.rowSpan || 1;
       const colSpan = element.colSpan || 1;
 
-      for (let r = 0; r < rowSpan; r++) {
-        for (let c = 0, occupied = 0; c < colSpan + occupied; c++) {
-          if (filled[x + r][y + c + offsetX]) {
-            occupied++;
-            continue;
-          }
+      for (let c = 0, occupied = 0; c < colSpan + occupied; c++) {
+        if (filled[x][y + c + offset]) {
+          occupied++;
+          continue;
+        }
 
-          filled[x + r][y + c + offsetX] = [
+        for (let r = 0; r < rowSpan; r++) {
+          filled[x + r][y + c + offset] = [
             matrix[x][y], // entry
             {
               rtl: c - occupied + 1,
@@ -43,9 +42,20 @@ export function filledMatrix(
           ];
         }
       }
-      offsetX += colSpan - 1;
+
+      offset += colSpan - 1;
     }
   }
 
   return filled;
+}
+
+function colLength(rows: NodeEntry<CellElement>[][]): number {
+  let length = 0;
+
+  for (const [{ colSpan = 1 }] of rows[0]) {
+    length += colSpan;
+  }
+
+  return length;
 }

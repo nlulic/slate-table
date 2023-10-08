@@ -1,4 +1,3 @@
-import { CellElement, NodeEntryWithContext } from "../utils/types";
 import { EDITOR_TO_SELECTION, EDITOR_TO_SELECTION_SET } from "../weak-maps";
 import {
   Editor,
@@ -9,7 +8,7 @@ import {
   Path,
   Range,
 } from "slate";
-import { Point, isOfType, matrix as matrixGenerator } from "../utils";
+import { Point, filledMatrix, isOfType } from "../utils";
 import { TableCursor } from "../table-cursor";
 import { WithTableOptions } from "../options";
 
@@ -63,44 +62,7 @@ export const withSelection = <T extends Editor>(
       return apply(op);
     }
 
-    const [...matrix] = matrixGenerator(editor, { at: fromPath });
-
-    const rowLen = matrix.length;
-    const colLen = colLength(matrix);
-
-    const filled: NodeEntryWithContext[][] = Array.from({ length: rowLen });
-    for (let i = 0; i < filled.length; i++) {
-      filled[i] = Array.from({ length: colLen });
-    }
-
-    // fill matrix
-    for (let x = 0; x < matrix.length; x++) {
-      for (let y = 0, offsetX = 0; y < matrix[x].length; y++) {
-        const [element] = matrix[x][y];
-        const rowSpan = element.rowSpan || 1;
-        const colSpan = element.colSpan || 1;
-
-        for (let r = 0; r < rowSpan; r++) {
-          for (let c = 0, occupied = 0; c < colSpan + occupied; c++) {
-            if (filled[x + r][y + c + offsetX]) {
-              occupied++;
-              continue;
-            }
-
-            filled[x + r][y + c + offsetX] = [
-              matrix[x][y], // entry
-              {
-                rtl: c - occupied + 1,
-                ltr: colSpan - c + occupied,
-                ttb: r + 1,
-                btt: rowSpan - r,
-              },
-            ];
-          }
-        }
-        offsetX += colSpan - 1;
-      }
-    }
+    const filled = filledMatrix(editor, { at: fromPath });
 
     // find initial bounds
     const from = Point.valueOf(0, 0);
@@ -195,15 +157,4 @@ function hasCommonTable(editor: Editor, path: Path, another: Path): boolean {
     match: isOfType(editor, "table"),
     at: commonPath,
   });
-}
-
-// TODO: move to "filled matrix"
-export function colLength(rows: NodeEntry<CellElement>[][]): number {
-  let length = 0;
-
-  for (const [{ colSpan = 1 }] of rows[0]) {
-    length += colSpan;
-  }
-
-  return length;
 }
