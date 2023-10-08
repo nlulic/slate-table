@@ -1,8 +1,16 @@
+import { CellElement, WithType } from "./utils/types";
 import { DEFAULT_INSERT_TABLE_OPTIONS, InsertTableOptions } from "./options";
 import { EDITOR_TO_WITH_TABLE_OPTIONS } from "./weak-maps";
-import { Editor, Element, Location, Node, Path, Transforms } from "slate";
+import {
+  Editor,
+  Element,
+  Location,
+  Node,
+  NodeEntry,
+  Path,
+  Transforms,
+} from "slate";
 import { TableCursor } from "./table-cursor";
-import { CellElement, WithType } from "./utils/types";
 import { filledMatrix, isOfType } from "./utils";
 
 export const TableEditor = {
@@ -200,29 +208,40 @@ export const TableEditor = {
    * it will remove the row at the current selection.
    * @returns void
    */
-  removeRow(editor: Editor, options: { at?: Location } = {}): void {
-    const [table, tr] = Editor.nodes(editor, {
-      match: isOfType(editor, "table", "tr"),
+  removeRow(editor: Editor, options: { at?: Location } = {}) {
+    const editorOptions = EDITOR_TO_WITH_TABLE_OPTIONS.get(editor);
+
+    if (!editorOptions) {
+      return;
+    }
+
+    const [table, section, tr, td] = Editor.nodes(editor, {
+      match: isOfType(
+        editor,
+        "table", // table
+        "thead", // section
+        "tbody",
+        "tfoot",
+        "tr", // row
+        "td", // cell
+        "th"
+      ),
       at: options.at,
     });
 
-    if (!table || !tr) {
+    if (!table || !section || !tr || !td) {
       return;
     }
 
     const [, tablePath] = table;
+    const [, sectionPath] = section;
     const [, trPath] = tr;
+    const [, tdPath] = td;
 
     // check if there is a sibling in the table
     const [, globalSibling] = Editor.nodes(editor, {
       match: isOfType(editor, "tr"),
       at: tablePath,
-    });
-
-    // check if there is a sibling in the table section
-    const [, sibling] = Editor.nodes(editor, {
-      match: isOfType(editor, "tr"),
-      at: Path.parent(trPath),
     });
 
     if (!globalSibling) {
@@ -231,8 +250,113 @@ export const TableEditor = {
       });
     }
 
-    Transforms.removeNodes(editor, {
-      at: sibling ? trPath : Path.parent(trPath), // removes table section if there is no sibling in it
+    const matrix = filledMatrix(editor, { at: options.at });
+
+    let currentTrIndex = 0;
+    out: for (let x = 0; x < matrix.length; x++) {
+      for (let y = 0; y < matrix[x].length; y++) {
+        const [[, path], { ltr: colSpan }] = matrix[x][y];
+
+        if (Path.equals(tdPath, path)) {
+          currentTrIndex = x;
+          break out;
+        }
+
+        y += colSpan - 1;
+      }
+    }
+
+    // Flags whether the tr has a cell with a rowspan attribute (greater than 1).
+    // If true, cells with a rowspan will be moved to the next tr.
+    let hasRowspan = false;
+
+    // cells which span over multiple rows and have to be reduced
+    // when deleting the current tr
+    const toReduce: NodeEntry<CellElement>[] = [];
+
+    for (let i = 0; i < matrix[currentTrIndex].length; i++) {
+      const [entry, { ltr: colSpan, ttb, btt }] = matrix[currentTrIndex][i];
+
+      // checks if the cell marks the beginning of a rowspan.
+      if (ttb === 1 && btt > 1) {
+        hasRowspan = true;
+      }
+
+      // check if the cell has a rowspan greater 1, indicating
+      // it spans multiple rows.
+      if (ttb > 1 || btt > 1) {
+        toReduce.push(entry);
+      }
+
+      i += colSpan - 1;
+    }
+
+    const toAdd: NodeEntry<CellElement>[] = [];
+    const next = matrix[currentTrIndex + 1];
+    for (let i = 0; hasRowspan && i < next?.length; i++) {
+      const [entry, { ltr: colSpan, ttb }] = next[i];
+
+      // - If 1, it indicates the start of either a rowspan or a normal cell, and it can be carried over.
+      // - If 2, it signifies the start of a rowspan in the previous cell and should be carried over.
+      // - If greater than 2, the rowspan is above the current row and should not be carried over.
+      if (ttb > 2) {
+        continue;
+      }
+
+      toAdd.push(entry);
+
+      i += colSpan - 1;
+    }
+
+    Editor.withoutNormalizing(editor, () => {
+      for (const [{ rowSpan = 1 }, path] of toReduce) {
+        Transforms.setNodes<CellElement>(
+          editor,
+          { rowSpan: rowSpan - 1 },
+          { at: path }
+        );
+      }
+
+      // If a cell of the tr contains the start of a rowspan
+      // the cells will be merged with the next row
+      if (hasRowspan) {
+        const { blocks } = editorOptions;
+
+        Transforms.mergeNodes(editor, {
+          match: isOfType(editor, "tr"),
+          at: Path.next(trPath),
+        });
+
+        Transforms.insertNodes(
+          editor,
+          {
+            type: blocks.tr,
+            children: toAdd.map((entry) => {
+              const [element] = entry;
+
+              if (toReduce.includes(entry)) {
+                const { rowSpan = 1, ...rest } = element;
+
+                return { ...rest, rowSpan: rowSpan === 1 ? 1 : rowSpan - 1 };
+              }
+
+              return element;
+            }),
+          } as Node,
+          { at: Path.next(trPath) }
+        );
+      }
+
+      // check if there is a sibling in the table section
+      const [, sibling] = Editor.nodes(editor, {
+        match: isOfType(editor, "tr"),
+        at: sectionPath,
+      });
+
+      return Transforms.removeNodes(editor, {
+        // removes table section if there is no sibling in it
+        at: sibling ? trPath : sectionPath,
+      });
     });
   },
   /**

@@ -13,7 +13,6 @@ export interface PreventableEvent {
   preventDefault(): void;
 }
 
-// TODO: move somewhere
 export type NodeEntryWithContext = [
   NodeEntry<CellElement>,
   {

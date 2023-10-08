@@ -1,7 +1,4 @@
 export default {
-  // Stop running tests after `n` failures
-  bail: 1,
-
   // Automatically clear mock calls, instances, contexts and results before every test
   clearMocks: true,
 

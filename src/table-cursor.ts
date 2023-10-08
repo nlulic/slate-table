@@ -321,7 +321,7 @@ export const TableCursor = {
     }
 
     // Hacky fix to trigger change detection on selected
-    // cells by invoking a no-op operation on the paths
+    // cells by invoking a no-op on the paths
     for (const row of matrix) {
       for (const [, path] of row) {
         // no-op since the paths are the same
