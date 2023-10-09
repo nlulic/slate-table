@@ -126,7 +126,7 @@ export const TableEditor = {
 
     const matrix = filledMatrix(editor, { at: options.at });
 
-    let currentTrIndex = 0;
+    let trIndex = 0;
     outer: for (let x = 0; x < matrix.length; x++) {
       const [, currentTdPath] = currentTd;
       for (let y = 0; y < matrix[x].length; y++) {
@@ -135,7 +135,7 @@ export const TableEditor = {
           continue;
         }
 
-        currentTrIndex = x;
+        trIndex = x;
 
         // When determining the exit condition, we consider two scenarios:
         // 1. If a row will be added above the current selection, we seek the first match.
@@ -152,7 +152,7 @@ export const TableEditor = {
     });
 
     Editor.withoutNormalizing(editor, () => {
-      const destIndex = options.above ? currentTrIndex - 1 : currentTrIndex + 1;
+      const destIndex = options.above ? trIndex - 1 : trIndex + 1;
       const isWithinBounds = destIndex >= 0 && destIndex < matrix.length;
 
       let increasedRowspan = 0;
@@ -178,7 +178,7 @@ export const TableEditor = {
       const { length: colLen } = isWithinBounds ? matrix[destIndex] : matrix[0];
       const { blocks } = editorOptions;
 
-      const [, currentPath] = tableRows[currentTrIndex];
+      const [, currentPath] = tableRows[trIndex];
       const [section] = currentSection;
 
       Transforms.insertNodes(
@@ -252,13 +252,13 @@ export const TableEditor = {
 
     const matrix = filledMatrix(editor, { at: options.at });
 
-    let currentTrIndex = 0;
+    let trIndex = 0;
     out: for (let x = 0; x < matrix.length; x++) {
       for (let y = 0; y < matrix[x].length; y++) {
         const [[, path], { ltr: colSpan }] = matrix[x][y];
 
         if (Path.equals(tdPath, path)) {
-          currentTrIndex = x;
+          trIndex = x;
           break out;
         }
 
@@ -274,8 +274,8 @@ export const TableEditor = {
     // when deleting the current tr
     const toReduce: NodeEntry<CellElement>[] = [];
 
-    for (let i = 0; i < matrix[currentTrIndex].length; i++) {
-      const [entry, { ltr: colSpan, ttb, btt }] = matrix[currentTrIndex][i];
+    for (let i = 0; i < matrix[trIndex].length; i++) {
+      const [entry, { ltr: colSpan, ttb, btt }] = matrix[trIndex][i];
 
       // checks if the cell marks the beginning of a rowspan.
       if (ttb === 1 && btt > 1) {
@@ -292,7 +292,7 @@ export const TableEditor = {
     }
 
     const toAdd: NodeEntry<CellElement>[] = [];
-    const next = matrix[currentTrIndex + 1];
+    const next = matrix[trIndex + 1];
     for (let i = 0; hasRowspan && i < next?.length; i++) {
       const [entry, { ltr: colSpan, ttb }] = next[i];
 
@@ -374,47 +374,65 @@ export const TableEditor = {
       return;
     }
 
-    const {
-      blocks: { td, th, thead },
-    } = editorOptions;
-
-    const [table, cell] = Editor.nodes(editor, {
-      match: isOfType(editor, "table", "th", "td"),
-      at: options.at,
+    const [table, td] = Editor.nodes(editor, {
+      match: isOfType(
+        editor,
+        "table", // table
+        "td", // cell
+        "th"
+      ),
     });
 
-    if (!table || !cell) {
+    if (!table || !td) {
       return;
     }
 
-    const [, tablePath] = table;
-    const rows = Editor.nodes(editor, {
-      match: isOfType(editor, "tr"),
-      at: tablePath,
-    });
-    const [, targetCellPath] = cell;
+    const [, tdPath] = td;
+
+    const matrix = filledMatrix(editor, { at: options.at });
+
+    let tdIndex = 0;
+    out: for (let x = 0; x < matrix.length; x++) {
+      for (let y = 0; y < matrix[x].length; y++) {
+        const [[, path]] = matrix[x][y];
+
+        if (Path.equals(tdPath, path)) {
+          tdIndex = y;
+          if (options.left) {
+            break out;
+          }
+        }
+      }
+    }
 
     Editor.withoutNormalizing(editor, () => {
-      for (const [, path] of rows) {
-        const { type: parentType } = Node.parent(
-          editor,
-          path
-        ) as WithType<Element>;
+      const { blocks } = editorOptions;
+      for (let x = 0; x < matrix.length; x++) {
+        const [[{ colSpan = 1 }, path], { ltr, rtl }] = matrix[x][tdIndex];
 
-        const insertPath: Path = [
-          ...path,
-          targetCellPath[targetCellPath.length - 1],
-        ];
+        const shouldIncreaseColspan = options.left ? rtl > 1 : ltr > 1;
+        if (shouldIncreaseColspan) {
+          Transforms.setNodes<CellElement>(
+            editor,
+            { colSpan: colSpan + 1 },
+            { at: path }
+          );
+          continue;
+        }
+
+        // a section should always be present in the table
+        const [[section]] = Editor.nodes(editor, {
+          match: isOfType(editor, "thead", "tbody", "tfoot"),
+          at: path,
+        });
 
         Transforms.insertNodes(
           editor,
           {
-            type: parentType === thead ? th : td,
+            type: section.type === blocks.thead ? blocks.th : blocks.td,
             children: [{ text: "" }],
           } as Node,
-          {
-            at: options.left ? insertPath : Path.next(insertPath),
-          }
+          { at: options.left ? path : Path.next(path) }
         );
       }
     });
