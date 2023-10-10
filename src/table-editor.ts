@@ -1,15 +1,7 @@
-import { CellElement, WithType } from "./utils/types";
+import { CellElement } from "./utils/types";
 import { DEFAULT_INSERT_TABLE_OPTIONS, InsertTableOptions } from "./options";
 import { EDITOR_TO_WITH_TABLE_OPTIONS } from "./weak-maps";
-import {
-  Editor,
-  Element,
-  Location,
-  Node,
-  NodeEntry,
-  Path,
-  Transforms,
-} from "slate";
+import { Editor, Location, Node, NodeEntry, Path, Transforms } from "slate";
 import { TableCursor } from "./table-cursor";
 import { filledMatrix, isOfType } from "./utils";
 
@@ -381,6 +373,7 @@ export const TableEditor = {
         "td", // cell
         "th"
       ),
+      at: options.at,
     });
 
     if (!table || !td) {
@@ -443,38 +436,66 @@ export const TableEditor = {
    * @returns void
    */
   removeColumn(editor: Editor, options: { at?: Location } = {}): void {
-    const [table, cell] = Editor.nodes(editor, {
-      match: isOfType(editor, "table", "th", "td"),
+    const [table, tr, td] = Editor.nodes(editor, {
+      match: isOfType(
+        editor,
+        "table", // table
+        "tr", // tr
+        "td", // cell
+        "th"
+      ),
       at: options.at,
     });
 
-    if (!table || !cell) {
+    if (!table || !tr || !td) {
       return;
     }
 
     const [, tablePath] = table;
+    const [, trPath] = tr;
+    const [, tdPath] = td;
 
-    const rows = Editor.nodes(editor, {
-      match: isOfType(editor, "tr"),
-      at: tablePath,
+    const [, sibling] = Editor.nodes(editor, {
+      match: isOfType(editor, "th", "td"),
+      at: trPath,
     });
 
-    const [, targetCellPath] = cell;
-    const [, sibling] = Node.children(editor, Path.parent(targetCellPath));
-
-    // Remove table if it is the last column in the table
     if (!sibling) {
-      return this.removeTable(editor, { at: options.at });
+      return Transforms.removeNodes(editor, {
+        at: tablePath,
+      });
+    }
+
+    const matrix = filledMatrix(editor, { at: options.at });
+
+    let tdIndex = 0;
+    out: for (let x = 0; x < matrix.length; x++) {
+      for (let y = 0; y < matrix[x].length; y++) {
+        const [[, path], { ltr: colSpan }] = matrix[x][y];
+
+        if (Path.equals(tdPath, path)) {
+          tdIndex = y;
+          break out;
+        }
+
+        y += colSpan - 1;
+      }
     }
 
     Editor.withoutNormalizing(editor, () => {
-      for (const [, path] of rows) {
-        const deletionPath: Path = [
-          ...path,
-          targetCellPath[targetCellPath.length - 1],
-        ];
+      for (let x = 0; x < matrix.length; x++) {
+        const [[{ colSpan = 1 }, path], { ltr, rtl }] = matrix[x][tdIndex];
 
-        Transforms.removeNodes(editor, { at: deletionPath });
+        if (ltr === 1 && rtl === 1) {
+          Transforms.removeNodes(editor, { at: path });
+          continue;
+        }
+
+        Transforms.setNodes<CellElement>(
+          editor,
+          { colSpan: colSpan - 1 },
+          { at: path }
+        );
       }
     });
   },

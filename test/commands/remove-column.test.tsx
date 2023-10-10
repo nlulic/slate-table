@@ -170,4 +170,306 @@ describe("removeColumn", () => {
     assert.deepEqual(editor.children, expected.children);
     assert.deepEqual(editor.selection, expected.selection);
   });
+
+  /*
+   * Actual:                Expected:
+   * +---+---+---+---+      +---+---+---+---+
+   * | 1 | 2*| 3 | 4 |  =>  | 1 | 2 | 3 | 4 |
+   * +---+---+---+---+      +---+---+---+---+
+   * | 5 |     6     |      | 5 |     6     |
+   * +---+---+---+---+      +---+---+---+---+
+   * |   7   | 8 | 9 |      |   7   | 8 | 9 |
+   * +---+---+---+---+      +---+---+---+---+
+   */
+  it("should remove the column and correctly reduce colspan", () => {
+    const actual = (
+      <editor>
+        <table>
+          <thead>
+            <tr>
+              <th>
+                <paragraph>
+                  <text>1</text>
+                </paragraph>
+              </th>
+              <th>
+                <paragraph>
+                  <text>
+                    2<cursor />
+                  </text>
+                </paragraph>
+              </th>
+              <th>
+                <paragraph>
+                  <text>3</text>
+                </paragraph>
+              </th>
+              <th>
+                <paragraph>
+                  <text>4</text>
+                </paragraph>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>
+                <paragraph>
+                  <text>5</text>
+                </paragraph>
+              </td>
+              <td colSpan={3}>
+                <paragraph>
+                  <text>6</text>
+                </paragraph>
+              </td>
+            </tr>
+          </tbody>
+          <tfoot>
+            <tr>
+              <td colSpan={2}>
+                <paragraph>
+                  <text>7</text>
+                </paragraph>
+              </td>
+              <td>
+                <paragraph>
+                  <text>8</text>
+                </paragraph>
+              </td>
+              <td>
+                <paragraph>
+                  <text>9</text>
+                </paragraph>
+              </td>
+            </tr>
+          </tfoot>
+        </table>
+      </editor>
+    );
+
+    const expected = (
+      <editor>
+        <table>
+          <thead>
+            <tr>
+              <th>
+                <paragraph>
+                  <text>1</text>
+                </paragraph>
+              </th>
+              <th>
+                <paragraph>
+                  <text>
+                    <cursor />3
+                  </text>
+                </paragraph>
+              </th>
+              <th>
+                <paragraph>
+                  <text>4</text>
+                </paragraph>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>
+                <paragraph>
+                  <text>5</text>
+                </paragraph>
+              </td>
+              <td colSpan={2}>
+                <paragraph>
+                  <text>6</text>
+                </paragraph>
+              </td>
+            </tr>
+          </tbody>
+          <tfoot>
+            <tr>
+              <td colSpan={1}>
+                <paragraph>
+                  <text>7</text>
+                </paragraph>
+              </td>
+              <td>
+                <paragraph>
+                  <text>8</text>
+                </paragraph>
+              </td>
+              <td>
+                <paragraph>
+                  <text>9</text>
+                </paragraph>
+              </td>
+            </tr>
+          </tfoot>
+        </table>
+      </editor>
+    );
+
+    const editor = withTest(
+      withTable(actual, {
+        ...DEFAULT_WITH_TABLE_OPTIONS,
+        withNormalization: false,
+      })
+    );
+
+    TableEditor.removeColumn(editor);
+
+    assert.deepEqual(editor.children, expected.children);
+    assert.deepEqual(editor.selection, expected.selection);
+  });
+
+  /*
+   * Actual:                Expected:
+   * +---+---+---+---+      +---+---+---+
+   * | 1 | 2 | 3 | 4 |  =>  | 1 | 3 | 4 |
+   * +---+---+---+---+      +---+---+---+
+   * | 5 |     6*    |      | 5 |   6   |
+   * +---+---+---+---+      +---+---+---+
+   * |   7   | 8 | 9 |      | 7 | 8 | 9 |
+   * +---+---+---+---+      +---+---+---+
+   */
+  it("should remove the column and correctly reduce colspan when selection has a colspan", () => {
+    const actual = (
+      <editor>
+        <table>
+          <thead>
+            <tr>
+              <th>
+                <paragraph>
+                  <text>1</text>
+                </paragraph>
+              </th>
+              <th>
+                <paragraph>
+                  <text>2</text>
+                </paragraph>
+              </th>
+              <th>
+                <paragraph>
+                  <text>3</text>
+                </paragraph>
+              </th>
+              <th>
+                <paragraph>
+                  <text>4</text>
+                </paragraph>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>
+                <paragraph>
+                  <text>5</text>
+                </paragraph>
+              </td>
+              <td colSpan={3}>
+                <paragraph>
+                  <text>
+                    6<cursor />
+                  </text>
+                </paragraph>
+              </td>
+            </tr>
+          </tbody>
+          <tfoot>
+            <tr>
+              <td colSpan={2}>
+                <paragraph>
+                  <text>7</text>
+                </paragraph>
+              </td>
+              <td>
+                <paragraph>
+                  <text>8</text>
+                </paragraph>
+              </td>
+              <td>
+                <paragraph>
+                  <text>9</text>
+                </paragraph>
+              </td>
+            </tr>
+          </tfoot>
+        </table>
+      </editor>
+    );
+
+    const expected = (
+      <editor>
+        <table>
+          <thead>
+            <tr>
+              <th>
+                <paragraph>
+                  <text>1</text>
+                </paragraph>
+              </th>
+              <th>
+                <paragraph>
+                  <text>3</text>
+                </paragraph>
+              </th>
+              <th>
+                <paragraph>
+                  <text>4</text>
+                </paragraph>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>
+                <paragraph>
+                  <text>5</text>
+                </paragraph>
+              </td>
+              <td colSpan={2}>
+                <paragraph>
+                  <text>
+                    6<cursor />
+                  </text>
+                </paragraph>
+              </td>
+            </tr>
+          </tbody>
+          <tfoot>
+            <tr>
+              <td colSpan={1}>
+                <paragraph>
+                  <text>7</text>
+                </paragraph>
+              </td>
+              <td>
+                <paragraph>
+                  <text>8</text>
+                </paragraph>
+              </td>
+              <td>
+                <paragraph>
+                  <text>9</text>
+                </paragraph>
+              </td>
+            </tr>
+          </tfoot>
+        </table>
+      </editor>
+    );
+
+    const editor = withTest(
+      withTable(actual, {
+        ...DEFAULT_WITH_TABLE_OPTIONS,
+        withNormalization: false,
+      })
+    );
+
+    TableEditor.removeColumn(editor);
+
+    assert.deepEqual(editor.children, expected.children);
+    assert.deepEqual(editor.selection, expected.selection);
+  });
 });
