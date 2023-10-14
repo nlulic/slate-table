@@ -20,9 +20,7 @@ export function filledMatrix(
   // fill matrix
   for (let x = 0; x < matrix.length; x++) {
     for (let y = 0, offset = 0; y < matrix[x].length; y++) {
-      const [element] = matrix[x][y];
-      const rowSpan = element.rowSpan || 1;
-      const colSpan = element.colSpan || 1;
+      const [{ rowSpan = 1, colSpan = 1 }] = matrix[x][y];
 
       for (let c = 0, occupied = 0; c < colSpan + occupied; c++) {
         if (filled[x][y + c + offset]) {

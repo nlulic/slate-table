@@ -400,33 +400,78 @@ export const TableEditor = {
 
     Editor.withoutNormalizing(editor, () => {
       const { blocks } = editorOptions;
-      for (let x = 0; x < matrix.length; x++) {
-        const [[{ colSpan = 1 }, path], { ltr, rtl }] = matrix[x][tdIndex];
+      outer: for (let x = 0; x < matrix.length; x++) {
+        const [[{ colSpan = 1 }, path], { ltr, rtl, ttb, btt }] =
+          matrix[x][tdIndex];
 
-        const shouldIncreaseColspan = options.left ? rtl > 1 : ltr > 1;
-        if (shouldIncreaseColspan) {
+        // when inserting left and the right-to-left is greater than 1, the colspan is increased
+        // when inserting right and the left-to-right is greater than 1, the colspan is increased
+        if (options.left ? rtl > 1 : ltr > 1) {
           Transforms.setNodes<CellElement>(
             editor,
             { colSpan: colSpan + 1 },
             { at: path }
           );
+
+          // skip increasing the colspan for the same cell if it has a rowspan
+          x += btt - 1;
           continue;
         }
 
-        // a section should always be present in the table
+        // section should always be present in the table
         const [[section]] = Editor.nodes(editor, {
           match: isOfType(editor, "thead", "tbody", "tfoot"),
           at: path,
         });
 
-        Transforms.insertNodes(
-          editor,
-          {
-            type: section.type === blocks.thead ? blocks.th : blocks.td,
-            children: [{ text: "" }],
-          } as Node,
-          { at: options.left ? path : Path.next(path) }
-        );
+        const insertTd = (path: Path): void =>
+          Transforms.insertNodes(
+            editor,
+            {
+              type: section.type === blocks.thead ? blocks.th : blocks.td,
+              children: [
+                {
+                  type: blocks.content,
+                  children: [{ text: "" }],
+                } as Node,
+              ],
+            } as Node,
+            { at: path }
+          );
+
+        // if the cell has no rowspan, just insert:
+        if (ttb === 1) {
+          insertTd(options.left ? path : Path.next(path));
+          continue;
+        }
+
+        // iterate to the prev real cell
+        for (let y = tdIndex; y >= 0; y--) {
+          const [[, path], { ttb }] = matrix[x][y];
+
+          // skip cells which span through the row because of their rowspan attribute
+          if (ttb !== 1) {
+            continue;
+          }
+
+          // always the next path when adding from this loop
+          insertTd(Path.next(path));
+          continue outer;
+        }
+
+        let index = 0;
+        for (const [, path] of Editor.nodes(editor, {
+          match: isOfType(editor, "tr"),
+          at: table[1],
+        })) {
+          if (index !== x) {
+            index++;
+            continue;
+          }
+
+          insertTd(path.concat(0));
+          continue outer;
+        }
       }
     });
   },
@@ -435,6 +480,7 @@ export const TableEditor = {
    * it will remove the column at the current selection.
    * @returns void
    */
+  // TODO: theres still a problem with this...
   removeColumn(editor: Editor, options: { at?: Location } = {}): void {
     const [table, tr, td] = Editor.nodes(editor, {
       match: isOfType(
@@ -484,18 +530,17 @@ export const TableEditor = {
 
     Editor.withoutNormalizing(editor, () => {
       for (let x = 0; x < matrix.length; x++) {
-        const [[{ colSpan = 1 }, path], { ltr, rtl }] = matrix[x][tdIndex];
+        const [[{ colSpan = 1 }, path], { ltr, rtl, btt }] = matrix[x][tdIndex];
 
-        if (ltr === 1 && rtl === 1) {
-          Transforms.removeNodes(editor, { at: path });
-          continue;
-        }
+        ltr === 1 && rtl === 1
+          ? Transforms.removeNodes(editor, { at: path })
+          : Transforms.setNodes<CellElement>(
+              editor,
+              { colSpan: colSpan - 1 },
+              { at: path }
+            );
 
-        Transforms.setNodes<CellElement>(
-          editor,
-          { colSpan: colSpan - 1 },
-          { at: path }
-        );
+        x += btt - 1; // increase by rowspan
       }
     });
   },

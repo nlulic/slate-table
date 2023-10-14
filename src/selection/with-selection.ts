@@ -63,7 +63,6 @@ export const withSelection = <T extends Editor>(
     }
 
     const filled = filledMatrix(editor, { at: fromPath });
-
     // find initial bounds
     const from = Point.valueOf(0, 0);
     const to = Point.valueOf(0, 0);
