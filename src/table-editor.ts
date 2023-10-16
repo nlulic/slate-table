@@ -480,7 +480,6 @@ export const TableEditor = {
    * it will remove the column at the current selection.
    * @returns void
    */
-  // TODO: theres still a problem with this...
   removeColumn(editor: Editor, options: { at?: Location } = {}): void {
     const [table, tr, td] = Editor.nodes(editor, {
       match: isOfType(
@@ -529,8 +528,33 @@ export const TableEditor = {
     }
 
     Editor.withoutNormalizing(editor, () => {
-      for (let x = 0; x < matrix.length; x++) {
-        const [[{ colSpan = 1 }, path], { ltr, rtl, btt }] = matrix[x][tdIndex];
+      for (let x = matrix.length - 1; x >= 0; x--) {
+        const [[{ colSpan = 1 }, path], { ltr, rtl, ttb }] = matrix[x][tdIndex];
+
+        // skip "fake" cells which belong to a cell with a `rowspan`
+        if (ttb > 1) {
+          continue;
+        }
+
+        let hasSibling = false;
+        for (let y = 0; y < matrix[x].length; y++) {
+          if (y === tdIndex) {
+            continue;
+          }
+
+          const [[, siblingPath], { ltr: colSpan }] = matrix[x][y];
+          if (Path.isSibling(path, siblingPath)) {
+            hasSibling = true;
+            break;
+          }
+
+          y += colSpan - 1;
+        }
+
+        if (!hasSibling) {
+          this.removeRow(editor, { at: path });
+          continue;
+        }
 
         ltr === 1 && rtl === 1
           ? Transforms.removeNodes(editor, { at: path })
@@ -540,7 +564,7 @@ export const TableEditor = {
               { at: path }
             );
 
-        x += btt - 1; // increase by rowspan
+        x -= ttb - 1;
       }
     });
   },

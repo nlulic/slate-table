@@ -1,5 +1,6 @@
 import { Editor, Element } from "slate";
 import { createHyperscript } from "slate-hyperscript";
+import { WithTableOptions, DEFAULT_WITH_TABLE_OPTIONS } from "../src/options";
 
 export const jsx = createHyperscript({
   elements: {
@@ -30,6 +31,11 @@ export const jsx = createHyperscript({
     inline: { inline: true },
   },
 });
+
+export const DEFAULT_TEST_WITH_TABLE_OPTIONS: WithTableOptions = {
+  ...DEFAULT_WITH_TABLE_OPTIONS,
+  withNormalization: false,
+};
 
 export const withTest = (editor: Editor) => {
   const { isInline } = editor;

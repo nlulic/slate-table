@@ -2,20 +2,11 @@
 /** @jsx jsx */
 
 import assert from "assert";
-import {
-  DEFAULT_WITH_TABLE_OPTIONS,
-  WithTableOptions,
-} from "../../src/options";
+import { DEFAULT_TEST_WITH_TABLE_OPTIONS, jsx, withTest } from "../index";
 import { TableEditor } from "../../src/table-editor";
-import { jsx, withTest } from "../index";
 import { withTable } from "../../src/with-table";
 
 describe("insertColumn", () => {
-  const tableOptions: WithTableOptions = {
-    ...DEFAULT_WITH_TABLE_OPTIONS,
-    withNormalization: false,
-  };
-
   /*
    * Actual:        Expected:
    * +---+---+      +---+---+---+
@@ -109,7 +100,7 @@ describe("insertColumn", () => {
       </editor>
     );
 
-    const editor = withTest(withTable(actual, tableOptions));
+    const editor = withTest(withTable(actual, DEFAULT_TEST_WITH_TABLE_OPTIONS));
 
     TableEditor.insertColumn(editor);
 
@@ -210,7 +201,7 @@ describe("insertColumn", () => {
       </editor>
     );
 
-    const editor = withTest(withTable(actual, tableOptions));
+    const editor = withTest(withTable(actual, DEFAULT_TEST_WITH_TABLE_OPTIONS));
 
     TableEditor.insertColumn(editor, { left: true });
 
@@ -309,7 +300,7 @@ describe("insertColumn", () => {
       </editor>
     );
 
-    const editor = withTest(withTable(actual, tableOptions));
+    const editor = withTest(withTable(actual, DEFAULT_TEST_WITH_TABLE_OPTIONS));
 
     TableEditor.insertColumn(editor, { at: [0, 0, 0, 1] });
 
@@ -410,7 +401,7 @@ describe("insertColumn", () => {
       </editor>
     );
 
-    const editor = withTest(withTable(actual, tableOptions));
+    const editor = withTest(withTable(actual, DEFAULT_TEST_WITH_TABLE_OPTIONS));
 
     TableEditor.insertColumn(editor);
 
@@ -511,7 +502,7 @@ describe("insertColumn", () => {
       </editor>
     );
 
-    const editor = withTest(withTable(actual, tableOptions));
+    const editor = withTest(withTable(actual, DEFAULT_TEST_WITH_TABLE_OPTIONS));
 
     TableEditor.insertColumn(editor, { left: true });
 
@@ -687,7 +678,7 @@ describe("insertColumn", () => {
       </editor>
     );
 
-    const editor = withTest(withTable(actual, tableOptions));
+    const editor = withTest(withTable(actual, DEFAULT_TEST_WITH_TABLE_OPTIONS));
 
     TableEditor.insertColumn(editor);
 
@@ -863,7 +854,7 @@ describe("insertColumn", () => {
       </editor>
     );
 
-    const editor = withTest(withTable(actual, tableOptions));
+    const editor = withTest(withTable(actual, DEFAULT_TEST_WITH_TABLE_OPTIONS));
 
     TableEditor.insertColumn(editor, { left: true });
 
@@ -1039,7 +1030,7 @@ describe("insertColumn", () => {
       </editor>
     );
 
-    const editor = withTest(withTable(actual, tableOptions));
+    const editor = withTest(withTable(actual, DEFAULT_TEST_WITH_TABLE_OPTIONS));
 
     TableEditor.insertColumn(editor);
 
@@ -1215,7 +1206,7 @@ describe("insertColumn", () => {
       </editor>
     );
 
-    const editor = withTest(withTable(actual, tableOptions));
+    const editor = withTest(withTable(actual, DEFAULT_TEST_WITH_TABLE_OPTIONS));
 
     TableEditor.insertColumn(editor, { left: true });
 
@@ -1233,7 +1224,7 @@ describe("insertColumn", () => {
    * |   7   | 8 | 9 |      |   7   | X | 8 | 9 |
    * +---+---+---+---+      +---+---+---+---+---+
    */
-  it("should insert to the right when column has `colspan` and increase it", () => {
+  it("should insert to the right when column has colspan and increase it", () => {
     const actual = (
       <editor>
         <table>
@@ -1376,7 +1367,7 @@ describe("insertColumn", () => {
       </editor>
     );
 
-    const editor = withTest(withTable(actual, tableOptions));
+    const editor = withTest(withTable(actual, DEFAULT_TEST_WITH_TABLE_OPTIONS));
 
     TableEditor.insertColumn(editor);
 
@@ -1394,7 +1385,7 @@ describe("insertColumn", () => {
    * |   7   | 8 | 9 |      |   7   | X | 8 | 9 |
    * +---+---+---+---+      +---+---+---+---+---+
    */
-  it("should insert to the left when column has `colspan` and increase it", () => {
+  it("should insert to the left when column has colspan and increase it", () => {
     const actual = (
       <editor>
         <table>
@@ -1537,7 +1528,7 @@ describe("insertColumn", () => {
       </editor>
     );
 
-    const editor = withTest(withTable(actual, tableOptions));
+    const editor = withTest(withTable(actual, DEFAULT_TEST_WITH_TABLE_OPTIONS));
 
     TableEditor.insertColumn(editor, { left: true });
 
@@ -1713,7 +1704,7 @@ describe("insertColumn", () => {
       </editor>
     );
 
-    const editor = withTest(withTable(actual, tableOptions));
+    const editor = withTest(withTable(actual, DEFAULT_TEST_WITH_TABLE_OPTIONS));
 
     TableEditor.insertColumn(editor);
 
@@ -1889,7 +1880,7 @@ describe("insertColumn", () => {
       </editor>
     );
 
-    const editor = withTest(withTable(actual, tableOptions));
+    const editor = withTest(withTable(actual, DEFAULT_TEST_WITH_TABLE_OPTIONS));
 
     TableEditor.insertColumn(editor, { left: true });
 
@@ -1907,7 +1898,7 @@ describe("insertColumn", () => {
    * | 4 |   |      | 4 |   | X |
    * +---+---+      +---+---+---+
    */
-  it("should insert at the end when cell has `rowspan`", () => {
+  it("should insert at the end when cell has rowspan", () => {
     const actual = (
       <editor>
         <table>
@@ -1997,7 +1988,7 @@ describe("insertColumn", () => {
       </editor>
     );
 
-    const editor = withTest(withTable(actual, tableOptions));
+    const editor = withTest(withTable(actual, DEFAULT_TEST_WITH_TABLE_OPTIONS));
 
     TableEditor.insertColumn(editor);
 
@@ -2015,7 +2006,7 @@ describe("insertColumn", () => {
    * |   | 4 |      | X |   | 4 |
    * +---+---+      +---+---+---+
    */
-  it("should insert at the start when cell has `rowspan`", () => {
+  it("should insert at the start when cell has rowspan", () => {
     const actual = (
       <editor>
         <table>
@@ -2105,7 +2096,7 @@ describe("insertColumn", () => {
       </editor>
     );
 
-    const editor = withTest(withTable(actual, tableOptions));
+    const editor = withTest(withTable(actual, DEFAULT_TEST_WITH_TABLE_OPTIONS));
 
     TableEditor.insertColumn(editor, { left: true });
 
@@ -2125,7 +2116,7 @@ describe("insertColumn", () => {
    * | 4 |   |      | 4 |   | X |
    * +---+---+      +---+---+---+
    */
-  it("should insert at the end when cell has `rowspan` and `thead`", () => {
+  it("should insert at the end when cell has rowspan and thead", () => {
     const actual = (
       <editor>
         <table>
@@ -2248,7 +2239,7 @@ describe("insertColumn", () => {
       </editor>
     );
 
-    const editor = withTest(withTable(actual, tableOptions));
+    const editor = withTest(withTable(actual, DEFAULT_TEST_WITH_TABLE_OPTIONS));
 
     TableEditor.insertColumn(editor);
 
@@ -2268,7 +2259,7 @@ describe("insertColumn", () => {
    * |   | 4 |      | X |   | 4 |
    * +---+---+      +---+---+---+
    */
-  it("should insert at the start when cell has `rowspan` and `thead`", () => {
+  it("should insert at the start when cell has rowspan and thead", () => {
     const actual = (
       <editor>
         <table>
@@ -2391,7 +2382,7 @@ describe("insertColumn", () => {
       </editor>
     );
 
-    const editor = withTest(withTable(actual, tableOptions));
+    const editor = withTest(withTable(actual, DEFAULT_TEST_WITH_TABLE_OPTIONS));
 
     TableEditor.insertColumn(editor, { left: true });
 
@@ -2413,7 +2404,7 @@ describe("insertColumn", () => {
    * | 8 | 9 | 0 | 1 |      | 8 | 9 | 0 | X | 1 |
    * +---+---+---+---+      +---+---+---+---+---+
    */
-  it("should insert to the right when column has `rowspan` and `colspan` and increase its `colspan` correctly", () => {
+  it("should insert to the right when column has rowspan and colspan and increase its colspan correctly", () => {
     const actual = (
       <editor>
         <table>
@@ -2625,7 +2616,7 @@ describe("insertColumn", () => {
       </editor>
     );
 
-    const editor = withTest(withTable(actual, tableOptions));
+    const editor = withTest(withTable(actual, DEFAULT_TEST_WITH_TABLE_OPTIONS));
 
     TableEditor.insertColumn(editor);
 
@@ -2647,7 +2638,7 @@ describe("insertColumn", () => {
    * | 8 | 9 | 0 | 1 |      | 8 | 9 | X | 0 | 1 |
    * +---+---+---+---+      +---+---+---+---+---+
    */
-  it("should insert to the left when column has `rowspan` and `colspan` and increase its `colspan` correctly", () => {
+  it("should insert to the left when column has rowspan and colspan and increase its colspan correctly", () => {
     const actual = (
       <editor>
         <table>
@@ -2859,7 +2850,7 @@ describe("insertColumn", () => {
       </editor>
     );
 
-    const editor = withTest(withTable(actual, tableOptions));
+    const editor = withTest(withTable(actual, DEFAULT_TEST_WITH_TABLE_OPTIONS));
 
     TableEditor.insertColumn(editor, { left: true });
 
