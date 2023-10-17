@@ -2,29 +2,41 @@
 /** @jsx jsx */
 
 import assert from "assert";
-import {
-  DEFAULT_WITH_TABLE_OPTIONS,
-  WithTableOptions,
-} from "../../src/options";
 import { TableEditor } from "../../src/table-editor";
-import { jsx, withTest } from "../index";
+import { DEFAULT_TEST_WITH_TABLE_OPTIONS, jsx, withTest } from "../index";
 import { withTable } from "../../src/with-table";
 
 describe("removeRow", () => {
-  const WITH_TABLE_OPTIONS: WithTableOptions = {
-    ...DEFAULT_WITH_TABLE_OPTIONS,
-    // disable normalization to not remove redundant rowSpan attributes
-    withNormalization: false,
-  };
-
-  it("should remove the row in the current selection", () => {
+  /*
+   * Actual:            Expected:
+   * +---+---+---+      +---+---+---+
+   * | 1 | 2 | 3 |  =>  | 1 | 2 | 3*|
+   * +---+---+---+      +---+---+---+
+   * | 4*| 5 | 6 |      | 7 | 8 | 9 |
+   * +---+---+---+      +---+---+---+
+   * | 7 | 8 | 9 |
+   * +---+---+---+
+   */
+  it("should remove the middle row", () => {
     const actual = (
       <editor>
         <table>
           <thead>
             <tr>
               <th>
-                <paragraph />
+                <paragraph>
+                  <text>1</text>
+                </paragraph>
+              </th>
+              <th>
+                <paragraph>
+                  <text>2</text>
+                </paragraph>
+              </th>
+              <th>
+                <paragraph>
+                  <text>3</text>
+                </paragraph>
               </th>
             </tr>
           </thead>
@@ -32,127 +44,96 @@ describe("removeRow", () => {
             <tr>
               <td>
                 <paragraph>
-                  <text />
+                  <text>
+                    4<cursor />
+                  </text>
                 </paragraph>
               </td>
-            </tr>
-            <tr>
               <td>
                 <paragraph>
-                  <text />
-                  <cursor />
+                  <text>5</text>
+                </paragraph>
+              </td>
+              <td>
+                <paragraph>
+                  <text>6</text>
                 </paragraph>
               </td>
             </tr>
           </tbody>
+          <tfoot>
+            <tr>
+              <td>
+                <paragraph>
+                  <text>7</text>
+                </paragraph>
+              </td>
+              <td>
+                <paragraph>
+                  <text>8</text>
+                </paragraph>
+              </td>
+              <td>
+                <paragraph>
+                  <text>9</text>
+                </paragraph>
+              </td>
+            </tr>
+          </tfoot>
         </table>
       </editor>
     );
+
     const expected = (
       <editor>
         <table>
           <thead>
             <tr>
               <th>
-                <paragraph />
+                <paragraph>
+                  <text>1</text>
+                </paragraph>
+              </th>
+              <th>
+                <paragraph>
+                  <text>2</text>
+                </paragraph>
+              </th>
+              <th>
+                <paragraph>
+                  <text>3</text>
+                </paragraph>
               </th>
             </tr>
           </thead>
-          <tbody>
+          <tfoot>
             <tr>
               <td>
                 <paragraph>
-                  <text />
-                  <cursor />
+                  <text>
+                    <cursor />7
+                  </text>
+                </paragraph>
+              </td>
+              <td>
+                <paragraph>
+                  <text>8</text>
+                </paragraph>
+              </td>
+              <td>
+                <paragraph>
+                  <text>9</text>
                 </paragraph>
               </td>
             </tr>
-          </tbody>
+          </tfoot>
         </table>
       </editor>
     );
 
-    const editor = withTest(withTable(actual, WITH_TABLE_OPTIONS));
+    const editor = withTest(withTable(actual, DEFAULT_TEST_WITH_TABLE_OPTIONS));
 
     TableEditor.removeRow(editor);
-
-    assert.deepEqual(editor.children, expected.children);
-    assert.deepEqual(editor.selection, expected.selection);
-  });
-
-  it("should remove the row at a specified location", () => {
-    const actual = (
-      <editor>
-        <table>
-          <thead>
-            <tr>
-              <th>
-                <paragraph />
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>
-                <paragraph>
-                  <text />
-                  <cursor />
-                </paragraph>
-              </td>
-            </tr>
-            <tr>
-              <td>
-                <paragraph>
-                  <text />
-                </paragraph>
-              </td>
-            </tr>
-            <tr>
-              <td>
-                <paragraph>
-                  <text />
-                </paragraph>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </editor>
-    );
-
-    const expected = (
-      <editor>
-        <table>
-          <thead>
-            <tr>
-              <th>
-                <paragraph />
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>
-                <paragraph>
-                  <text />
-                  <cursor />
-                </paragraph>
-              </td>
-            </tr>
-            <tr>
-              <td>
-                <paragraph>
-                  <text />
-                </paragraph>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </editor>
-    );
-
-    const editor = withTest(withTable(actual, WITH_TABLE_OPTIONS));
-
-    TableEditor.removeRow(editor, { at: [0, 1, 1] });
 
     assert.deepEqual(editor.children, expected.children);
     assert.deepEqual(editor.selection, expected.selection);
@@ -161,26 +142,149 @@ describe("removeRow", () => {
   /*
    * Actual:            Expected:
    * +---+---+---+      +---+---+---+
-   * |   | 2 | 3 |  =>  |   | 4 | 5 |
-   * +   +---+---+      + 1 +---+---+
-   * | 1*| 4 | 5 |      |   | 6 | 7 |
-   * +   +---+---+      +---+---+---+
-   * |   | 6 | 7 |
+   * | 1 | 2 | 3 |  =>  | 1 | 2 | 3 |
+   * +---+---+---+      +---+---+---+
+   * | 4 | 5 | 6 |      | 7 | 8 | 9 |
+   * +---+---+---+      +---+---+---+
+   * | 7 | 8 | 9 |
    * +---+---+---+
-   * The cell with a rowspan attribute greater than 1 should
-   * be moved to the next row and its rowspan attribute will
-   * get reduced by 1.
    */
-  it("should remove a row with a rowspan attribute", () => {
+  it("should remove at a specified location", () => {
+    const actual = (
+      <editor>
+        <table>
+          <thead>
+            <tr>
+              <th>
+                <paragraph>
+                  <text>1</text>
+                </paragraph>
+              </th>
+              <th>
+                <paragraph>
+                  <text>2</text>
+                </paragraph>
+              </th>
+              <th>
+                <paragraph>
+                  <text>3</text>
+                </paragraph>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>
+                <paragraph>
+                  <text>4</text>
+                </paragraph>
+              </td>
+              <td>
+                <paragraph>
+                  <text>5</text>
+                </paragraph>
+              </td>
+              <td>
+                <paragraph>
+                  <text>6</text>
+                </paragraph>
+              </td>
+            </tr>
+          </tbody>
+          <tfoot>
+            <tr>
+              <td>
+                <paragraph>
+                  <text>7</text>
+                </paragraph>
+              </td>
+              <td>
+                <paragraph>
+                  <text>8</text>
+                </paragraph>
+              </td>
+              <td>
+                <paragraph>
+                  <text>9</text>
+                </paragraph>
+              </td>
+            </tr>
+          </tfoot>
+        </table>
+      </editor>
+    );
+
+    const expected = (
+      <editor>
+        <table>
+          <thead>
+            <tr>
+              <th>
+                <paragraph>
+                  <text>1</text>
+                </paragraph>
+              </th>
+              <th>
+                <paragraph>
+                  <text>2</text>
+                </paragraph>
+              </th>
+              <th>
+                <paragraph>
+                  <text>3</text>
+                </paragraph>
+              </th>
+            </tr>
+          </thead>
+          <tfoot>
+            <tr>
+              <td>
+                <paragraph>
+                  <text>7</text>
+                </paragraph>
+              </td>
+              <td>
+                <paragraph>
+                  <text>8</text>
+                </paragraph>
+              </td>
+              <td>
+                <paragraph>
+                  <text>9</text>
+                </paragraph>
+              </td>
+            </tr>
+          </tfoot>
+        </table>
+      </editor>
+    );
+
+    const editor = withTest(withTable(actual, DEFAULT_TEST_WITH_TABLE_OPTIONS));
+
+    TableEditor.removeRow(editor, { at: [0, 1, 0, 0, 0] });
+
+    assert.deepEqual(editor.children, expected.children);
+    assert.deepEqual(editor.selection, expected.selection);
+  });
+
+  /*
+   * Actual:            Expected:
+   * +---+---+---+      +---+---+---+
+   * | 1*| 2 | 3 |  =>  |*4 | 5 | 6 |
+   * +---+---+---+      +---+---+---+
+   * | 4 | 5 | 6 |
+   * +---+---+---+
+   */
+  it("should remove start row", () => {
     const actual = (
       <editor>
         <table>
           <tbody>
             <tr>
-              <td rowSpan={3}>
+              <td>
                 <paragraph>
                   <text>
-                    <cursor />1
+                    1<cursor />
                   </text>
                 </paragraph>
               </td>
@@ -206,16 +310,9 @@ describe("removeRow", () => {
                   <text>5</text>
                 </paragraph>
               </td>
-            </tr>
-            <tr>
               <td>
                 <paragraph>
                   <text>6</text>
-                </paragraph>
-              </td>
-              <td>
-                <paragraph>
-                  <text>7</text>
                 </paragraph>
               </td>
             </tr>
@@ -229,16 +326,11 @@ describe("removeRow", () => {
         <table>
           <tbody>
             <tr>
-              <td rowSpan={2}>
-                <paragraph>
-                  <text>
-                    <cursor />1
-                  </text>
-                </paragraph>
-              </td>
               <td>
                 <paragraph>
-                  <text>4</text>
+                  <text>
+                    <cursor />4
+                  </text>
                 </paragraph>
               </td>
               <td>
@@ -246,25 +338,18 @@ describe("removeRow", () => {
                   <text>5</text>
                 </paragraph>
               </td>
-            </tr>
-            <tr>
               <td>
                 <paragraph>
                   <text>6</text>
                 </paragraph>
               </td>
-              <td>
-                <paragraph>
-                  <text>7</text>
-                </paragraph>
-              </td>
             </tr>
           </tbody>
         </table>
       </editor>
     );
 
-    const editor = withTest(withTable(actual, WITH_TABLE_OPTIONS));
+    const editor = withTest(withTable(actual, DEFAULT_TEST_WITH_TABLE_OPTIONS));
 
     TableEditor.removeRow(editor);
 
@@ -275,103 +360,18 @@ describe("removeRow", () => {
   /*
    * Actual:            Expected:
    * +---+---+---+      +---+---+---+
-   * |   | 2*| 3 |  =>  | 1 | 4 | 5 |
-   * + 1 +---+---+      +---+---+---+
-   * |   | 4 | 5 |
-   * +---+---+---+
-   */
-  it("should remove a row and reduce its rowspan attribute correctly (merging)", () => {
-    const actual = (
-      <editor>
-        <table>
-          <tbody>
-            <tr>
-              <td rowSpan={2}>
-                <paragraph>
-                  <text>1</text>
-                </paragraph>
-              </td>
-              <td>
-                <paragraph>
-                  <text>
-                    <cursor />2
-                  </text>
-                </paragraph>
-              </td>
-              <td>
-                <paragraph>
-                  <text>3</text>
-                </paragraph>
-              </td>
-            </tr>
-            <tr>
-              <td>
-                <paragraph>
-                  <text>4</text>
-                </paragraph>
-              </td>
-              <td>
-                <paragraph>
-                  <text>5</text>
-                </paragraph>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </editor>
-    );
-
-    const expected = (
-      <editor>
-        <table>
-          <tbody>
-            <tr>
-              <td rowSpan={1}>
-                <paragraph>
-                  <text>
-                    <cursor />1
-                  </text>
-                </paragraph>
-              </td>
-              <td>
-                <paragraph>
-                  <text>4</text>
-                </paragraph>
-              </td>
-              <td>
-                <paragraph>
-                  <text>5</text>
-                </paragraph>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </editor>
-    );
-
-    const editor = withTest(withTable(actual, WITH_TABLE_OPTIONS));
-
-    TableEditor.removeRow(editor);
-
-    assert.deepEqual(editor.children, expected.children);
-    assert.deepEqual(editor.selection, expected.selection);
-  });
-
-  /*
-   * Actual:            Expected:
+   * | 1 | 2 | 3 |  =>  | 1 | 2 | 3*|
    * +---+---+---+      +---+---+---+
-   * |   | 2 | 3 |  =>  | 1 | 2 | 3 |
-   * + 1 +---+---+      +---+---+---+
-   * |   | 5*| 6 |
+   * | 4*| 5 | 6 |
    * +---+---+---+
    */
-  it("should remove a row and reduce its rowspan attribute correctly", () => {
+  it("should remove end row", () => {
     const actual = (
       <editor>
         <table>
           <tbody>
             <tr>
-              <td rowSpan={2}>
+              <td>
                 <paragraph>
                   <text>1</text>
                 </paragraph>
@@ -391,8 +391,13 @@ describe("removeRow", () => {
               <td>
                 <paragraph>
                   <text>
-                    5<cursor />
+                    4<cursor />
                   </text>
+                </paragraph>
+              </td>
+              <td>
+                <paragraph>
+                  <text>5</text>
                 </paragraph>
               </td>
               <td>
@@ -411,7 +416,7 @@ describe("removeRow", () => {
         <table>
           <tbody>
             <tr>
-              <td rowSpan={1}>
+              <td>
                 <paragraph>
                   <text>1</text>
                 </paragraph>
@@ -434,7 +439,609 @@ describe("removeRow", () => {
       </editor>
     );
 
-    const editor = withTest(withTable(actual, WITH_TABLE_OPTIONS));
+    const editor = withTest(withTable(actual, DEFAULT_TEST_WITH_TABLE_OPTIONS));
+
+    TableEditor.removeRow(editor);
+
+    assert.deepEqual(editor.children, expected.children);
+    assert.deepEqual(editor.selection, expected.selection);
+  });
+
+  /*
+   * Actual:    Expected:
+   * +---+      +---+
+   * | h*|  =>  | 1 |
+   * +---+      +---+
+   * | 1 |
+   * +---+
+   */
+  it("should remove section (`thead`, `tbody` or `tfoot`) if it only has one row", () => {
+    const actual = (
+      <editor>
+        <table>
+          <thead>
+            <tr>
+              <th>
+                <paragraph>
+                  <text>
+                    h<cursor />
+                  </text>
+                </paragraph>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>
+                <paragraph>
+                  <text>1</text>
+                </paragraph>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </editor>
+    );
+
+    const expected = (
+      <editor>
+        <table>
+          <tbody>
+            <tr>
+              <td>
+                <paragraph>
+                  <text>
+                    <cursor />1
+                  </text>
+                </paragraph>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </editor>
+    );
+
+    const editor = withTest(withTable(actual, DEFAULT_TEST_WITH_TABLE_OPTIONS));
+
+    TableEditor.removeRow(editor);
+
+    assert.deepEqual(editor.children, expected.children);
+    assert.deepEqual(editor.selection, expected.selection);
+  });
+
+  /*
+   * Actual:            Expected:
+   * +---+---+---+
+   * | 1*| 2 | 3 |  =>  EMPTY
+   * +---+---+---+
+   */
+  it("should remove table if it only has one row", () => {
+    const actual = (
+      <editor>
+        <table>
+          <tbody>
+            <tr>
+              <td>
+                <paragraph>
+                  <text>
+                    1<cursor />
+                  </text>
+                </paragraph>
+              </td>
+              <td>
+                <paragraph>
+                  <text>2</text>
+                </paragraph>
+              </td>
+              <td>
+                <paragraph>
+                  <text>3</text>
+                </paragraph>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </editor>
+    );
+
+    const expected = <editor />;
+
+    const editor = withTest(withTable(actual, DEFAULT_TEST_WITH_TABLE_OPTIONS));
+
+    TableEditor.removeRow(editor);
+
+    assert.deepEqual(editor.children, expected.children);
+    assert.deepEqual(editor.selection, expected.selection);
+  });
+
+  /*
+   * Actual:        Expected:
+   * +---+---+      +---+---+
+   * | 1 |   |  =>  | 1 |   |
+   * +---+   +      +---+ 2 +
+   * | 3*| 2 |      | 4 |   |
+   * +---+   +      +---+---+
+   * | 4 |   |
+   * +---+---+
+   */
+  it("should remove row with rowspan at end and decrease it", () => {
+    const actual = (
+      <editor>
+        <table>
+          <tbody>
+            <tr>
+              <td>
+                <paragraph>
+                  <text>1</text>
+                </paragraph>
+              </td>
+              <td rowSpan={3}>
+                <paragraph>
+                  <text>2</text>
+                </paragraph>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <paragraph>
+                  <text>
+                    3<cursor />
+                  </text>
+                </paragraph>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <paragraph>
+                  <text>4</text>
+                </paragraph>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </editor>
+    );
+
+    const expected = (
+      <editor>
+        <table>
+          <tbody>
+            <tr>
+              <td>
+                <paragraph>
+                  <text>1</text>
+                </paragraph>
+              </td>
+              <td rowSpan={2}>
+                <paragraph>
+                  <text>2</text>
+                </paragraph>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <paragraph>
+                  <text>
+                    <cursor />4
+                  </text>
+                </paragraph>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </editor>
+    );
+
+    const editor = withTest(withTable(actual, DEFAULT_TEST_WITH_TABLE_OPTIONS));
+
+    TableEditor.removeRow(editor);
+
+    assert.deepEqual(editor.children, expected.children);
+    assert.deepEqual(editor.selection, expected.selection);
+  });
+
+  /*
+   * Actual:        Expected:
+   * +---+---+      +---+---+
+   * |   | 2 |  =>  |   | 3 |
+   * +   +---+      + 1*+---+
+   * | 1*| 3 |      |   | 4 |
+   * +   +---+      +---+---+
+   * |   | 4 |
+   * +---+---+
+   */
+  it("should remove row with rowspan at start and decrease it", () => {
+    const actual = (
+      <editor>
+        <table>
+          <tbody>
+            <tr>
+              <td rowSpan={3}>
+                <paragraph>
+                  <text>
+                    1<cursor />
+                  </text>
+                </paragraph>
+              </td>
+              <td>
+                <paragraph>
+                  <text>2</text>
+                </paragraph>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <paragraph>
+                  <text>3</text>
+                </paragraph>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <paragraph>
+                  <text>4</text>
+                </paragraph>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </editor>
+    );
+
+    const expected = (
+      <editor>
+        <table>
+          <tbody>
+            <tr>
+              <td rowSpan={2}>
+                <paragraph>
+                  <text>
+                    <cursor />1
+                  </text>
+                </paragraph>
+              </td>
+              <td>
+                <paragraph>
+                  <text>3</text>
+                </paragraph>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <paragraph>
+                  <text>4</text>
+                </paragraph>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </editor>
+    );
+
+    const editor = withTest(withTable(actual, DEFAULT_TEST_WITH_TABLE_OPTIONS));
+
+    TableEditor.removeRow(editor);
+
+    assert.deepEqual(editor.children, expected.children);
+    assert.deepEqual(editor.selection, expected.selection);
+  });
+
+  /*
+   * Actual:            Expected:
+   * +---+---+---+      +---+---+---+
+   * | 1 |       |  =>  | 1 |       |
+   * +---+       +      +---+   2   +
+   * | 3*|   2   |      |*4 |       |
+   * +---+       +      +---+---+---+
+   * | 4 |       |
+   * +---+---+---+
+   */
+  it("should remove row in the middle with rowspan and decrease it", () => {
+    const actual = (
+      <editor>
+        <table>
+          <tbody>
+            <tr>
+              <td>
+                <paragraph>
+                  <text>1</text>
+                </paragraph>
+              </td>
+              <td rowSpan={3} colSpan={2}>
+                <paragraph>
+                  <text>2</text>
+                </paragraph>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <paragraph>
+                  <text>
+                    3<cursor />
+                  </text>
+                </paragraph>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <paragraph>
+                  <text>4</text>
+                </paragraph>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </editor>
+    );
+
+    const expected = (
+      <editor>
+        <table>
+          <tbody>
+            <tr>
+              <td>
+                <paragraph>
+                  <text>1</text>
+                </paragraph>
+              </td>
+              <td rowSpan={2} colSpan={2}>
+                <paragraph>
+                  <text>2</text>
+                </paragraph>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <paragraph>
+                  <text>
+                    <cursor />4
+                  </text>
+                </paragraph>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </editor>
+    );
+
+    const editor = withTest(withTable(actual, DEFAULT_TEST_WITH_TABLE_OPTIONS));
+
+    TableEditor.removeRow(editor);
+
+    assert.deepEqual(editor.children, expected.children);
+    assert.deepEqual(editor.selection, expected.selection);
+  });
+
+  /*
+   * Actual:            Expected:
+   * +---+---+---+      +---+---+---+
+   * | 1*|       |  =>  |*3 |       |
+   * +---+       +      +---+   2   +
+   * | 3 |   2   |      | 4 |       |
+   * +---+       +      +---+---+---+
+   * | 4 |       |
+   * +---+---+---+
+   */
+  it("should remove row with rowspan and decrease it", () => {
+    const actual = (
+      <editor>
+        <table>
+          <tbody>
+            <tr>
+              <td>
+                <paragraph>
+                  <text>
+                    1<cursor />
+                  </text>
+                </paragraph>
+              </td>
+              <td rowSpan={3} colSpan={2}>
+                <paragraph>
+                  <text>2</text>
+                </paragraph>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <paragraph>
+                  <text>3</text>
+                </paragraph>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <paragraph>
+                  <text>4</text>
+                </paragraph>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </editor>
+    );
+
+    const expected = (
+      <editor>
+        <table>
+          <tbody>
+            <tr>
+              <td>
+                <paragraph>
+                  <text>
+                    <cursor />3
+                  </text>
+                </paragraph>
+              </td>
+              <td rowSpan={2} colSpan={2}>
+                <paragraph>
+                  <text>2</text>
+                </paragraph>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <paragraph>
+                  <text>4</text>
+                </paragraph>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </editor>
+    );
+
+    const editor = withTest(withTable(actual, DEFAULT_TEST_WITH_TABLE_OPTIONS));
+
+    TableEditor.removeRow(editor);
+
+    assert.deepEqual(editor.children, expected.children);
+    assert.deepEqual(editor.selection, expected.selection);
+  });
+
+  /*
+   * Actual:            Expected:
+   * +---+---+---+      +---+---+---+
+   * | h | h | h |      | h | h | h |
+   * +---+---+---+      +---+---+---+
+   * | 1 |   | 3 |  =>  | 4 |   | 5 |
+   * +---+   +---+      +---+ 2*+---+
+   * | 4 | 2*| 5 |      | 6 |   | 7 |
+   * +---+   +---+      +---+---+---+
+   * | 6 |   | 7 |
+   * +---+---+---+
+   */
+  it("should remove row with rowspan and decrease it in table with thead", () => {
+    const actual = (
+      <editor>
+        <table>
+          <thead>
+            <tr>
+              <th>
+                <paragraph>
+                  <text>h1</text>
+                </paragraph>
+              </th>
+              <th>
+                <paragraph>
+                  <text>h2</text>
+                </paragraph>
+              </th>
+              <th>
+                <paragraph>
+                  <text>h3</text>
+                </paragraph>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>
+                <paragraph>
+                  <text>1</text>
+                </paragraph>
+              </td>
+              <td rowSpan={3}>
+                <paragraph>
+                  <text>
+                    2<cursor />
+                  </text>
+                </paragraph>
+              </td>
+              <td>
+                <paragraph>
+                  <text>3</text>
+                </paragraph>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <paragraph>
+                  <text>4</text>
+                </paragraph>
+              </td>
+              <td>
+                <paragraph>
+                  <text>5</text>
+                </paragraph>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <paragraph>
+                  <text>6</text>
+                </paragraph>
+              </td>
+              <td>
+                <paragraph>
+                  <text>7</text>
+                </paragraph>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </editor>
+    );
+
+    const expected = (
+      <editor>
+        <table>
+          <thead>
+            <tr>
+              <th>
+                <paragraph>
+                  <text>h1</text>
+                </paragraph>
+              </th>
+              <th>
+                <paragraph>
+                  <text>h2</text>
+                </paragraph>
+              </th>
+              <th>
+                <paragraph>
+                  <text>h3</text>
+                </paragraph>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>
+                <paragraph>
+                  <text>
+                    <cursor />4
+                  </text>
+                </paragraph>
+              </td>
+              <td rowSpan={2}>
+                <paragraph>
+                  <text>2</text>
+                </paragraph>
+              </td>
+              <td>
+                <paragraph>
+                  <text>5</text>
+                </paragraph>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <paragraph>
+                  <text>6</text>
+                </paragraph>
+              </td>
+              <td>
+                <paragraph>
+                  <text>7</text>
+                </paragraph>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </editor>
+    );
+
+    const editor = withTest(withTable(actual, DEFAULT_TEST_WITH_TABLE_OPTIONS));
 
     TableEditor.removeRow(editor);
 
@@ -447,12 +1054,12 @@ describe("removeRow", () => {
    * +---+---+---+---+      +---+---+---+---+
    * |   | 2 | 3 | 4 |  =>  |   | 2 | 3 | 4 |
    * +   +---+---+---+      + 1 +---+---+---+
-   * | 1 | 5*|   | 7 |      |   | 8 | 6 | 9 |
+   * | 1 | 5*|   | 7 |      |   |*8 | 6 | 9 |
    * +   +---+ 6 +---+      +---+---+---+---+
    * |   | 8 |   | 9 |
    * +---+---+---+---+
    */
-  it("should remove a row with a rowspan and reduce surrounding rowspan attributes", () => {
+  it("should remove a row with a rowspan and decrease multiple", () => {
     const actual = (
       <editor>
         <table>
@@ -565,471 +1172,7 @@ describe("removeRow", () => {
       </editor>
     );
 
-    const editor = withTest(withTable(actual, WITH_TABLE_OPTIONS));
-
-    TableEditor.removeRow(editor);
-
-    assert.deepEqual(editor.children, expected.children);
-    assert.deepEqual(editor.selection, expected.selection);
-  });
-
-  /*
-   * Actual:            Expected:
-   * +---+---+---+---+      +---+---+---+---+
-   * |   | 2*| 3 | 4 |  =>  |   | 5 |   | 7 |
-   * +   +---+---+---+      + 1 +---+ 6 +---+
-   * | 1 | 5 |   | 7 |      |   | 8 |   | 9 |
-   * +   +---+ 6 +---+      +---+---+---+---+
-   * |   | 8 |   | 9 |
-   * +---+---+---+---+
-   */
-  it("should remove a row with a rowspan and not reduce rowspan attributes in the row below", () => {
-    const actual = (
-      <editor>
-        <table>
-          <tbody>
-            <tr>
-              <td rowSpan={3}>
-                <paragraph>
-                  <text>1</text>
-                </paragraph>
-              </td>
-              <td>
-                <paragraph>
-                  <text>
-                    2<cursor />
-                  </text>
-                </paragraph>
-              </td>
-              <td>
-                <paragraph>
-                  <text>3</text>
-                </paragraph>
-              </td>
-              <td>
-                <paragraph>
-                  <text>4</text>
-                </paragraph>
-              </td>
-            </tr>
-            <tr>
-              <td>
-                <paragraph>
-                  <text>5</text>
-                </paragraph>
-              </td>
-              <td rowSpan={2}>
-                <paragraph>
-                  <text>6</text>
-                </paragraph>
-              </td>
-              <td>
-                <paragraph>
-                  <text>7</text>
-                </paragraph>
-              </td>
-            </tr>
-            <tr>
-              <td>
-                <paragraph>
-                  <text>8</text>
-                </paragraph>
-              </td>
-              <td>
-                <paragraph>
-                  <text>9</text>
-                </paragraph>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </editor>
-    );
-
-    const expected = (
-      <editor>
-        <table>
-          <tbody>
-            <tr>
-              <td rowSpan={2}>
-                <paragraph>
-                  <text>
-                    <cursor />1
-                  </text>
-                </paragraph>
-              </td>
-              <td>
-                <paragraph>
-                  <text>5</text>
-                </paragraph>
-              </td>
-              <td rowSpan={2}>
-                <paragraph>
-                  <text>6</text>
-                </paragraph>
-              </td>
-              <td>
-                <paragraph>
-                  <text>7</text>
-                </paragraph>
-              </td>
-            </tr>
-            <tr>
-              <td>
-                <paragraph>
-                  <text>8</text>
-                </paragraph>
-              </td>
-              <td>
-                <paragraph>
-                  <text>9</text>
-                </paragraph>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </editor>
-    );
-
-    const editor = withTest(withTable(actual, WITH_TABLE_OPTIONS));
-
-    TableEditor.removeRow(editor);
-
-    assert.deepEqual(editor.children, expected.children);
-    assert.deepEqual(editor.selection, expected.selection);
-  });
-
-  /*
-   * Actual:            Expected:
-   * +---+---+---+---+      +---+---+---+---+
-   * | 1 | 2 |   | 4 |  =>  | 1 | 2 | 3 | 4 |
-   * +---+---+ 3 +---+      +---+---+---+---+
-   * |   | 6*|   | 7 |      | 5 | 8 | 9 | 0 |
-   * + 5 +---+---+---+      +---+---+---+---+
-   * |   | 8 | 9 | 0 |
-   * +---+---+---+---+
-   */
-  it("should remove a row with a rowspan and reduce surrounding rowspan attributes in the row above", () => {
-    const actual = (
-      <editor>
-        <table>
-          <tbody>
-            <tr>
-              <td>
-                <paragraph>
-                  <text>1</text>
-                </paragraph>
-              </td>
-              <td>
-                <paragraph>
-                  <text>2</text>
-                </paragraph>
-              </td>
-              <td rowSpan={2}>
-                <paragraph>
-                  <text>3</text>
-                </paragraph>
-              </td>
-              <td>
-                <paragraph>
-                  <text>4</text>
-                </paragraph>
-              </td>
-            </tr>
-            <tr>
-              <td rowSpan={2}>
-                <paragraph>
-                  <text>5</text>
-                </paragraph>
-              </td>
-              <td>
-                <paragraph>
-                  <text>
-                    6<cursor />
-                  </text>
-                </paragraph>
-              </td>
-              <td>
-                <paragraph>
-                  <text>7</text>
-                </paragraph>
-              </td>
-            </tr>
-            <tr>
-              <td>
-                <paragraph>
-                  <text>8</text>
-                </paragraph>
-              </td>
-              <td>
-                <paragraph>
-                  <text>9</text>
-                </paragraph>
-              </td>
-              <td>
-                <paragraph>
-                  <text>0</text>
-                </paragraph>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </editor>
-    );
-
-    const expected = (
-      <editor>
-        <table>
-          <tbody>
-            <tr>
-              <td>
-                <paragraph>
-                  <text>1</text>
-                </paragraph>
-              </td>
-              <td>
-                <paragraph>
-                  <text>2</text>
-                </paragraph>
-              </td>
-              <td rowSpan={1}>
-                <paragraph>
-                  <text>3</text>
-                </paragraph>
-              </td>
-              <td>
-                <paragraph>
-                  <text>4</text>
-                </paragraph>
-              </td>
-            </tr>
-            <tr>
-              <td rowSpan={1}>
-                <paragraph>
-                  <text>
-                    <cursor />5
-                  </text>
-                </paragraph>
-              </td>
-              <td>
-                <paragraph>
-                  <text>8</text>
-                </paragraph>
-              </td>
-              <td>
-                <paragraph>
-                  <text>9</text>
-                </paragraph>
-              </td>
-              <td>
-                <paragraph>
-                  <text>0</text>
-                </paragraph>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </editor>
-    );
-
-    const editor = withTest(withTable(actual, WITH_TABLE_OPTIONS));
-
-    TableEditor.removeRow(editor);
-
-    assert.deepEqual(editor.children, expected.children);
-    assert.deepEqual(editor.selection, expected.selection);
-  });
-
-  it("should remove thead if the last row is removed", () => {
-    const actual = (
-      <editor>
-        <table>
-          <thead>
-            <tr>
-              <th>
-                <paragraph>
-                  <text />
-                  <cursor />
-                </paragraph>
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>
-                <paragraph />
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </editor>
-    );
-
-    const expected = (
-      <editor>
-        <table>
-          <tbody>
-            <tr>
-              <td>
-                <paragraph />
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </editor>
-    );
-
-    const editor = withTest(withTable(actual, WITH_TABLE_OPTIONS));
-
-    TableEditor.removeRow(editor);
-
-    assert.deepEqual(editor.children, expected.children);
-    assert.deepEqual(editor.selection, expected.selection);
-  });
-
-  it("should remove tfoot if the last row is removed", () => {
-    const actual = (
-      <editor>
-        <table>
-          <thead>
-            <tr>
-              <th>
-                <paragraph />
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>
-                <paragraph />
-              </td>
-            </tr>
-          </tbody>
-          <tfoot>
-            <tr>
-              <td>
-                <paragraph>
-                  <cursor />
-                  <text />
-                </paragraph>
-              </td>
-            </tr>
-          </tfoot>
-        </table>
-      </editor>
-    );
-
-    const expected = (
-      <editor>
-        <table>
-          <thead>
-            <tr>
-              <th>
-                <paragraph />
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>
-                <paragraph />
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </editor>
-    );
-
-    const editor = withTest(withTable(actual, WITH_TABLE_OPTIONS));
-
-    TableEditor.removeRow(editor);
-
-    assert.deepEqual(editor.children, expected.children);
-    assert.deepEqual(editor.selection, expected.selection);
-  });
-
-  it("should remove tbody if the last row is removed", () => {
-    const actual = (
-      <editor>
-        <table>
-          <thead>
-            <tr>
-              <th>
-                <paragraph />
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>
-                <paragraph>
-                  <cursor />
-                  <text />
-                </paragraph>
-              </td>
-            </tr>
-          </tbody>
-          <tfoot>
-            <tr>
-              <td>
-                <paragraph />
-              </td>
-            </tr>
-          </tfoot>
-        </table>
-      </editor>
-    );
-
-    const expected = (
-      <editor>
-        <table>
-          <thead>
-            <tr>
-              <th>
-                <paragraph />
-              </th>
-            </tr>
-          </thead>
-          <tfoot>
-            <tr>
-              <td>
-                <paragraph />
-              </td>
-            </tr>
-          </tfoot>
-        </table>
-      </editor>
-    );
-
-    const editor = withTest(withTable(actual, WITH_TABLE_OPTIONS));
-
-    TableEditor.removeRow(editor);
-
-    assert.deepEqual(editor.children, expected.children);
-    assert.deepEqual(editor.selection, expected.selection);
-  });
-
-  it("should remove table if the last row of the last parent (tbody, thead, tfoot) is deleted", () => {
-    const actual = (
-      <editor>
-        <table>
-          <tbody>
-            <tr>
-              <td>
-                <paragraph>
-                  <cursor />
-                  <text />
-                </paragraph>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </editor>
-    );
-
-    const expected = <editor />;
-
-    const editor = withTest(withTable(actual, WITH_TABLE_OPTIONS));
+    const editor = withTest(withTable(actual, DEFAULT_TEST_WITH_TABLE_OPTIONS));
 
     TableEditor.removeRow(editor);
 
