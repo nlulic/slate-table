@@ -32,10 +32,10 @@ export const jsx = createHyperscript({
   },
 });
 
-export const DEFAULT_TEST_WITH_TABLE_OPTIONS: WithTableOptions = {
+export const DEFAULT_TEST_WITH_TABLE_OPTIONS = {
   ...DEFAULT_WITH_TABLE_OPTIONS,
   withNormalization: false,
-};
+} as const satisfies WithTableOptions;
 
 export const withTest = (editor: Editor) => {
   const { isInline } = editor;

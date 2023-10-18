@@ -8,23 +8,73 @@ import { jsx, withTest } from "../index";
 import { withTable } from "../../src/with-table";
 
 describe("insertRow", () => {
-  it("should insert a row above the current selection", () => {
+  /*
+   * Actual:            Expected:
+   * +---+---+---+      +---+---+---+
+   * | 1 | 2 | 3 |      | 1 | 2 | 3 |
+   * +---+---+---+      +---+---+---+
+   * | 4*| 5 | 6 |      | X | X | X |
+   * +---+---+---+      +---+---+---+
+   * | 7 | 8 | 9 |  =>  | 4*| 5 | 6 |
+   * +---+---+---+      +---+---+---+
+   *                    | 7 | 8 | 9 |
+   *                    +---+---+---+
+   */
+  it("should insert to the top", () => {
     const actual = (
       <editor>
         <table>
-          <thead>
-            <tr>
-              <th>
-                <paragraph />
-              </th>
-            </tr>
-          </thead>
           <tbody>
             <tr>
               <td>
                 <paragraph>
-                  <text />
-                  <cursor />
+                  <text>1</text>
+                </paragraph>
+              </td>
+              <td>
+                <paragraph>
+                  <text>2</text>
+                </paragraph>
+              </td>
+              <td>
+                <paragraph>
+                  <text>3</text>
+                </paragraph>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <paragraph>
+                  <text>
+                    4<cursor />
+                  </text>
+                </paragraph>
+              </td>
+              <td>
+                <paragraph>
+                  <text>5</text>
+                </paragraph>
+              </td>
+              <td>
+                <paragraph>
+                  <text>6</text>
+                </paragraph>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <paragraph>
+                  <text>7</text>
+                </paragraph>
+              </td>
+              <td>
+                <paragraph>
+                  <text>8</text>
+                </paragraph>
+              </td>
+              <td>
+                <paragraph>
+                  <text>9</text>
                 </paragraph>
               </td>
             </tr>
@@ -36,15 +86,35 @@ describe("insertRow", () => {
     const expected = (
       <editor>
         <table>
-          <thead>
-            <tr>
-              <th>
-                <paragraph />
-              </th>
-            </tr>
-          </thead>
           <tbody>
             <tr>
+              <td>
+                <paragraph>
+                  <text>1</text>
+                </paragraph>
+              </td>
+              <td>
+                <paragraph>
+                  <text>2</text>
+                </paragraph>
+              </td>
+              <td>
+                <paragraph>
+                  <text>3</text>
+                </paragraph>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <paragraph>
+                  <text />
+                </paragraph>
+              </td>
+              <td>
+                <paragraph>
+                  <text />
+                </paragraph>
+              </td>
               <td>
                 <paragraph>
                   <text />
@@ -54,8 +124,36 @@ describe("insertRow", () => {
             <tr>
               <td>
                 <paragraph>
-                  <text />
-                  <cursor />
+                  <text>
+                    4<cursor />
+                  </text>
+                </paragraph>
+              </td>
+              <td>
+                <paragraph>
+                  <text>5</text>
+                </paragraph>
+              </td>
+              <td>
+                <paragraph>
+                  <text>6</text>
+                </paragraph>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <paragraph>
+                  <text>7</text>
+                </paragraph>
+              </td>
+              <td>
+                <paragraph>
+                  <text>8</text>
+                </paragraph>
+              </td>
+              <td>
+                <paragraph>
+                  <text>9</text>
                 </paragraph>
               </td>
             </tr>
@@ -72,14 +170,202 @@ describe("insertRow", () => {
     assert.deepEqual(editor.selection, expected.selection);
   });
 
-  it("should insert a row below the current selection", () => {
+  /*
+   * Actual:            Expected:
+   * +---+---+---+      +---+---+---+
+   * | 1*| 2 | 3 |      | 1*| 2 | 3 |
+   * +---+---+---+      +---+---+---+
+   * | 4 | 5 | 6 |      | X | X | X |
+   * +---+---+---+      +---+---+---+
+   * | 7 | 8 | 9 |  =>  | 4 | 5 | 6 |
+   * +---+---+---+      +---+---+---+
+   *                    | 7 | 8 | 9 |
+   *                    +---+---+---+
+   */
+  it("should insert to the bottom", () => {
+    const actual = (
+      <editor>
+        <table>
+          <tbody>
+            <tr>
+              <td>
+                <paragraph>
+                  <text>
+                    1<cursor />
+                  </text>
+                </paragraph>
+              </td>
+              <td>
+                <paragraph>
+                  <text>2</text>
+                </paragraph>
+              </td>
+              <td>
+                <paragraph>
+                  <text>3</text>
+                </paragraph>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <paragraph>
+                  <text>4</text>
+                </paragraph>
+              </td>
+              <td>
+                <paragraph>
+                  <text>5</text>
+                </paragraph>
+              </td>
+              <td>
+                <paragraph>
+                  <text>6</text>
+                </paragraph>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <paragraph>
+                  <text>7</text>
+                </paragraph>
+              </td>
+              <td>
+                <paragraph>
+                  <text>8</text>
+                </paragraph>
+              </td>
+              <td>
+                <paragraph>
+                  <text>9</text>
+                </paragraph>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </editor>
+    );
+
+    const expected = (
+      <editor>
+        <table>
+          <tbody>
+            <tr>
+              <td>
+                <paragraph>
+                  <text>
+                    1<cursor />
+                  </text>
+                </paragraph>
+              </td>
+              <td>
+                <paragraph>
+                  <text>2</text>
+                </paragraph>
+              </td>
+              <td>
+                <paragraph>
+                  <text>3</text>
+                </paragraph>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <paragraph>
+                  <text />
+                </paragraph>
+              </td>
+              <td>
+                <paragraph>
+                  <text />
+                </paragraph>
+              </td>
+              <td>
+                <paragraph>
+                  <text />
+                </paragraph>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <paragraph>
+                  <text>4</text>
+                </paragraph>
+              </td>
+              <td>
+                <paragraph>
+                  <text>5</text>
+                </paragraph>
+              </td>
+              <td>
+                <paragraph>
+                  <text>6</text>
+                </paragraph>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <paragraph>
+                  <text>7</text>
+                </paragraph>
+              </td>
+              <td>
+                <paragraph>
+                  <text>8</text>
+                </paragraph>
+              </td>
+              <td>
+                <paragraph>
+                  <text>9</text>
+                </paragraph>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </editor>
+    );
+
+    const editor = withTest(withTable(actual, DEFAULT_WITH_TABLE_OPTIONS));
+
+    TableEditor.insertRow(editor);
+
+    assert.deepEqual(editor.children, expected.children);
+    assert.deepEqual(editor.selection, expected.selection);
+  });
+
+  /*
+   * Actual:            Expected:
+   * +---+---+---+      +---+---+---+
+   * | 1*| 2 | 3 |      | X | X | X |
+   * +---+---+---+      +---+---+---+
+   * | 4 | 5 | 6 |      | 1*| 2 | 3 |
+   * +---+---+---+      +---+---+---+
+   * | 7 | 8 | 9 |  =>  | 4 | 5 | 6 |
+   * +---+---+---+      +---+---+---+
+   *                    | 7 | 8 | 9 |
+   *                    +---+---+---+
+   */
+  it("should insert at the top of the table", () => {
     const actual = (
       <editor>
         <table>
           <thead>
             <tr>
               <th>
-                <paragraph />
+                <paragraph>
+                  <text>
+                    1<cursor />
+                  </text>
+                </paragraph>
+              </th>
+              <th>
+                <paragraph>
+                  <text>2</text>
+                </paragraph>
+              </th>
+              <th>
+                <paragraph>
+                  <text>3</text>
+                </paragraph>
               </th>
             </tr>
           </thead>
@@ -87,8 +373,34 @@ describe("insertRow", () => {
             <tr>
               <td>
                 <paragraph>
-                  <text />
-                  <cursor />
+                  <text>4</text>
+                </paragraph>
+              </td>
+              <td>
+                <paragraph>
+                  <text>5</text>
+                </paragraph>
+              </td>
+              <td>
+                <paragraph>
+                  <text>6</text>
+                </paragraph>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <paragraph>
+                  <text>7</text>
+                </paragraph>
+              </td>
+              <td>
+                <paragraph>
+                  <text>8</text>
+                </paragraph>
+              </td>
+              <td>
+                <paragraph>
+                  <text>9</text>
                 </paragraph>
               </td>
             </tr>
@@ -103,7 +415,38 @@ describe("insertRow", () => {
           <thead>
             <tr>
               <th>
-                <paragraph />
+                <paragraph>
+                  <text />
+                </paragraph>
+              </th>
+              <th>
+                <paragraph>
+                  <text />
+                </paragraph>
+              </th>
+              <th>
+                <paragraph>
+                  <text />
+                </paragraph>
+              </th>
+            </tr>
+            <tr>
+              <th>
+                <paragraph>
+                  <text>
+                    1<cursor />
+                  </text>
+                </paragraph>
+              </th>
+              <th>
+                <paragraph>
+                  <text>2</text>
+                </paragraph>
+              </th>
+              <th>
+                <paragraph>
+                  <text>3</text>
+                </paragraph>
               </th>
             </tr>
           </thead>
@@ -111,12 +454,197 @@ describe("insertRow", () => {
             <tr>
               <td>
                 <paragraph>
-                  <text />
-                  <cursor />
+                  <text>4</text>
+                </paragraph>
+              </td>
+              <td>
+                <paragraph>
+                  <text>5</text>
+                </paragraph>
+              </td>
+              <td>
+                <paragraph>
+                  <text>6</text>
                 </paragraph>
               </td>
             </tr>
             <tr>
+              <td>
+                <paragraph>
+                  <text>7</text>
+                </paragraph>
+              </td>
+              <td>
+                <paragraph>
+                  <text>8</text>
+                </paragraph>
+              </td>
+              <td>
+                <paragraph>
+                  <text>9</text>
+                </paragraph>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </editor>
+    );
+
+    const editor = withTest(withTable(actual, DEFAULT_WITH_TABLE_OPTIONS));
+
+    TableEditor.insertRow(editor, { above: true });
+
+    assert.deepEqual(editor.children, expected.children);
+    assert.deepEqual(editor.selection, expected.selection);
+  });
+
+  /*
+   * Actual:            Expected:
+   * +---+---+---+      +---+---+---+
+   * | 1 | 2 | 3 |      | 1 | 2 | 3 |
+   * +---+---+---+      +---+---+---+
+   * | 4 | 5 | 6 |      | 4 | 5 | 6 |
+   * +---+---+---+      +---+---+---+
+   * | 7*| 8 | 9 |  =>  | 7*| 8 | 9 |
+   * +---+---+---+      +---+---+---+
+   *                    | X | X | X |
+   *                    +---+---+---+
+   */
+  it("should insert at the bottom of the table", () => {
+    const actual = (
+      <editor>
+        <table>
+          <thead>
+            <tr>
+              <th>
+                <paragraph>
+                  <text>1</text>
+                </paragraph>
+              </th>
+              <th>
+                <paragraph>
+                  <text>2</text>
+                </paragraph>
+              </th>
+              <th>
+                <paragraph>
+                  <text>3</text>
+                </paragraph>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>
+                <paragraph>
+                  <text>4</text>
+                </paragraph>
+              </td>
+              <td>
+                <paragraph>
+                  <text>5</text>
+                </paragraph>
+              </td>
+              <td>
+                <paragraph>
+                  <text>6</text>
+                </paragraph>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <paragraph>
+                  <text>
+                    7<cursor />
+                  </text>
+                </paragraph>
+              </td>
+              <td>
+                <paragraph>
+                  <text>8</text>
+                </paragraph>
+              </td>
+              <td>
+                <paragraph>
+                  <text>9</text>
+                </paragraph>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </editor>
+    );
+
+    const expected = (
+      <editor>
+        <table>
+          <thead>
+            <tr>
+              <th>
+                <paragraph>
+                  <text>1</text>
+                </paragraph>
+              </th>
+              <th>
+                <paragraph>
+                  <text>2</text>
+                </paragraph>
+              </th>
+              <th>
+                <paragraph>
+                  <text>3</text>
+                </paragraph>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>
+                <paragraph>
+                  <text>4</text>
+                </paragraph>
+              </td>
+              <td>
+                <paragraph>
+                  <text>5</text>
+                </paragraph>
+              </td>
+              <td>
+                <paragraph>
+                  <text>6</text>
+                </paragraph>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <paragraph>
+                  <text>
+                    7<cursor />
+                  </text>
+                </paragraph>
+              </td>
+              <td>
+                <paragraph>
+                  <text>8</text>
+                </paragraph>
+              </td>
+              <td>
+                <paragraph>
+                  <text>9</text>
+                </paragraph>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <paragraph>
+                  <text />
+                </paragraph>
+              </td>
+              <td>
+                <paragraph>
+                  <text />
+                </paragraph>
+              </td>
               <td>
                 <paragraph>
                   <text />
@@ -136,86 +664,19 @@ describe("insertRow", () => {
     assert.deepEqual(editor.selection, expected.selection);
   });
 
-  it("should insert a row at a specified location", () => {
-    const actual = (
-      <editor>
-        <table>
-          <thead>
-            <tr>
-              <th>
-                <paragraph />
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>
-                <paragraph>
-                  <text />
-                  <cursor />
-                </paragraph>
-              </td>
-            </tr>
-            <tr>
-              <td>
-                <paragraph>
-                  <text />
-                </paragraph>
-              </td>
-            </tr>
-            {/* should be added here  */}
-          </tbody>
-        </table>
-      </editor>
-    );
-
-    const expected = (
-      <editor>
-        <table>
-          <thead>
-            <tr>
-              <th>
-                <paragraph />
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>
-                <paragraph>
-                  <text />
-                  <cursor />
-                </paragraph>
-              </td>
-            </tr>
-            <tr>
-              <td>
-                <paragraph>
-                  <text />
-                </paragraph>
-              </td>
-            </tr>
-            <tr>
-              <td>
-                <paragraph>
-                  <text />
-                </paragraph>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </editor>
-    );
-
-    const editor = withTest(withTable(actual, DEFAULT_WITH_TABLE_OPTIONS));
-
-    TableEditor.insertRow(editor, { at: [0, 1, 1] });
-
-    assert.deepEqual(editor.children, expected.children);
-    assert.deepEqual(editor.selection, expected.selection);
-  });
-
-  it("should insert a row with header-cells when inside thead", () => {
+  /*
+   * Actual:            Expected:
+   * +---+---+---+      +---+---+---+
+   * | 1 | 2 | 3 |      | 1 | 2 | 3 |
+   * +---+---+---+      +---+---+---+
+   * | 4 | 5 | 6 |      | 4 | 5 | 6 |
+   * +---+---+---+      +---+---+---+
+   * | 7 | 8 | 9 |  =>  | 7 | 8 | 9 |
+   * +---+---+---+      +---+---+---+
+   *                    | X | X | X |
+   *                    +---+---+---+
+   */
+  it("should insert below a specified location", () => {
     const actual = (
       <editor>
         <table>
@@ -223,8 +684,17 @@ describe("insertRow", () => {
             <tr>
               <th>
                 <paragraph>
-                  <text />
-                  <cursor />
+                  <text>1</text>
+                </paragraph>
+              </th>
+              <th>
+                <paragraph>
+                  <text>2</text>
+                </paragraph>
+              </th>
+              <th>
+                <paragraph>
+                  <text>3</text>
                 </paragraph>
               </th>
             </tr>
@@ -232,7 +702,36 @@ describe("insertRow", () => {
           <tbody>
             <tr>
               <td>
-                <paragraph />
+                <paragraph>
+                  <text>4</text>
+                </paragraph>
+              </td>
+              <td>
+                <paragraph>
+                  <text>5</text>
+                </paragraph>
+              </td>
+              <td>
+                <paragraph>
+                  <text>6</text>
+                </paragraph>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <paragraph>
+                  <text>7</text>
+                </paragraph>
+              </td>
+              <td>
+                <paragraph>
+                  <text>8</text>
+                </paragraph>
+              </td>
+              <td>
+                <paragraph>
+                  <text>9</text>
+                </paragraph>
               </td>
             </tr>
           </tbody>
@@ -247,15 +746,17 @@ describe("insertRow", () => {
             <tr>
               <th>
                 <paragraph>
-                  <text />
-                  <cursor />
+                  <text>1</text>
                 </paragraph>
               </th>
-            </tr>
-            <tr>
               <th>
                 <paragraph>
-                  <text />
+                  <text>2</text>
+                </paragraph>
+              </th>
+              <th>
+                <paragraph>
+                  <text>3</text>
                 </paragraph>
               </th>
             </tr>
@@ -263,7 +764,53 @@ describe("insertRow", () => {
           <tbody>
             <tr>
               <td>
-                <paragraph />
+                <paragraph>
+                  <text>4</text>
+                </paragraph>
+              </td>
+              <td>
+                <paragraph>
+                  <text>5</text>
+                </paragraph>
+              </td>
+              <td>
+                <paragraph>
+                  <text>6</text>
+                </paragraph>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <paragraph>
+                  <text>7</text>
+                </paragraph>
+              </td>
+              <td>
+                <paragraph>
+                  <text>8</text>
+                </paragraph>
+              </td>
+              <td>
+                <paragraph>
+                  <text>9</text>
+                </paragraph>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <paragraph>
+                  <text />
+                </paragraph>
+              </td>
+              <td>
+                <paragraph>
+                  <text />
+                </paragraph>
+              </td>
+              <td>
+                <paragraph>
+                  <text />
+                </paragraph>
               </td>
             </tr>
           </tbody>
@@ -273,71 +820,7 @@ describe("insertRow", () => {
 
     const editor = withTest(withTable(actual, DEFAULT_WITH_TABLE_OPTIONS));
 
-    TableEditor.insertRow(editor);
-
-    assert.deepEqual(editor.children, expected.children);
-    assert.deepEqual(editor.selection, expected.selection);
-  });
-
-  it("should insert a row with td when inside tfoot", () => {
-    const actual = (
-      <editor>
-        <table>
-          <tbody>
-            <tr>
-              <td>
-                <paragraph />
-              </td>
-            </tr>
-          </tbody>
-          <tfoot>
-            <tr>
-              <td>
-                <paragraph>
-                  <text />
-                  <cursor />
-                </paragraph>
-              </td>
-            </tr>
-          </tfoot>
-        </table>
-      </editor>
-    );
-
-    const expected = (
-      <editor>
-        <table>
-          <tbody>
-            <tr>
-              <td>
-                <paragraph />
-              </td>
-            </tr>
-          </tbody>
-          <tfoot>
-            <tr>
-              <td>
-                <paragraph>
-                  <text />
-                  <cursor />
-                </paragraph>
-              </td>
-            </tr>
-            <tr>
-              <td>
-                <paragraph>
-                  <text />
-                </paragraph>
-              </td>
-            </tr>
-          </tfoot>
-        </table>
-      </editor>
-    );
-
-    const editor = withTest(withTable(actual, DEFAULT_WITH_TABLE_OPTIONS));
-
-    TableEditor.insertRow(editor);
+    TableEditor.insertRow(editor, { at: [0, 1, 1, 0, 0, 0] });
 
     assert.deepEqual(editor.children, expected.children);
     assert.deepEqual(editor.selection, expected.selection);
@@ -357,7 +840,7 @@ describe("insertRow", () => {
    *                    | 8 | 9 | 0 |
    *                    +---+---+---+
    */
-  it("should insert a row above the selection and increase the rowspan of cells if necessary", () => {
+  it("should insert above row with multiple rowspan cols and increase them", () => {
     const actual = (
       <editor>
         <table>
@@ -529,7 +1012,7 @@ describe("insertRow", () => {
    *                    | 8 | 9 | 0 |
    *                    +---+---+---+
    */
-  it("should insert a row below the selection and increase the rowspan of cells if necessary", () => {
+  it("should insert below row with multiple rowspan cols and increase them", () => {
     const actual = (
       <editor>
         <table>
@@ -701,7 +1184,7 @@ describe("insertRow", () => {
    *                    | 8 | 9 | 0 |
    *                    +---+---+---+
    */
-  test("that inserting a row above cells with rowspan does not increase their rowspan", () => {
+  it("should insert above rowspan without increasing rowspan", () => {
     const actual = (
       <editor>
         <table>
@@ -883,7 +1366,7 @@ describe("insertRow", () => {
    *                    | 8 | 9 | 0 |
    *                    +---+---+---+
    */
-  test("that inserting a row below cells with rowspan does not increase their rowspan", () => {
+  it("should insert below rowspan without increasing rowspan", () => {
     const actual = (
       <editor>
         <table>
@@ -1061,7 +1544,7 @@ describe("insertRow", () => {
    *                    | 8 | 9 | 0 |
    *                    +---+---+---+
    */
-  test("that inserting a row above a cell with a rowspan does not increase their rowspan", () => {
+  it("should insert above rowspan with selection", () => {
     const actual = (
       <editor>
         <table>
@@ -1239,7 +1722,7 @@ describe("insertRow", () => {
    *                    | 8 | 9 | 0 |
    *                    +---+---+---+
    */
-  test("that inserting a row below a cell with a rowspan does not increase their rowspan", () => {
+  it("should insert below rowspan with selection", () => {
     const actual = (
       <editor>
         <table>
@@ -1415,7 +1898,7 @@ describe("insertRow", () => {
    * | 6 | 7 | 8 |      | 6 | 7 | 8 |
    * +---+---+---+      +---+---+---+
    */
-  test("that inserting a row at the top of the table does not increase rowspan", () => {
+  it("should insert at the start of the table rowspan without increasing rowspan", () => {
     const actual = (
       <editor>
         <table>
@@ -1567,7 +2050,7 @@ describe("insertRow", () => {
    *                    | X | X | X |
    *                    +---+---+---+
    */
-  test("that inserting a row at the bottom of the table does not increase rowspan", () => {
+  it("should insert at the end of the table rowspan without increasing rowspan", () => {
     const actual = (
       <editor>
         <table>
@@ -1695,6 +2178,270 @@ describe("insertRow", () => {
               </td>
             </tr>
           </tbody>
+        </table>
+      </editor>
+    );
+
+    const editor = withTest(withTable(actual, DEFAULT_WITH_TABLE_OPTIONS));
+
+    TableEditor.insertRow(editor);
+
+    assert.deepEqual(editor.children, expected.children);
+    assert.deepEqual(editor.selection, expected.selection);
+  });
+
+  /*
+   * Actual:            Expected:
+   * +---+---+---+      +---+---+---+
+   * | h*| h | h |      | h*| h | h |
+   * +---+---+---+      +---+---+---+
+   * | 1 | 2 | 3 |  =>  | X | X | X |
+   * +---+---+---+      +---+---+---+
+   *                    | 1 | 2 | 3 |
+   *                    +---+---+---+
+   */
+  it("should insert a row with `th` when inside thead", () => {
+    const actual = (
+      <editor>
+        <table>
+          <thead>
+            <tr>
+              <th>
+                <paragraph>
+                  <text>
+                    h1
+                    <cursor />
+                  </text>
+                </paragraph>
+              </th>
+              <th>
+                <paragraph>
+                  <text>h2</text>
+                </paragraph>
+              </th>
+              <th>
+                <paragraph>
+                  <text>h3</text>
+                </paragraph>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>
+                <paragraph>
+                  <text>1</text>
+                </paragraph>
+              </td>
+              <td>
+                <paragraph>
+                  <text>2</text>
+                </paragraph>
+              </td>
+              <td>
+                <paragraph>
+                  <text>3</text>
+                </paragraph>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </editor>
+    );
+
+    const expected = (
+      <editor>
+        <table>
+          <thead>
+            <tr>
+              <th>
+                <paragraph>
+                  <text>
+                    h1
+                    <cursor />
+                  </text>
+                </paragraph>
+              </th>
+              <th>
+                <paragraph>
+                  <text>h2</text>
+                </paragraph>
+              </th>
+              <th>
+                <paragraph>
+                  <text>h3</text>
+                </paragraph>
+              </th>
+            </tr>
+            <tr>
+              <th>
+                <paragraph>
+                  <text />
+                </paragraph>
+              </th>
+              <th>
+                <paragraph>
+                  <text />
+                </paragraph>
+              </th>
+              <th>
+                <paragraph>
+                  <text />
+                </paragraph>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>
+                <paragraph>
+                  <text>1</text>
+                </paragraph>
+              </td>
+              <td>
+                <paragraph>
+                  <text>2</text>
+                </paragraph>
+              </td>
+              <td>
+                <paragraph>
+                  <text>3</text>
+                </paragraph>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </editor>
+    );
+
+    const editor = withTest(withTable(actual, DEFAULT_WITH_TABLE_OPTIONS));
+
+    TableEditor.insertRow(editor);
+
+    assert.deepEqual(editor.children, expected.children);
+    assert.deepEqual(editor.selection, expected.selection);
+  });
+
+  /*
+   * Actual:            Expected:
+   * +---+---+---+      +---+---+---+
+   * | 1 | 2 | 3 |      | 1 | 2 | 3 |
+   * +---+---+---+      +---+---+---+
+   * | f | f | f |  =>  | f | f | f |
+   * +---+---+---+      +---+---+---+
+   *                    | X | X | X |
+   *                    +---+---+---+
+   */
+  it("should insert a row with `td` when inside tfoot", () => {
+    const actual = (
+      <editor>
+        <table>
+          <tbody>
+            <tr>
+              <td>
+                <paragraph>
+                  <text>1</text>
+                </paragraph>
+              </td>
+              <td>
+                <paragraph>
+                  <text>2</text>
+                </paragraph>
+              </td>
+              <td>
+                <paragraph>
+                  <text>3</text>
+                </paragraph>
+              </td>
+            </tr>
+          </tbody>
+          <tfoot>
+            <tr>
+              <td>
+                <paragraph>
+                  <text>
+                    f1
+                    <cursor />
+                  </text>
+                </paragraph>
+              </td>
+              <td>
+                <paragraph>
+                  <text>f2</text>
+                </paragraph>
+              </td>
+              <td>
+                <paragraph>
+                  <text>f3</text>
+                </paragraph>
+              </td>
+            </tr>
+          </tfoot>
+        </table>
+      </editor>
+    );
+
+    const expected = (
+      <editor>
+        <table>
+          <tbody>
+            <tr>
+              <td>
+                <paragraph>
+                  <text>1</text>
+                </paragraph>
+              </td>
+              <td>
+                <paragraph>
+                  <text>2</text>
+                </paragraph>
+              </td>
+              <td>
+                <paragraph>
+                  <text>3</text>
+                </paragraph>
+              </td>
+            </tr>
+          </tbody>
+          <tfoot>
+            <tr>
+              <td>
+                <paragraph>
+                  <text>
+                    f1
+                    <cursor />
+                  </text>
+                </paragraph>
+              </td>
+              <td>
+                <paragraph>
+                  <text>f2</text>
+                </paragraph>
+              </td>
+              <td>
+                <paragraph>
+                  <text>f3</text>
+                </paragraph>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <paragraph>
+                  <text />
+                </paragraph>
+              </td>
+              <td>
+                <paragraph>
+                  <text />
+                </paragraph>
+              </td>
+              <td>
+                <paragraph>
+                  <text />
+                </paragraph>
+              </td>
+            </tr>
+          </tfoot>
         </table>
       </editor>
     );

@@ -2,26 +2,36 @@
 /** @jsx jsx */
 
 import assert from "assert";
-import { DEFAULT_WITH_TABLE_OPTIONS } from "../../src/options";
 import { TableEditor } from "../../src/table-editor";
-import { jsx, withTest } from "../index";
+import { jsx, withTest, DEFAULT_TEST_WITH_TABLE_OPTIONS } from "../index";
 import { withTable } from "../../src/with-table";
 
 describe("insertTable", () => {
-  it("should insert table using default options", () => {
+  /*
+   * Actual:    Expected:
+   *            +---+---+
+   * EMPTY  =>  | X | X |
+   *            +---+---+
+   *            | X | X |
+   *            +---+---+
+   */
+  it("should insert table at the current selection", () => {
     const actual = (
       <editor>
         <paragraph>
-          <cursor />
+          <text>
+            <cursor />
+          </text>
         </paragraph>
       </editor>
     );
 
-    // default options will insert a 2x2 table
     const expected = (
       <editor>
         <paragraph>
-          <text />
+          <text>
+            <cursor />
+          </text>
         </paragraph>
         <table>
           <tbody>
@@ -55,7 +65,8 @@ describe("insertTable", () => {
       </editor>
     );
 
-    const editor = withTest(withTable(actual, DEFAULT_WITH_TABLE_OPTIONS));
+    // default options will insert a 2x2 table
+    const editor = withTest(withTable(actual, DEFAULT_TEST_WITH_TABLE_OPTIONS));
 
     TableEditor.insertTable(editor);
 
@@ -63,6 +74,16 @@ describe("insertTable", () => {
     assert.deepEqual(editor.selection, expected.selection);
   });
 
+  /*
+   * Actual:    Expected:
+   *            +---+---+
+   * EMPTY  =>  | X | X |
+   *            +---+---+
+   *            | X | X |
+   *            +---+---+
+   *            | X | X |
+   *            +---+---+
+   */
   it("should insert a table with a custom number of rows and columns", () => {
     const actual = (
       <editor>
@@ -121,7 +142,7 @@ describe("insertTable", () => {
       </editor>
     );
 
-    const editor = withTest(withTable(actual, DEFAULT_WITH_TABLE_OPTIONS));
+    const editor = withTest(withTable(actual, DEFAULT_TEST_WITH_TABLE_OPTIONS));
 
     TableEditor.insertTable(editor, { rows: 3, cols: 2 });
 
@@ -129,6 +150,12 @@ describe("insertTable", () => {
     assert.deepEqual(editor.selection, expected.selection);
   });
 
+  /*
+   * Actual:    Expected:
+   *            +---+
+   * EMPTY  =>  | X |
+   *            +---+
+   */
   it("should sanitize number of rows and columns and insert a 1x1 table", () => {
     const actual = (
       <editor>
@@ -158,7 +185,7 @@ describe("insertTable", () => {
       </editor>
     );
 
-    const editor = withTest(withTable(actual, DEFAULT_WITH_TABLE_OPTIONS));
+    const editor = withTest(withTable(actual, DEFAULT_TEST_WITH_TABLE_OPTIONS));
 
     TableEditor.insertTable(editor, { rows: -3, cols: 0 });
 
@@ -166,6 +193,12 @@ describe("insertTable", () => {
     assert.deepEqual(editor.selection, expected.selection);
   });
 
+  /*
+   * Actual:    Expected:
+   *            +---+
+   * EMPTY  =>  | X |
+   *            +---+
+   */
   it("should insert a table at a specific location", () => {
     const actual = (
       <editor>
@@ -199,7 +232,7 @@ describe("insertTable", () => {
       </editor>
     );
 
-    const editor = withTest(withTable(actual, DEFAULT_WITH_TABLE_OPTIONS));
+    const editor = withTest(withTable(actual, DEFAULT_TEST_WITH_TABLE_OPTIONS));
 
     TableEditor.insertTable(editor, { rows: 1, cols: 1, at: [2] });
 

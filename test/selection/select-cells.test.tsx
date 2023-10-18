@@ -9,7 +9,7 @@ import { jsx, withTest } from "../index";
 import { withTable } from "../../src/with-table";
 import { isOfType } from "../../src/utils";
 
-describe("cell selection", () => {
+describe("withSelection", () => {
   /*
    * Actual:             Expected:
    * +---+---+---+       +---+---+---+
