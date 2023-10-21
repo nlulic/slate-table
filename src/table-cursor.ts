@@ -1,5 +1,4 @@
 import {
-  BasePoint,
   Editor,
   Element,
   Location,
@@ -16,11 +15,11 @@ import {
   EDITOR_TO_SELECTION_SET,
   EDITOR_TO_WITH_TABLE_OPTIONS,
 } from "./weak-maps";
-import { Edge, PreventableEvent } from "./utils/types";
-import { isOfType, matrix } from "./utils";
+import { NodeEntryWithContext, SelectionMode } from "./utils/types";
+import { filledMatrix, isOfType, matrix } from "./utils";
 
 export const TableCursor = {
-  /** @returns `true` if the selection is inside a table, `false` otherwise. */
+  /** @returns `true` if the selection is inside a table, otherwise `false`. */
   isInTable(editor: Editor, options: { at?: Location } = {}): boolean {
     const [table] = Editor.nodes(editor, {
       match: isOfType(editor, "table"),
@@ -31,266 +30,421 @@ export const TableCursor = {
   },
   /**
    * Moves the cursor to the cell above the current selection.
-   * @param {Edge} [options.edge] - When specified, the cursor will move to another cell only if the
-   * selection is positioned at a specific "edge". If the "edge" is set to `top`, the cursor will only
-   * move if the selection is at the first element of the cell's content.
-   *
-   * Possible values: `left`, `right`, `top`, `bottom`.
-   * @returns void
+   * @param {'start' | 'end' | 'all'} [options.mode] - Specifies the selection mode,
+   * which can be one of the following: `start` to move the cursor to the beginning
+   * of the cell's content, `end` to move it to the end, or `all` to extend the
+   * selection over the entire cell's content.
+   * @returns `true` if the action was successful, `false` otherwise.
    */
-  above(
-    editor: Editor,
-    event: PreventableEvent,
-    options: { edge?: Edge } = {}
-  ): void {
-    const { selection } = editor;
-
-    if (!selection || !Range.isCollapsed(selection)) {
-      return;
+  above(editor: Editor, options: { mode?: SelectionMode } = {}): boolean {
+    if (!editor.selection) {
+      return false;
     }
 
-    const [table, selectedCell] = Editor.nodes(editor, {
+    const [table, td] = Editor.nodes(editor, {
       match: isOfType(editor, "table", "th", "td"),
     });
 
-    if (!table || !selectedCell) {
-      return;
+    if (!table || !td) {
+      return false;
     }
 
     const [, tablePath] = table;
-    const [, selectedCellPath] = selectedCell;
+    const [, tdPath] = td;
 
-    if (
-      options.edge &&
-      !isOnEdge(editor, selection.anchor, selectedCellPath, options.edge)
-    ) {
-      return;
-    }
+    const m = filledMatrix(editor, { at: tablePath });
 
-    let prev: NodeEntry[] | undefined;
-    let index = 0;
-    row: for (const cells of matrix(editor, { at: selectedCellPath })) {
-      for (index = 0; index < cells.length; index++) {
-        const [, path] = cells[index];
-        if (Path.equals(path, selectedCellPath)) {
-          break row;
+    let previous: NodeEntryWithContext[] | undefined;
+    let indexY = 0;
+    outer: for (let x = 0; x < m.length; x++) {
+      for (indexY = 0; indexY < m[x].length; indexY++) {
+        const [[, path], { ltr: colSpan }] = m[x][indexY];
+        if (Path.equals(path, tdPath)) {
+          break outer;
         }
+
+        indexY += colSpan - 1;
       }
-      prev = cells;
+      previous = m[x];
     }
 
-    const targetCell = prev?.[index];
-
-    if (!targetCell) {
+    if (!previous || !previous[indexY]) {
       if (Path.hasPrevious(tablePath)) {
-        event.preventDefault();
         Transforms.select(editor, Editor.end(editor, Path.previous(tablePath)));
+        return true;
       }
-      return;
+
+      return false;
     }
 
-    const [, targetCellPath] = targetCell;
-    event.preventDefault();
-    Transforms.select(editor, Editor.end(editor, targetCellPath));
+    const [[, path]] = previous[indexY];
+
+    options.mode === "all"
+      ? Transforms.select(editor, path)
+      : Transforms.select(
+          editor,
+          options.mode === "start"
+            ? Editor.start(editor, path)
+            : Editor.end(editor, path)
+        );
+
+    return true;
   },
   /**
    * Moves the cursor to the cell below the current selection.
-   * @param {Edge} [options.edge] - When specified, the cursor will move to another cell only if the
-   * selection is positioned at a specific "edge". If the "edge" is set to `bottom`, the cursor will only
-   * move if the selection is at the last element of the cell's content.
-   *
-   * Possible values: `left`, `right`, `top`, `bottom`.
-   * @returns void
+   * @param {'start' | 'end' | 'all'} [options.mode] - Specifies the selection mode,
+   * which can be one of the following: `start` to move the cursor to the beginning
+   * of the cell's content, `end` to move it to the end, or `all` to extend the
+   * selection over the entire cell's content.
+   * @returns `true` if the action was successful, `false` otherwise.
    */
-  below(
-    editor: Editor,
-    event: PreventableEvent,
-    options: { edge?: Edge } = {}
-  ): void {
-    const { selection } = editor;
-
-    if (!selection || !Range.isCollapsed(selection)) {
-      return;
+  below(editor: Editor, options: { mode?: SelectionMode } = {}): boolean {
+    if (!editor.selection) {
+      return false;
     }
 
-    const [table, selectedCell] = Editor.nodes(editor, {
+    const [table, td] = Editor.nodes(editor, {
       match: isOfType(editor, "table", "th", "td"),
+      at: Range.end(editor.selection),
     });
 
-    if (!table || !selectedCell) {
-      return;
+    if (!table || !td) {
+      return false;
     }
 
     const [, tablePath] = table;
-    const [, selectedCellPath] = selectedCell;
+    const [, tdPath] = td;
 
-    if (
-      options.edge &&
-      !isOnEdge(editor, selection.anchor, selectedCellPath, options.edge)
-    ) {
-      return;
-    }
+    const m = filledMatrix(editor, { at: tablePath });
 
-    const matrixGenerator = matrix(editor, { at: selectedCellPath });
+    let next: NodeEntryWithContext[] | undefined;
+    let indexY = 0;
+    outer: for (let x = 0; x < m.length; x++) {
+      for (indexY = 0; indexY < m[x].length; indexY++) {
+        const [[, path], { ltr: colSpan, btt: rowSpan }] = m[x][indexY];
 
-    let next: NodeEntry[] | undefined;
-    let index = 0;
-    row: for (const cells of matrixGenerator) {
-      for (index = 0; index < cells.length; index++) {
-        const [, path] = cells[index];
-        if (Path.equals(path, selectedCellPath)) {
-          next = matrixGenerator.next().value;
-          break row;
+        if (rowSpan === 1 && Path.equals(path, tdPath)) {
+          next = m[x + 1];
+          break outer;
         }
+
+        indexY += colSpan - 1;
       }
     }
 
-    const targetCell = next?.[index];
-
-    if (!targetCell) {
+    if (!next || !next[indexY]) {
       if (Node.has(editor, Path.next(tablePath))) {
-        event.preventDefault();
         Transforms.select(editor, Editor.end(editor, Path.next(tablePath)));
+        return true;
       }
-      return;
+
+      return false;
     }
 
-    const [, targetCellPath] = targetCell;
-    event.preventDefault();
-    Transforms.select(editor, Editor.end(editor, targetCellPath));
+    const [[, path]] = next[indexY];
+
+    options.mode === "all"
+      ? Transforms.select(editor, path)
+      : Transforms.select(
+          editor,
+          options.mode === "start"
+            ? Editor.start(editor, path)
+            : Editor.end(editor, path)
+        );
+
+    return true;
   },
   /**
-   * Moves the cursor to the cell after the current selection.
-   * @param {Edge} [options.edge] - When specified, the cursor will move to another cell only if the
-   * selection is positioned at a specific "edge". If the "edge" is set to `right`, the cursor will only
-   * move if the selection is at the end of the cell's content.
-   *
-   * Possible values: `left`, `right`, `top`, `bottom`.
-   * @returns void
+   * Moves the cursor to the cell next to the current selection.
+   * @param {'start' | 'end' | 'all'} [options.mode] - Specifies the selection mode,
+   * which can be one of the following: `start` to move the cursor to the beginning
+   * of the cell's content, `end` to move it to the end, or `all` to extend the
+   * selection over the entire cell's content.
+   * @returns `true` if the action was successful, `false` otherwise.
    */
-  next(
-    editor: Editor,
-    event: PreventableEvent,
-    options: { edge?: Edge } = {}
-  ): void {
-    const { selection } = editor;
-
-    if (!selection || !Range.isCollapsed(selection)) {
-      return;
+  next(editor: Editor, options: { mode?: SelectionMode } = {}): boolean {
+    if (!editor.selection) {
+      return false;
     }
 
-    const [table, selectedCell] = Editor.nodes(editor, {
+    const [table, td] = Editor.nodes(editor, {
       match: isOfType(editor, "table", "th", "td"),
+      at: Range.end(editor.selection),
     });
 
-    if (!table || !selectedCell) {
-      return;
+    if (!table || !td) {
+      return false;
     }
 
     const [, tablePath] = table;
-    const [, selectedCellPath] = selectedCell;
+    const [, tdPath] = td;
 
-    if (
-      options.edge &&
-      !isOnEdge(editor, selection.anchor, selectedCellPath, options.edge)
-    ) {
-      return;
-    }
-
-    const matrixGenerator = matrix(editor, { at: selectedCellPath });
-
-    let current: NodeEntry[] | undefined, next: NodeEntry[] | undefined;
-    let index = 0;
-    row: for (const cells of matrixGenerator) {
-      current = cells;
-      for (index = 0; index < cells.length; index++) {
-        const [, path] = cells[index];
-        if (Path.equals(path, selectedCellPath)) {
-          next = matrixGenerator.next().value;
-          break row;
+    let foundTd = false;
+    let nextPath: Path | undefined;
+    outer: for (const tr of matrix(editor, { at: tablePath })) {
+      for (const [, path] of tr) {
+        if (!foundTd) {
+          foundTd = Path.equals(path, tdPath);
+          continue;
         }
+
+        nextPath = path;
+        break outer;
       }
     }
 
-    const targetCell = current?.[index + 1] || next?.[0];
-
-    if (!targetCell) {
+    if (!nextPath) {
       if (Node.has(editor, Path.next(tablePath))) {
-        event.preventDefault();
         Transforms.select(editor, Editor.end(editor, Path.next(tablePath)));
+        return true;
       }
-      return;
+
+      return false;
     }
 
-    const [, targetCellPath] = targetCell;
-    event.preventDefault();
-    Transforms.select(editor, Editor.end(editor, targetCellPath));
+    options.mode === "all"
+      ? Transforms.select(editor, nextPath)
+      : Transforms.select(
+          editor,
+          options.mode === "start"
+            ? Editor.start(editor, nextPath)
+            : Editor.end(editor, nextPath)
+        );
+
+    return true;
   },
   /**
    * Moves the cursor to the cell before the current selection.
-   * @param {Edge} [options.edge] - When specified, the cursor will move to another cell only if the
-   * selection is positioned at a specific "edge". If the "edge" is set to `left`, the cursor will only
-   * move if the selection is at the start of the cell's content.
-   *
-   * Possible values: `left`, `right`, `top`, `bottom`.
-   * @returns void
+   * @param {'start' | 'end' | 'all'} [options.mode] - Specifies the selection mode,
+   * which can be one of the following: `start` to move the cursor to the beginning
+   * of the cell's content, `end` to move it to the end, or `all` to extend the
+   * selection over the entire cell's content.
+   * @returns `true` if the action was successful, `false` otherwise.
    */
-  previous(
-    editor: Editor,
-    event: PreventableEvent,
-    options: { edge?: Edge } = {}
-  ): void {
-    const { selection } = editor;
-
-    if (!selection || !Range.isCollapsed(selection)) {
-      return;
+  previous(editor: Editor, options: { mode?: SelectionMode } = {}): boolean {
+    if (!editor.selection) {
+      return false;
     }
 
-    const [table, selectedCell] = Editor.nodes(editor, {
+    const [table, td] = Editor.nodes(editor, {
       match: isOfType(editor, "table", "th", "td"),
+      at: Range.start(editor.selection),
     });
 
-    if (!table || !selectedCell) {
-      return;
+    if (!table || !td) {
+      return false;
     }
 
     const [, tablePath] = table;
-    const [, selectedCellPath] = selectedCell;
+    const [, tdPath] = td;
 
-    if (
-      options.edge &&
-      !isOnEdge(editor, selection.anchor, selectedCellPath, options.edge)
-    ) {
-      return;
-    }
-
-    let prev: NodeEntry[] | undefined, current: NodeEntry[] | undefined;
-    let index = 0;
-    row: for (const cells of matrix(editor, { at: selectedCellPath })) {
-      prev = current;
-      current = cells;
-      for (index = 0; index < cells.length; index++) {
-        const [, path] = cells[index];
-        if (Path.equals(path, selectedCellPath)) {
-          break row;
+    let foundTd = false;
+    let previousPath: Path | undefined;
+    outer: for (const tr of matrix(editor, { at: tablePath, reverse: true })) {
+      for (const [, path] of tr) {
+        if (!foundTd) {
+          foundTd = Path.equals(path, tdPath);
+          continue;
         }
+
+        previousPath = path;
+        break outer;
       }
     }
 
-    const targetCell = current?.[index - 1] || prev?.[prev.length - 1];
-
-    if (!targetCell) {
-      // select the element above the table if the cell does not exist
+    if (!previousPath) {
       if (Path.hasPrevious(tablePath)) {
-        event.preventDefault();
         Transforms.select(editor, Editor.end(editor, Path.previous(tablePath)));
+        return true;
       }
-      return;
+
+      return false;
     }
 
-    const [, targetCellPath] = targetCell;
-    event.preventDefault();
-    Transforms.select(editor, Editor.end(editor, targetCellPath));
+    options.mode === "all"
+      ? Transforms.select(editor, previousPath)
+      : Transforms.select(
+          editor,
+          options.mode === "start"
+            ? Editor.start(editor, previousPath)
+            : Editor.end(editor, previousPath)
+        );
+
+    return true;
+  },
+  /**
+   * Checks if the cursor is in the first cell of the table
+   * @returns {boolean} `true` if the cursor is in the first cell, otherwise `false`.
+   */
+  isInFirstCell(editor: Editor): boolean {
+    if (!editor.selection) {
+      return false;
+    }
+
+    const [table, td] = Editor.nodes(editor, {
+      match: isOfType(editor, "table", "th", "td"),
+    });
+
+    if (!table || !td) {
+      return false;
+    }
+
+    const [firstTd] = Editor.nodes(editor, {
+      match: isOfType(editor, "th", "td"),
+      at: table[1],
+    });
+
+    return !!firstTd && Path.equals(firstTd[1], td[1]);
+  },
+  /**
+   * Checks if the cursor is in the last cell of the table
+   * @returns {boolean} `true` if the cursor is in the last cell, otherwise `false`.
+   */
+  isInLastCell(editor: Editor): boolean {
+    if (!editor.selection) {
+      return false;
+    }
+
+    const [table, td] = Editor.nodes(editor, {
+      match: isOfType(editor, "table", "th", "td"),
+      at: Range.end(editor.selection),
+    });
+
+    if (!table || !td) {
+      return false;
+    }
+
+    const [lastTd] = Editor.nodes(editor, {
+      match: isOfType(editor, "th", "td"),
+      reverse: true,
+      at: table[1],
+    });
+
+    return !!lastTd && Path.equals(lastTd[1], td[1]);
+  },
+  /**
+   * Checks if the cursor is in the first row of the table
+   * @returns {boolean} `true` if the cursor is in the first row, otherwise `false`.
+   */
+  isInFirstRow(editor: Editor): boolean {
+    if (!editor.selection) {
+      return false;
+    }
+
+    const [table, tr] = Editor.nodes(editor, {
+      match: isOfType(editor, "table", "tr"),
+    });
+
+    if (!table || !tr) {
+      return false;
+    }
+
+    const [firstTr] = Editor.nodes(editor, {
+      match: isOfType(editor, "tr"),
+      at: table[1],
+    });
+
+    return !!firstTr && Path.equals(firstTr[1], tr[1]);
+  },
+  /**
+   * Checks if the cursor is in the first row of the table
+   * @returns {boolean} `true` if the cursor is in the first row, otherwise `false`.
+   */
+  isInLastRow(editor: Editor): boolean {
+    if (!editor.selection) {
+      return false;
+    }
+
+    const [table, tr] = Editor.nodes(editor, {
+      match: isOfType(editor, "table", "tr"),
+      at: Range.end(editor.selection),
+    });
+
+    if (!table || !tr) {
+      return false;
+    }
+
+    const [lastTr] = Editor.nodes(editor, {
+      match: isOfType(editor, "tr"),
+      reverse: true,
+      at: table[1],
+    });
+
+    return !!lastTr && Path.equals(lastTr[1], tr[1]);
+  },
+  /**
+   * Checks if the cursor is positioned at the beginning of the cell's content.
+   * @returns {boolean} `true` if the cursor is at the left edge of the cell's content, `false` otherwise.
+   */
+  isOnLeftEdge(editor: Editor): boolean {
+    const { selection } = editor;
+    if (!selection) {
+      return false;
+    }
+
+    const [td] = Editor.nodes(editor, {
+      match: isOfType(editor, "th", "td"),
+    });
+
+    return td
+      ? Point.equals(selection.anchor, Editor.start(editor, td[1]))
+      : false;
+  },
+  /**
+   * Checks if the cursor is positioned at the end of the cell's content.
+   * @returns {boolean} `true` if the cursor is at the right edge of the cell's content, `false` otherwise.
+   */
+  isOnRightEdge(editor: Editor): boolean {
+    const { selection } = editor;
+    if (!selection) {
+      return false;
+    }
+
+    const [td] = Editor.nodes(editor, {
+      match: isOfType(editor, "th", "td"),
+      at: Range.end(selection),
+    });
+
+    return td
+      ? Point.equals(Range.end(selection), Editor.end(editor, td[1]))
+      : false;
+  },
+  /**
+   * Checks if the cursor is positioned at the first block of the cell's content.
+   * @returns {boolean} `true` if the cursor is at the top edge of the cell's content, `false` otherwise.
+   */
+  isOnTopEdge(editor: Editor): boolean {
+    const { selection } = editor;
+    if (!selection) {
+      return false;
+    }
+
+    const [td] = Editor.nodes(editor, {
+      match: isOfType(editor, "th", "td"),
+    });
+
+    return td
+      ? Path.equals(selection.anchor.path, Editor.start(editor, td[1]).path)
+      : false;
+  },
+  /**
+   * Checks if the cursor is positioned at the last block of the cell's content.
+   * @returns {boolean} `true` if the cursor is at the bottom edge of the cell's content, `false` otherwise.
+   */
+  isOnBottomEdge(editor: Editor): boolean {
+    const { selection } = editor;
+    if (!selection) {
+      return false;
+    }
+
+    const [td] = Editor.nodes(editor, {
+      match: isOfType(editor, "th", "td"),
+      at: Range.end(selection),
+    });
+
+    return td
+      ? Path.equals(Range.end(selection).path, Editor.end(editor, td[1]).path)
+      : false;
   },
   /**
    * Retrieves a matrix representing the selected cells within a table.
@@ -314,6 +468,13 @@ export const TableCursor = {
   },
   /** Clears the selection from the table */
   unselect(editor: Editor): void {
+    const editorOptions = EDITOR_TO_WITH_TABLE_OPTIONS.get(editor);
+    if (!editorOptions?.withSelection) {
+      throw new Error(
+        "The `unselect` command must be used with the `withSelection` option."
+      );
+    }
+
     const matrix = EDITOR_TO_SELECTION.get(editor);
 
     if (!matrix?.length) {
@@ -358,23 +519,3 @@ export const TableCursor = {
     return selectedElements.has(element);
   },
 };
-
-function isOnEdge(
-  editor: Editor,
-  point: BasePoint,
-  nodePath: Path,
-  edge: Edge
-): boolean {
-  switch (edge) {
-    case "top":
-      return Path.equals(point.path, Editor.start(editor, nodePath).path);
-    case "bottom":
-      return Path.equals(point.path, Editor.end(editor, nodePath).path);
-    case "right":
-      return Point.equals(point, Editor.end(editor, nodePath));
-    case "left":
-      return Point.equals(point, Editor.start(editor, nodePath));
-    default:
-      return false;
-  }
-}

@@ -1,17 +1,11 @@
 import { Element, NodeEntry } from "slate";
 
-/** Extends an element with the "type" property  */
-export type WithType<T extends Element> = T & Record<"type", unknown>;
-
 export type CellElement = WithType<
   { rowSpan?: number; colSpan?: number } & Element
 >;
 
-export type Edge = "left" | "right" | "top" | "bottom";
-
-export interface PreventableEvent {
-  preventDefault(): void;
-}
+/** Extends an element with the "type" property  */
+export type WithType<T extends Element> = T & Record<"type", unknown>;
 
 export type NodeEntryWithContext = [
   NodeEntry<CellElement>,
@@ -22,3 +16,5 @@ export type NodeEntryWithContext = [
     btt: number; // bottom-to-top (rowspan)
   }
 ];
+
+export type SelectionMode = "start" | "end" | "all";

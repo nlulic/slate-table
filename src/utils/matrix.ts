@@ -5,11 +5,13 @@ import { isOfType } from "./is-of-type";
 
 export function* matrix(
   editor: Editor,
-  options: { at?: Location | Span } = {}
+  options: { at?: Location | Span; reverse?: boolean } = {}
 ): Generator<NodeEntry<CellElement>[], undefined> {
+  const { at, reverse } = options;
+
   const [table] = Editor.nodes(editor, {
     match: isOfType(editor, "table"),
-    at: options.at,
+    at,
   });
 
   if (!table) {
@@ -19,12 +21,13 @@ export function* matrix(
   const [, tablePath] = table;
 
   for (const [, rowPath] of Editor.nodes(editor, {
-    at: Span.isSpan(options.at) ? options.at : tablePath,
+    at: Span.isSpan(at) ? at : tablePath,
     match: isOfType(editor, "tr"),
+    reverse,
   })) {
     const cells: NodeEntry<CellElement>[] = [];
 
-    for (const [cell, path] of Node.children(editor, rowPath)) {
+    for (const [cell, path] of Node.children(editor, rowPath, { reverse })) {
       if (isElement<CellElement>(cell)) {
         cells.push([cell, path]);
       }
