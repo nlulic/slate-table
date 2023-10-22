@@ -36,7 +36,7 @@ export const TableCursor = {
    * selection over the entire cell's content.
    * @returns `true` if the action was successful, `false` otherwise.
    */
-  above(editor: Editor, options: { mode?: SelectionMode } = {}): boolean {
+  upward(editor: Editor, options: { mode?: SelectionMode } = {}): boolean {
     if (!editor.selection) {
       return false;
     }
@@ -98,7 +98,7 @@ export const TableCursor = {
    * selection over the entire cell's content.
    * @returns `true` if the action was successful, `false` otherwise.
    */
-  below(editor: Editor, options: { mode?: SelectionMode } = {}): boolean {
+  downward(editor: Editor, options: { mode?: SelectionMode } = {}): boolean {
     if (!editor.selection) {
       return false;
     }
@@ -162,7 +162,7 @@ export const TableCursor = {
    * selection over the entire cell's content.
    * @returns `true` if the action was successful, `false` otherwise.
    */
-  next(editor: Editor, options: { mode?: SelectionMode } = {}): boolean {
+  forward(editor: Editor, options: { mode?: SelectionMode } = {}): boolean {
     if (!editor.selection) {
       return false;
     }
@@ -221,7 +221,7 @@ export const TableCursor = {
    * selection over the entire cell's content.
    * @returns `true` if the action was successful, `false` otherwise.
    */
-  previous(editor: Editor, options: { mode?: SelectionMode } = {}): boolean {
+  backward(editor: Editor, options: { mode?: SelectionMode } = {}): boolean {
     if (!editor.selection) {
       return false;
     }

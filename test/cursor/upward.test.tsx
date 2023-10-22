@@ -6,7 +6,7 @@ import { TableCursor } from "../../src/table-cursor";
 import { DEFAULT_TEST_WITH_TABLE_OPTIONS, jsx, withTest } from "../index";
 import { withTable } from "../../src/with-table";
 
-describe("above", () => {
+describe("upward", () => {
   /*
    * Actual:            Expected:
    * +---+---+---+      +---+---+---+
@@ -112,7 +112,7 @@ describe("above", () => {
 
     const editor = withTest(withTable(actual, DEFAULT_TEST_WITH_TABLE_OPTIONS));
 
-    const successful = TableCursor.above(editor);
+    const successful = TableCursor.upward(editor);
 
     assert.deepEqual(editor.children, expected.children);
     assert.deepEqual(editor.selection, expected.selection);
@@ -224,7 +224,7 @@ describe("above", () => {
 
     const editor = withTest(withTable(actual, DEFAULT_TEST_WITH_TABLE_OPTIONS));
 
-    const successful = TableCursor.above(editor, { mode: "start" });
+    const successful = TableCursor.upward(editor, { mode: "start" });
     expect(successful).toBe(true);
 
     assert.deepEqual(editor.children, expected.children);
@@ -336,7 +336,7 @@ describe("above", () => {
 
     const editor = withTest(withTable(actual, DEFAULT_TEST_WITH_TABLE_OPTIONS));
 
-    const successful = TableCursor.above(editor, { mode: "all" });
+    const successful = TableCursor.upward(editor, { mode: "all" });
     expect(successful).toBe(true);
 
     assert.deepEqual(editor.children, expected.children);
@@ -453,7 +453,7 @@ describe("above", () => {
 
     const editor = withTest(withTable(actual, DEFAULT_TEST_WITH_TABLE_OPTIONS));
 
-    const successful = TableCursor.above(editor);
+    const successful = TableCursor.upward(editor);
     expect(successful).toBe(false);
 
     assert.deepEqual(editor.children, expected.children);
@@ -569,7 +569,7 @@ describe("above", () => {
 
     const editor = withTest(withTable(actual, DEFAULT_TEST_WITH_TABLE_OPTIONS));
 
-    const successful = TableCursor.above(editor);
+    const successful = TableCursor.upward(editor);
     expect(successful).toBe(true);
 
     assert.deepEqual(editor.children, expected.children);
@@ -681,7 +681,7 @@ describe("above", () => {
 
     const editor = withTest(withTable(actual, DEFAULT_TEST_WITH_TABLE_OPTIONS));
 
-    const successful = TableCursor.above(editor);
+    const successful = TableCursor.upward(editor);
     expect(successful).toBe(false);
 
     assert.deepEqual(editor.children, expected.children);
@@ -795,7 +795,7 @@ describe("above", () => {
 
     const editor = withTest(withTable(actual, DEFAULT_TEST_WITH_TABLE_OPTIONS));
 
-    const successful = TableCursor.above(editor);
+    const successful = TableCursor.upward(editor);
     expect(successful).toBe(true);
 
     assert.deepEqual(editor.children, expected.children);

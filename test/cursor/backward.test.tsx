@@ -6,7 +6,7 @@ import { TableCursor } from "../../src/table-cursor";
 import { DEFAULT_TEST_WITH_TABLE_OPTIONS, jsx, withTest } from "../index";
 import { withTable } from "../../src/with-table";
 
-describe("previous", () => {
+describe("backward", () => {
   /*
    * Actual:            Expected:
    * +---+---+---+      +---+---+---+
@@ -112,7 +112,7 @@ describe("previous", () => {
 
     const editor = withTest(withTable(actual, DEFAULT_TEST_WITH_TABLE_OPTIONS));
 
-    const successful = TableCursor.previous(editor);
+    const successful = TableCursor.backward(editor);
     expect(successful).toBe(true);
 
     assert.deepEqual(editor.children, expected.children);
@@ -224,7 +224,7 @@ describe("previous", () => {
 
     const editor = withTest(withTable(actual, DEFAULT_TEST_WITH_TABLE_OPTIONS));
 
-    const successful = TableCursor.previous(editor, { mode: "start" });
+    const successful = TableCursor.backward(editor, { mode: "start" });
     expect(successful).toBe(true);
 
     assert.deepEqual(editor.children, expected.children);
@@ -336,7 +336,7 @@ describe("previous", () => {
 
     const editor = withTest(withTable(actual, DEFAULT_TEST_WITH_TABLE_OPTIONS));
 
-    const successful = TableCursor.previous(editor, { mode: "all" });
+    const successful = TableCursor.backward(editor, { mode: "all" });
     expect(successful).toBe(true);
 
     assert.deepEqual(editor.children, expected.children);
@@ -448,7 +448,7 @@ describe("previous", () => {
 
     const editor = withTest(withTable(actual, DEFAULT_TEST_WITH_TABLE_OPTIONS));
 
-    const successful = TableCursor.previous(editor);
+    const successful = TableCursor.backward(editor);
     expect(successful).toBe(true);
 
     assert.deepEqual(editor.children, expected.children);
@@ -582,7 +582,7 @@ describe("previous", () => {
 
     const editor = withTest(withTable(actual, DEFAULT_TEST_WITH_TABLE_OPTIONS));
 
-    const successful = TableCursor.previous(editor);
+    const successful = TableCursor.backward(editor);
     expect(successful).toBe(true);
 
     assert.deepEqual(editor.children, expected.children);
@@ -716,7 +716,7 @@ describe("previous", () => {
 
     const editor = withTest(withTable(actual, DEFAULT_TEST_WITH_TABLE_OPTIONS));
 
-    const successful = TableCursor.previous(editor);
+    const successful = TableCursor.backward(editor);
     expect(successful).toBe(true);
 
     assert.deepEqual(editor.children, expected.children);
@@ -850,7 +850,7 @@ describe("previous", () => {
 
     const editor = withTest(withTable(actual, DEFAULT_TEST_WITH_TABLE_OPTIONS));
 
-    const successful = TableCursor.previous(editor);
+    const successful = TableCursor.backward(editor);
     expect(successful).toBe(true);
 
     assert.deepEqual(editor.children, expected.children);
@@ -967,7 +967,7 @@ describe("previous", () => {
 
     const editor = withTest(withTable(actual, DEFAULT_TEST_WITH_TABLE_OPTIONS));
 
-    const successful = TableCursor.previous(editor);
+    const successful = TableCursor.backward(editor);
     expect(successful).toBe(false);
 
     assert.deepEqual(editor.children, expected.children);
@@ -1083,7 +1083,7 @@ describe("previous", () => {
 
     const editor = withTest(withTable(actual, DEFAULT_TEST_WITH_TABLE_OPTIONS));
 
-    const successful = TableCursor.previous(editor);
+    const successful = TableCursor.backward(editor);
     expect(successful).toBe(true);
 
     assert.deepEqual(editor.children, expected.children);
@@ -1195,7 +1195,7 @@ describe("previous", () => {
 
     const editor = withTest(withTable(actual, DEFAULT_TEST_WITH_TABLE_OPTIONS));
 
-    const successful = TableCursor.previous(editor);
+    const successful = TableCursor.backward(editor);
     expect(successful).toBe(false);
 
     assert.deepEqual(editor.children, expected.children);
@@ -1309,7 +1309,7 @@ describe("previous", () => {
 
     const editor = withTest(withTable(actual, DEFAULT_TEST_WITH_TABLE_OPTIONS));
 
-    const successful = TableCursor.previous(editor);
+    const successful = TableCursor.backward(editor);
     expect(successful).toBe(true);
 
     assert.deepEqual(editor.children, expected.children);
