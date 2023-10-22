@@ -18,3 +18,5 @@ export type NodeEntryWithContext = [
 ];
 
 export type SelectionMode = "start" | "end" | "all";
+
+export type Edge = "start" | "end" | "top" | "bottom";

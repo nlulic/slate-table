@@ -15,11 +15,11 @@ import {
   EDITOR_TO_SELECTION_SET,
   EDITOR_TO_WITH_TABLE_OPTIONS,
 } from "./weak-maps";
-import { NodeEntryWithContext, SelectionMode } from "./utils/types";
+import { Edge, NodeEntryWithContext, SelectionMode } from "./utils/types";
 import { filledMatrix, isOfType, matrix } from "./utils";
 
 export const TableCursor = {
-  /** @returns `true` if the selection is inside a table, otherwise `false`. */
+  /** @returns {boolean} `true` if the selection is inside a table, otherwise `false`. */
   isInTable(editor: Editor, options: { at?: Location } = {}): boolean {
     const [table] = Editor.nodes(editor, {
       match: isOfType(editor, "table"),
@@ -34,7 +34,7 @@ export const TableCursor = {
    * which can be one of the following: `start` to move the cursor to the beginning
    * of the cell's content, `end` to move it to the end, or `all` to extend the
    * selection over the entire cell's content.
-   * @returns `true` if the action was successful, `false` otherwise.
+   * @returns {boolean} `true` if the action was successful, `false` otherwise.
    */
   upward(editor: Editor, options: { mode?: SelectionMode } = {}): boolean {
     if (!editor.selection) {
@@ -96,7 +96,7 @@ export const TableCursor = {
    * which can be one of the following: `start` to move the cursor to the beginning
    * of the cell's content, `end` to move it to the end, or `all` to extend the
    * selection over the entire cell's content.
-   * @returns `true` if the action was successful, `false` otherwise.
+   * @returns {boolean} `true` if the action was successful, `false` otherwise.
    */
   downward(editor: Editor, options: { mode?: SelectionMode } = {}): boolean {
     if (!editor.selection) {
@@ -160,7 +160,7 @@ export const TableCursor = {
    * which can be one of the following: `start` to move the cursor to the beginning
    * of the cell's content, `end` to move it to the end, or `all` to extend the
    * selection over the entire cell's content.
-   * @returns `true` if the action was successful, `false` otherwise.
+   * @returns {boolean} `true` if the action was successful, `false` otherwise.
    */
   forward(editor: Editor, options: { mode?: SelectionMode } = {}): boolean {
     if (!editor.selection) {
@@ -219,7 +219,7 @@ export const TableCursor = {
    * which can be one of the following: `start` to move the cursor to the beginning
    * of the cell's content, `end` to move it to the end, or `all` to extend the
    * selection over the entire cell's content.
-   * @returns `true` if the action was successful, `false` otherwise.
+   * @returns {boolean} `true` if the action was successful, `false` otherwise.
    */
   backward(editor: Editor, options: { mode?: SelectionMode } = {}): boolean {
     if (!editor.selection) {
@@ -273,178 +273,126 @@ export const TableCursor = {
     return true;
   },
   /**
-   * Checks if the cursor is in the first cell of the table
+   * Checks if the selection is positioned on an edge within a td or th.
+   * @param {'start' | 'end' | 'top' | 'bottom'} edge - Specifies which edge to check:
+   * - `start`: checks if the cursor is positioned at the start of the cell's content
+   * - `end`: checks if the cursor is positioned at the end of the cell's content
+   * - `top`: checks if the cursor is positioned at the first block of the cell's content
+   * - `bottom`: checks if the cursor is positioned at the last block of the cell's content
+   * @returns {boolean} `true` if the cursor is on the specified edge, `false` otherwise.
+   */
+  isOnEdge(editor: Editor, edge: Edge): boolean {
+    const { selection } = editor;
+    if (!selection) {
+      return false;
+    }
+
+    const point =
+      edge === "start" || edge === "top"
+        ? Range.start(selection)
+        : Range.end(selection);
+
+    const [td] = Editor.nodes(editor, {
+      match: isOfType(editor, "th", "td"),
+      at: point,
+    });
+
+    if (!td) {
+      return false;
+    }
+
+    const [, tdPath] = td;
+    const endPoint = Editor.end(editor, tdPath);
+    const startPoint = Editor.start(editor, tdPath);
+
+    switch (edge) {
+      case "start":
+        return Point.equals(point, startPoint);
+      case "end":
+        return Point.equals(point, endPoint);
+      case "top":
+        return Path.equals(point.path, startPoint.path);
+      case "bottom":
+        return Path.equals(point.path, endPoint.path);
+      default:
+        return false;
+    }
+  },
+  /**
+   * Checks if the cursor is in the first cell of the table.
+   * @param {boolean} [options.reverse] - If true, checks the table
+   * in reverse order to determine if the cell is last in table.
    * @returns {boolean} `true` if the cursor is in the first cell, otherwise `false`.
    */
-  isInFirstCell(editor: Editor): boolean {
+  isInFirstCell(editor: Editor, options: { reverse?: boolean } = {}): boolean {
     if (!editor.selection) {
       return false;
     }
 
     const [table, td] = Editor.nodes(editor, {
       match: isOfType(editor, "table", "th", "td"),
+      reverse: options.reverse,
     });
 
     if (!table || !td) {
       return false;
     }
 
-    const [firstTd] = Editor.nodes(editor, {
+    const [, tablePath] = table;
+    const [, tdPath] = td;
+
+    const [first] = Editor.nodes(editor, {
       match: isOfType(editor, "th", "td"),
-      at: table[1],
+      reverse: options.reverse,
+      at: tablePath,
     });
 
-    return !!firstTd && Path.equals(firstTd[1], td[1]);
+    return Path.equals(first[1], tdPath);
   },
   /**
    * Checks if the cursor is in the last cell of the table
    * @returns {boolean} `true` if the cursor is in the last cell, otherwise `false`.
    */
   isInLastCell(editor: Editor): boolean {
-    if (!editor.selection) {
-      return false;
-    }
-
-    const [table, td] = Editor.nodes(editor, {
-      match: isOfType(editor, "table", "th", "td"),
-      at: Range.end(editor.selection),
-    });
-
-    if (!table || !td) {
-      return false;
-    }
-
-    const [lastTd] = Editor.nodes(editor, {
-      match: isOfType(editor, "th", "td"),
-      reverse: true,
-      at: table[1],
-    });
-
-    return !!lastTd && Path.equals(lastTd[1], td[1]);
+    return TableCursor.isInFirstCell(editor, { reverse: true });
   },
   /**
-   * Checks if the cursor is in the first row of the table
+   * Checks if the cursor is in the first tr of the table.
+   * @param {boolean} [options.reverse] - If true, checks the table
+   * in reverse order to determine if the tr is last in table.
    * @returns {boolean} `true` if the cursor is in the first row, otherwise `false`.
    */
-  isInFirstRow(editor: Editor): boolean {
+  isInFirstRow(editor: Editor, options: { reverse?: boolean } = {}): boolean {
     if (!editor.selection) {
       return false;
     }
 
     const [table, tr] = Editor.nodes(editor, {
       match: isOfType(editor, "table", "tr"),
+      reverse: options.reverse,
     });
 
     if (!table || !tr) {
       return false;
     }
 
-    const [firstTr] = Editor.nodes(editor, {
+    const [, tablePath] = table;
+    const [, trPath] = tr;
+
+    const [first] = Editor.nodes(editor, {
       match: isOfType(editor, "tr"),
-      at: table[1],
+      reverse: options.reverse,
+      at: tablePath,
     });
 
-    return !!firstTr && Path.equals(firstTr[1], tr[1]);
+    return Path.equals(first[1], trPath);
   },
   /**
    * Checks if the cursor is in the first row of the table
    * @returns {boolean} `true` if the cursor is in the first row, otherwise `false`.
    */
   isInLastRow(editor: Editor): boolean {
-    if (!editor.selection) {
-      return false;
-    }
-
-    const [table, tr] = Editor.nodes(editor, {
-      match: isOfType(editor, "table", "tr"),
-      at: Range.end(editor.selection),
-    });
-
-    if (!table || !tr) {
-      return false;
-    }
-
-    const [lastTr] = Editor.nodes(editor, {
-      match: isOfType(editor, "tr"),
-      reverse: true,
-      at: table[1],
-    });
-
-    return !!lastTr && Path.equals(lastTr[1], tr[1]);
-  },
-  /**
-   * Checks if the cursor is positioned at the beginning of the cell's content.
-   * @returns {boolean} `true` if the cursor is at the left edge of the cell's content, `false` otherwise.
-   */
-  isOnLeftEdge(editor: Editor): boolean {
-    const { selection } = editor;
-    if (!selection) {
-      return false;
-    }
-
-    const [td] = Editor.nodes(editor, {
-      match: isOfType(editor, "th", "td"),
-    });
-
-    return td
-      ? Point.equals(selection.anchor, Editor.start(editor, td[1]))
-      : false;
-  },
-  /**
-   * Checks if the cursor is positioned at the end of the cell's content.
-   * @returns {boolean} `true` if the cursor is at the right edge of the cell's content, `false` otherwise.
-   */
-  isOnRightEdge(editor: Editor): boolean {
-    const { selection } = editor;
-    if (!selection) {
-      return false;
-    }
-
-    const [td] = Editor.nodes(editor, {
-      match: isOfType(editor, "th", "td"),
-      at: Range.end(selection),
-    });
-
-    return td
-      ? Point.equals(Range.end(selection), Editor.end(editor, td[1]))
-      : false;
-  },
-  /**
-   * Checks if the cursor is positioned at the first block of the cell's content.
-   * @returns {boolean} `true` if the cursor is at the top edge of the cell's content, `false` otherwise.
-   */
-  isOnTopEdge(editor: Editor): boolean {
-    const { selection } = editor;
-    if (!selection) {
-      return false;
-    }
-
-    const [td] = Editor.nodes(editor, {
-      match: isOfType(editor, "th", "td"),
-    });
-
-    return td
-      ? Path.equals(selection.anchor.path, Editor.start(editor, td[1]).path)
-      : false;
-  },
-  /**
-   * Checks if the cursor is positioned at the last block of the cell's content.
-   * @returns {boolean} `true` if the cursor is at the bottom edge of the cell's content, `false` otherwise.
-   */
-  isOnBottomEdge(editor: Editor): boolean {
-    const { selection } = editor;
-    if (!selection) {
-      return false;
-    }
-
-    const [td] = Editor.nodes(editor, {
-      match: isOfType(editor, "th", "td"),
-      at: Range.end(selection),
-    });
-
-    return td
-      ? Path.equals(Range.end(selection).path, Editor.end(editor, td[1]).path)
-      : false;
+    return TableCursor.isInFirstRow(editor, { reverse: true });
   },
   /**
    * Retrieves a matrix representing the selected cells within a table.

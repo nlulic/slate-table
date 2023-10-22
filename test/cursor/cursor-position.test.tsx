@@ -350,10 +350,11 @@ describe("cursor position", () => {
     expect(TableCursor.isInLastRow(editor)).toBe(true);
     expect(TableCursor.isInFirstCell(editor)).toBe(true);
     expect(TableCursor.isInLastCell(editor)).toBe(true);
-    expect(TableCursor.isOnTopEdge(editor)).toBe(true);
-    expect(TableCursor.isOnBottomEdge(editor)).toBe(true);
-    expect(TableCursor.isOnLeftEdge(editor)).toBe(true);
-    expect(TableCursor.isOnRightEdge(editor)).toBe(true);
+
+    expect(TableCursor.isOnEdge(editor, "top")).toBe(true);
+    expect(TableCursor.isOnEdge(editor, "bottom")).toBe(true);
+    expect(TableCursor.isOnEdge(editor, "start")).toBe(true);
+    expect(TableCursor.isOnEdge(editor, "end")).toBe(true);
   });
 
   it("should check if cursor is on the top and left edge of the cell's content", () => {
@@ -390,11 +391,11 @@ describe("cursor position", () => {
 
     const editor = withTest(withTable(state, DEFAULT_TEST_WITH_TABLE_OPTIONS));
 
-    expect(TableCursor.isOnLeftEdge(editor)).toBe(true);
-    expect(TableCursor.isOnTopEdge(editor)).toBe(true);
+    expect(TableCursor.isOnEdge(editor, "start")).toBe(true);
+    expect(TableCursor.isOnEdge(editor, "top")).toBe(true);
 
-    expect(TableCursor.isOnRightEdge(editor)).toBe(false);
-    expect(TableCursor.isOnBottomEdge(editor)).toBe(false);
+    expect(TableCursor.isOnEdge(editor, "end")).toBe(false);
+    expect(TableCursor.isOnEdge(editor, "bottom")).toBe(false);
   });
 
   it("should check if cursor is on the bottom and right edge of the cell's content", () => {
@@ -432,10 +433,10 @@ describe("cursor position", () => {
 
     const editor = withTest(withTable(state, DEFAULT_TEST_WITH_TABLE_OPTIONS));
 
-    expect(TableCursor.isOnLeftEdge(editor)).toBe(false);
-    expect(TableCursor.isOnTopEdge(editor)).toBe(false);
+    expect(TableCursor.isOnEdge(editor, "start")).toBe(false);
+    expect(TableCursor.isOnEdge(editor, "top")).toBe(false);
 
-    expect(TableCursor.isOnRightEdge(editor)).toBe(true);
-    expect(TableCursor.isOnBottomEdge(editor)).toBe(true);
+    expect(TableCursor.isOnEdge(editor, "end")).toBe(true);
+    expect(TableCursor.isOnEdge(editor, "bottom")).toBe(true);
   });
 });
