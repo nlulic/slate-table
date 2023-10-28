@@ -398,7 +398,7 @@ export const TableCursor = {
    * Retrieves a matrix representing the selected cells within a table.
    * @returns {NodeEntry<T>[][]} A matrix containing the selected cells.
    */
-  selection<T extends Element>(editor: Editor): NodeEntry<T>[][] {
+  *selection(editor: Editor): Generator<NodeEntry[]> {
     const editorOptions = EDITOR_TO_WITH_TABLE_OPTIONS.get(editor);
     if (!editorOptions?.withSelection) {
       throw new Error(
@@ -407,25 +407,18 @@ export const TableCursor = {
     }
 
     const matrix = EDITOR_TO_SELECTION.get(editor);
-
-    if (!matrix) {
-      return [];
-    }
-
-    const entries: NodeEntry<T>[][] = [];
-    for (let x = 0; x < matrix.length; x++) {
-      const cells: NodeEntry<T>[] = [];
+    for (let x = 0; matrix && x < matrix.length; x++) {
+      const cells: NodeEntry[] = [];
       for (let y = 0; y < matrix[x].length; y++) {
         const [entry, { ltr: colSpan, ttb }] = matrix[x][y];
 
-        ttb === 1 && cells.push(entry as NodeEntry<T>);
+        ttb === 1 && cells.push(entry);
 
         y += colSpan - 1;
       }
-      entries.push(cells);
-    }
 
-    return entries;
+      yield cells;
+    }
   },
   /** Clears the selection from the table */
   unselect(editor: Editor): void {
