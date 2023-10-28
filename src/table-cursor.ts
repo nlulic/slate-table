@@ -412,7 +412,20 @@ export const TableCursor = {
       return [];
     }
 
-    return matrix as NodeEntry<T>[][];
+    const entries: NodeEntry<T>[][] = [];
+    for (let x = 0; x < matrix.length; x++) {
+      const cells: NodeEntry<T>[] = [];
+      for (let y = 0; y < matrix[x].length; y++) {
+        const [entry, { ltr: colSpan, ttb }] = matrix[x][y];
+
+        ttb === 1 && cells.push(entry as NodeEntry<T>);
+
+        y += colSpan - 1;
+      }
+      entries.push(cells);
+    }
+
+    return entries;
   },
   /** Clears the selection from the table */
   unselect(editor: Editor): void {
@@ -429,10 +442,15 @@ export const TableCursor = {
       return;
     }
 
-    // Hacky fix to trigger change detection on selected
-    // cells by invoking a no-op on the paths
-    for (const row of matrix) {
-      for (const [, path] of row) {
+    for (let x = 0; x < matrix.length; x++) {
+      for (let y = 0; y < matrix[x].length; y++) {
+        const [[, path], { ltr: colSpan, ttb }] = matrix[x][y];
+        y += colSpan - 1;
+
+        if (ttb > 1) {
+          continue;
+        }
+
         // no-op since the paths are the same
         const noop: Operation = {
           type: "move_node",

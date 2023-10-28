@@ -1,9 +1,9 @@
 import { CellElement } from "./utils/types";
 import { DEFAULT_INSERT_TABLE_OPTIONS, InsertTableOptions } from "./options";
-import { EDITOR_TO_WITH_TABLE_OPTIONS } from "./weak-maps";
+import { EDITOR_TO_SELECTION, EDITOR_TO_WITH_TABLE_OPTIONS } from "./weak-maps";
 import { Editor, Location, Node, NodeEntry, Path, Transforms } from "slate";
 import { TableCursor } from "./table-cursor";
-import { filledMatrix, isOfType } from "./utils";
+import { filledMatrix, hasCommon, isElement, isOfType } from "./utils";
 
 export const TableEditor = {
   /**
@@ -552,7 +552,7 @@ export const TableEditor = {
         }
 
         if (!hasSibling) {
-          this.removeRow(editor, { at: path });
+          TableEditor.removeRow(editor, { at: path });
           continue;
         }
 
@@ -566,6 +566,134 @@ export const TableEditor = {
 
         x -= ttb - 1;
       }
+    });
+  },
+  /**
+   * Checks if the current selection can be merged. Merging is not possible when any of the following conditions are met:
+   * - The selection is empty.
+   * - The selection is not within the same "thead", "tbody," or "tfoot" section.
+   * @returns {boolean} `true` if the selection can be merged, otherwise `false`.
+   */
+  canMerge(editor: Editor): boolean {
+    const matrix = EDITOR_TO_SELECTION.get(editor);
+    // cannot merge when selection is empty
+    if (!matrix || !matrix.length) {
+      return false;
+    }
+
+    // prettier-ignore
+    const [[, lastPath]] = matrix[matrix.length - 1][matrix[matrix.length - 1].length - 1];
+    const [[, firstPath]] = matrix[0][0];
+
+    // cannot merge when selection is not in common section
+    if (!hasCommon(editor, firstPath, lastPath, "thead", "tbody", "tfoot")) {
+      return false;
+    }
+
+    return true;
+  },
+  /**
+   * Merges the selected cells in the table.
+   * @returns void
+   */
+  merge(editor: Editor): void {
+    if (!TableEditor.canMerge(editor)) {
+      return;
+    }
+
+    const selection = EDITOR_TO_SELECTION.get(editor);
+
+    if (!selection || !selection.length) {
+      return;
+    }
+
+    const [[, basePath]] = selection[0][0];
+    const [[, lastPath]] = Node.children(editor, basePath, { reverse: true });
+
+    const matrix = filledMatrix(editor, { at: basePath });
+
+    Editor.withoutNormalizing(editor, () => {
+      let rowSpan = 0;
+      let colSpan = 0;
+      for (let x = selection.length - 1; x >= 0; x--, rowSpan++) {
+        colSpan = 0;
+        for (let y = selection[x].length - 1; y >= 0; y--, colSpan++) {
+          const [[, path], { rtl: colspan, ttb }] = selection[x][y];
+
+          y -= colspan - 1;
+          colSpan += colspan - 1;
+
+          // skip first cell and "fake" cells which belong to a cell with a `rowspan`
+          if (Path.equals(basePath, path) || ttb > 1) {
+            continue;
+          }
+
+          // prettier-ignore
+          for (const [, childPath] of Node.children(editor, path, { reverse: true })) {
+            Transforms.moveNodes(editor, {
+              to: Path.next(lastPath),
+              at: childPath,
+            });
+          }
+
+          const [[, trPath]] = Editor.nodes(editor, {
+            match: isOfType(editor, "tr"),
+            at: path,
+          });
+
+          const [, sibling] = Node.children(editor, trPath);
+
+          if (sibling) {
+            Transforms.removeNodes(editor, { at: path });
+            continue;
+          }
+
+          // there has to be a better way to do this
+          let trIndex = 0;
+          out: for (let i = 0; i < matrix.length; i++) {
+            for (let j = 0; j < matrix[i].length; j++) {
+              const [[, tdPath]] = matrix[i][j];
+              if (Path.equals(tdPath, path)) {
+                trIndex = i;
+                break out;
+              }
+            }
+          }
+
+          for (let y = 0; y < matrix[trIndex].length; y++) {
+            const [[, tdPath], { ttb, ltr }] = matrix[trIndex][y];
+            y += ltr - 1;
+
+            if (ttb === 1) {
+              continue;
+            }
+
+            const [element] = Editor.node(editor, tdPath);
+            if (isElement<CellElement>(element)) {
+              const { rowSpan = 1 } = element;
+              Transforms.setNodes<CellElement>(
+                editor,
+                { rowSpan: rowSpan - 1 },
+                { at: tdPath }
+              );
+            }
+          }
+
+          rowSpan--;
+          Transforms.removeNodes(editor, { at: trPath });
+        }
+      }
+
+      // set the colspan to 1 when merging columns that match the matrix size
+      if (selection.length === matrix.length) {
+        colSpan = 1;
+      }
+
+      Transforms.setNodes<CellElement>(
+        editor,
+        { rowSpan, colSpan },
+        { at: basePath }
+      );
     });
   },
 };

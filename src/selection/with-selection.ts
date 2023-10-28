@@ -1,14 +1,7 @@
 import { EDITOR_TO_SELECTION, EDITOR_TO_SELECTION_SET } from "../weak-maps";
-import {
-  Editor,
-  Element,
-  Node,
-  NodeEntry,
-  Operation,
-  Path,
-  Range,
-} from "slate";
-import { Point, filledMatrix, isOfType } from "../utils";
+import { Editor, Element, Operation, Path, Range } from "slate";
+import { NodeEntryWithContext } from "../utils/types";
+import { Point, filledMatrix, hasCommon, isOfType } from "../utils";
 import { TableCursor } from "../table-cursor";
 import { WithTableOptions } from "../options";
 
@@ -57,7 +50,7 @@ export const withSelection = <T extends Editor>(
 
     if (
       Path.equals(fromPath, toPath) ||
-      !hasCommonTable(editor, fromPath, toPath)
+      !hasCommon(editor, fromPath, toPath, "table")
     ) {
       return apply(op);
     }
@@ -111,49 +104,24 @@ export const withSelection = <T extends Editor>(
       end = nextEnd;
     }
 
+    const selected: NodeEntryWithContext[][] = [];
     const selectedSet = new WeakSet<Element>();
-    const selected: NodeEntry<Element>[][] = [];
 
-    for (let i = start.x; i <= end.x; i++) {
-      const cells: NodeEntry<Element>[] = [];
-
-      for (let j = start.y; j <= end.y; j++) {
-        const [entry, { ltr: colSpan }] = filled[i][j];
-        const [element] = entry;
-
-        // prevent duplicate's from the filled matrix
-        if (selectedSet.has(element)) {
-          continue;
-        }
-
+    for (let x = start.x; x <= end.x; x++) {
+      const cells: NodeEntryWithContext[] = [];
+      for (let y = start.y; y <= end.y; y++) {
+        const [[element]] = filled[x][y];
         selectedSet.add(element);
-        cells.push(entry);
-
-        j += colSpan - 1;
+        cells.push(filled[x][y]);
       }
       selected.push(cells);
     }
 
-    EDITOR_TO_SELECTION_SET.set(editor, selectedSet);
     EDITOR_TO_SELECTION.set(editor, selected);
+    EDITOR_TO_SELECTION_SET.set(editor, selectedSet);
 
     apply(op);
   };
 
   return editor;
 };
-
-/** Determines whether two paths belong to the same table by checking if they share a common ancestor node of type table */
-function hasCommonTable(editor: Editor, path: Path, another: Path): boolean {
-  const [commonNode, commonPath] = Node.common(editor, path, another);
-  if (isOfType(editor, "table")(commonNode, commonPath)) {
-    return true;
-  }
-
-  // Warning: returns the common ancestor but will return `undefined` if the
-  // `commonPath` is equal to the table's path
-  return !!Editor.above(editor, {
-    match: isOfType(editor, "table"),
-    at: commonPath,
-  });
-}

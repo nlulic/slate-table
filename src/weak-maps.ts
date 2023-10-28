@@ -1,4 +1,5 @@
-import { Editor, Element, NodeEntry } from "slate";
+import { Editor, Element } from "slate";
+import { NodeEntryWithContext } from "./utils/types";
 import { WithTableOptions } from "./options";
 
 /** Weak reference between the `Editor` and the `WithTableOptions` */
@@ -10,7 +11,7 @@ export const EDITOR_TO_WITH_TABLE_OPTIONS = new WeakMap<
 /** Weak reference between the `Editor` and the selected elements */
 export const EDITOR_TO_SELECTION = new WeakMap<
   Editor,
-  NodeEntry<Element>[][]
+  NodeEntryWithContext[][]
 >();
 
 /** Weak reference between the `Editor` and a set of the selected elements */
