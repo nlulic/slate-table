@@ -5,15 +5,15 @@ import assert from "assert";
 import { DEFAULT_WITH_TABLE_OPTIONS } from "../../src/options";
 import { Editor, Range, SelectionOperation, Transforms } from "slate";
 import { TableCursor } from "../../src/table-cursor";
-import { jsx, withTest } from "../index";
-import { withTable } from "../../src/with-table";
 import { isOfType } from "../../src/utils";
+import { jsx, withTest } from "../testutils";
+import { withTable } from "../../src/with-table";
 
 describe("withSelection", () => {
   /*
    * Actual:             Expected:
    * +---+---+---+       +---+---+---+
-   * | 1 | 2 | 3 |  =>   | X | X | X |
+   * |>1 | 2 | 3<|  =>   | X | X | X |
    * +---+---+---+       +---+---+---+
    * | 4 | 5 | 6 |       | 4 | 5 | 6 |
    * +---+---+---+       +---+---+---+
@@ -168,7 +168,7 @@ describe("withSelection", () => {
   /*
    * Actual:             Expected:
    * +---+---+---+       +---+---+---+
-   * | 1 | 2 | 3 |  =>   | X | X | X |
+   * |<1 | 2 | 3>|  =>   | X | X | X |
    * +---+---+---+       +---+---+---+
    * | 4 | 5 | 6 |       | 4 | 5 | 6 |
    * +---+---+---+       +---+---+---+
@@ -323,11 +323,11 @@ describe("withSelection", () => {
   /*
    * Actual:             Expected:
    * +---+---+---+       +---+---+---+
-   * | 1 | 2 | 3 |  =>   | 1 | X | 3 |
+   * | 1 |>2 | 3 |  =>   | 1 | X | 3 |
    * +---+---+---+       +---+---+---+
    * | 4 | 5 | 6 |       | 4 | X | 6 |
    * +---+---+---+       +---+---+---+
-   * | 7 | 8 | 9 |       | 7 | X | 9 |
+   * | 7 | 8<| 9 |       | 7 | X | 9 |
    * +---+---+---+       +---+---+---+
    */
   it("should select the correct cells vertically from ttb", () => {
@@ -378,7 +378,7 @@ describe("withSelection", () => {
             <tr>
               <td>
                 <paragraph>
-                  <text></text>
+                  <text>7</text>
                 </paragraph>
               </td>
               <td>
@@ -446,7 +446,7 @@ describe("withSelection", () => {
             <tr>
               <td>
                 <paragraph>
-                  <text></text>
+                  <text>7</text>
                 </paragraph>
               </td>
               <td data={{ selected: true }}>
@@ -478,14 +478,14 @@ describe("withSelection", () => {
   /*
    * Actual:             Expected:
    * +---+---+---+       +---+---+---+
-   * | 1 | 2 | 3 |  =>   | 1 | X | 3 |
+   * | 1 |<2 | 3 |  =>   | 1 | X | 3 |
    * +---+---+---+       +---+---+---+
    * | 4 | 5 | 6 |       | 4 | X | 6 |
    * +---+---+---+       +---+---+---+
-   * | 7 | 8 | 9 |       | 7 | X | 9 |
+   * | 7 | 8>| 9 |       | 7 | X | 9 |
    * +---+---+---+       +---+---+---+
    */
-  it("should select the correct cells vertically from btp", () => {
+  it("should select the correct cells vertically from btt", () => {
     const actual = (
       <editor>
         <table>
@@ -533,7 +533,7 @@ describe("withSelection", () => {
             <tr>
               <td>
                 <paragraph>
-                  <text></text>
+                  <text>7</text>
                 </paragraph>
               </td>
               <td>
@@ -601,7 +601,7 @@ describe("withSelection", () => {
             <tr>
               <td>
                 <paragraph>
-                  <text></text>
+                  <text>7</text>
                 </paragraph>
               </td>
               <td data={{ selected: true }}>
@@ -633,9 +633,9 @@ describe("withSelection", () => {
   /*
    * Actual:             Expected:
    * +---+---+---+       +---+---+---+
-   * | 1 | 2 | 3 |  =>   | X | X | 3 |
+   * | 1 | 2>| 3 |  =>   | X | X | 3 |
    * +---+---+---+       +---+---+---+
-   * | 4 | 5 | 6 |       | X | X | 6 |
+   * | 4<| 5 | 6 |       | X | X | 6 |
    * +---+---+---+       +---+---+---+
    * | 7 | 8 | 9 |       | 7 | 8 | 9 |
    * +---+---+---+       +---+---+---+
@@ -690,7 +690,7 @@ describe("withSelection", () => {
             <tr>
               <td>
                 <paragraph>
-                  <text></text>
+                  <text>7</text>
                 </paragraph>
               </td>
               <td>
@@ -758,7 +758,7 @@ describe("withSelection", () => {
             <tr>
               <td>
                 <paragraph>
-                  <text></text>
+                  <text>7</text>
                 </paragraph>
               </td>
               <td>
@@ -788,9 +788,9 @@ describe("withSelection", () => {
   /*
    * Actual:             Expected:
    * +---+---+---+       +---+---+---+
-   * | 1 | 2 | 3 |  =>   | 1 | X | X |
+   * | 1 | 2>| 3 |  =>   | 1 | X | X |
    * +---+---+---+       +---+---+---+
-   * | 4 | 5 | 6 |       | 3 | X | X |
+   * | 4 | 5 |<6 |       | 3 | X | X |
    * +---+---+---+       +---+---+---+
    * | 7 | 8 | 9 |       | 7 | 8 | 9 |
    * +---+---+---+       +---+---+---+
@@ -845,7 +845,7 @@ describe("withSelection", () => {
             <tr>
               <td>
                 <paragraph>
-                  <text></text>
+                  <text>7</text>
                 </paragraph>
               </td>
               <td>
@@ -913,7 +913,7 @@ describe("withSelection", () => {
             <tr>
               <td>
                 <paragraph>
-                  <text></text>
+                  <text>7</text>
                 </paragraph>
               </td>
               <td>
@@ -943,14 +943,12 @@ describe("withSelection", () => {
   /*
    * Actual:             Expected:
    * +---+---+---+       +---+---+---+
-   * | 1 | 2 | 3 |  =>   | X | X | X |
+   * | 1>| 2 | 3 |  =>   | X | X | X |
    * +---+---+---+       +---+---+---+
-   * | 4 |   5   |       | X |   X   |
+   * | 4 |   5<  |       | X |   X   |
    * +---+---+---+       +---+---+---+
    * | 7 | 8 | 9 |       | 7 | 8 | 9 |
    * +---+---+---+       +---+---+---+
-   * anchor: 5
-   * focus:  1
    */
   it("should select the correct cells with colspan from rtl", () => {
     const actual = (
@@ -997,7 +995,7 @@ describe("withSelection", () => {
             <tr>
               <td>
                 <paragraph>
-                  <text></text>
+                  <text>7</text>
                 </paragraph>
               </td>
               <td>
@@ -1060,7 +1058,7 @@ describe("withSelection", () => {
             <tr>
               <td>
                 <paragraph>
-                  <text></text>
+                  <text>7</text>
                 </paragraph>
               </td>
               <td>
@@ -1090,14 +1088,12 @@ describe("withSelection", () => {
   /*
    * Actual:                Expected:
    * +---+---+---+---+      +---+---+---+---+
-   * | 1 | 2 |   3   |  =>  | X | X |   X   |
+   * |<1 | 2 |   3   |  =>  | X | X |   X   |
    * +---+---+---+---+      +---+---+---+---+
-   * |     4     | 5 |      |     X     | X |
+   * |     4>    | 5 |      |     X     | X |
    * +---+---+---+---+      +---+---+---+---+
    * | 6 | 7 | 8 | 9 |      | 6 | 7 | 8 | 9 |
    * +---+---+---+---+      +---+---+---+---+
-   * anchor: 1
-   * focus:  4
    */
   it("should select the correct cells with colspan from ltr", () => {
     const actual = (
@@ -1247,14 +1243,12 @@ describe("withSelection", () => {
   /*
    * Actual:            Expected:
    * +---+---+---+      +---+---+---+
-   * |   | 2 | 3 |  =>  |   | X | 3 |
-   * + 1 +---+---+      + X +---+---+
+   * |   | 2>| 3 |  =>  |   | X | 3 |
+   * +<1 +---+---+      + X +---+---+
    * |   |   | 6 |      |   |   | 6 |
    * +---+ 5 +---+      +---+ X +---+
    * | 7 |   | 9 |      | X |   | 9 |
    * +---+---+---+      +---+---+---+
-   * anchor: 1
-   * focus:  2
    */
   it("should select the correct cells with rowspan", () => {
     const actual = (
@@ -1384,14 +1378,12 @@ describe("withSelection", () => {
   /*
    * Actual:            Expected:
    * +---+---+---+      +---+---+---+
-   * |   | 2 | 3 |  =>  |   | X | X |
-   * + 1 +---+---+      + X +---+---+
+   * |   | 2>| 3 |  =>  |   | X | X |
+   * +<1 +---+---+      + X +---+---+
    * |   |   5   |      |   |   X   |
    * +---+---+---+      +---+---+---+
    * | 6 | 7 | 8 |      | 6 | 7 | 8 |
    * +---+---+---+      +---+---+---+
-   * anchor: 1
-   * focus:  2
    */
   it("should select the correct cells with rowspan and colspan", () => {
     const actual = (
@@ -1514,6 +1506,12 @@ describe("withSelection", () => {
     assert.deepEqual(editor.selection, expected.selection);
   });
 
+  /*
+   * Actual:        Expected:
+   * +---+---+      +---+---+
+   * |<1>| 2 |  =>  | 1 | 2 |
+   * +---+---+      +---+---+
+   */
   it("should have no selection if the range is in a single cell", () => {
     const actual = (
       <editor>
@@ -1553,6 +1551,135 @@ describe("withSelection", () => {
               <td>
                 <paragraph>
                   <text>2</text>
+                </paragraph>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </editor>
+    );
+
+    const editor = withTest(withTable(actual, DEFAULT_WITH_TABLE_OPTIONS));
+
+    applySelection(editor);
+
+    assert.deepEqual(editor.children, expected.children);
+    assert.deepEqual(editor.selection, expected.selection);
+  });
+
+  /*
+   * Actual:        Expected:
+   * +---+---+      +---+---+
+   * |<1 | 2 |  =>  |<1 | 2 |
+   * +---+---+      +---+---+
+   * | 3 | 4 |      | 3 | 4 |
+   * +---+---+      +---+---+
+   *
+   * +---+---+      +---+---+
+   * | 1 | 2>|      | 1 | 2>|
+   * +---+---+      +---+---+
+   */
+  it("should have no selection if the range is not in a common table", () => {
+    const actual = (
+      <editor>
+        <table>
+          <tbody>
+            <tr>
+              <td>
+                <paragraph>
+                  <text>
+                    <anchor />1
+                  </text>
+                </paragraph>
+              </td>
+              <td>
+                <paragraph>
+                  <text>2</text>
+                </paragraph>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <paragraph>
+                  <text>3</text>
+                </paragraph>
+              </td>
+              <td>
+                <paragraph>
+                  <text>4</text>
+                </paragraph>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+        <table>
+          <tbody>
+            <tr>
+              <td>
+                <paragraph>
+                  <text>1</text>
+                </paragraph>
+              </td>
+              <td>
+                <paragraph>
+                  <text>
+                    2<focus />
+                  </text>
+                </paragraph>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </editor>
+    );
+
+    const expected = (
+      <editor>
+        <table>
+          <tbody>
+            <tr>
+              <td>
+                <paragraph>
+                  <text>
+                    <anchor />1
+                  </text>
+                </paragraph>
+              </td>
+              <td>
+                <paragraph>
+                  <text>2</text>
+                </paragraph>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <paragraph>
+                  <text>3</text>
+                </paragraph>
+              </td>
+              <td>
+                <paragraph>
+                  <text>4</text>
+                </paragraph>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+        <table>
+          <tbody>
+            <tr>
+              <td>
+                <paragraph>
+                  <text>1</text>
+                </paragraph>
+              </td>
+              <td>
+                <paragraph>
+                  <text>
+                    2<focus />
+                  </text>
                 </paragraph>
               </td>
             </tr>
@@ -1694,9 +1821,7 @@ describe("withSelection", () => {
     expect(TableCursor.isSelected(editor, cell3)).toBeFalsy();
   });
 
-  /**
-   * Utility function to trigger the `selection` operation and add a `selected` flag to the cells.
-   */
+  /** Utility function to trigger the `selection` operation and add a `selected` flag to the cells. */
   function applySelection(editor: Editor): void {
     const { selection } = editor;
 

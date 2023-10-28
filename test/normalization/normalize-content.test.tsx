@@ -5,7 +5,7 @@ import assert from "assert";
 import normalizeContent from "../../src/normalization/normalize-content";
 import { DEFAULT_WITH_TABLE_OPTIONS } from "../../src/options";
 import { Editor } from "slate";
-import { jsx, withTest } from "..";
+import { jsx, withTest } from "../testutils";
 
 describe("normalize `content` node", () => {
   it("should remove other table nodes from content", () => {

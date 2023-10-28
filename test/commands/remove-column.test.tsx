@@ -2,7 +2,7 @@
 /** @jsx jsx */
 
 import assert from "assert";
-import { DEFAULT_TEST_WITH_TABLE_OPTIONS, jsx, withTest } from "../index";
+import { DEFAULT_TEST_WITH_TABLE_OPTIONS, jsx, withTest } from "../testutils";
 import { TableEditor } from "../../src/table-editor";
 import { withTable } from "../../src/with-table";
 
@@ -1881,6 +1881,101 @@ describe("removeColumn", () => {
               </td>
             </tr>
           </tfoot>
+        </table>
+      </editor>
+    );
+
+    const editor = withTest(withTable(actual, DEFAULT_TEST_WITH_TABLE_OPTIONS));
+
+    TableEditor.removeColumn(editor);
+
+    assert.deepEqual(editor.children, expected.children);
+    assert.deepEqual(editor.selection, expected.selection);
+  });
+
+  /*
+   * Actual:            Expected:
+   * +---+---+---+      +---+---+
+   * |   | 2 |   |      |   |   |
+   * + 1 +---+   +      + 1 +   +
+   * |   | 4*| 3 |      |   | 3 |
+   * +---+---+   +      +---+   +
+   * | 5 | 6 |   |      | 5 |   |
+   * +---+---+---+      +---+---+
+   */
+  // TODO: fix
+  xit('should remove column when cell with selection has no "real" sibling', () => {
+    const actual = (
+      <editor>
+        <table>
+          <tbody>
+            <tr>
+              <td rowSpan={2}>
+                <paragraph>
+                  <text>1</text>
+                </paragraph>
+              </td>
+              <td>
+                <paragraph>
+                  <text>2</text>
+                </paragraph>
+              </td>
+              <td rowSpan={3}>
+                <paragraph>
+                  <text>3</text>
+                </paragraph>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <paragraph>
+                  <text>
+                    4<cursor />
+                  </text>
+                </paragraph>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <paragraph>
+                  <text>5</text>
+                </paragraph>
+              </td>
+              <td>
+                <paragraph>
+                  <text>6</text>
+                </paragraph>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </editor>
+    );
+
+    const expected = (
+      <editor>
+        <table>
+          <tbody>
+            <tr>
+              <td rowSpan={1}>
+                <paragraph>
+                  <text>1</text>
+                </paragraph>
+              </td>
+              <td rowSpan={2}>
+                <paragraph>
+                  <text>3</text>
+                </paragraph>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <paragraph>
+                  <text>5</text>
+                </paragraph>
+              </td>
+            </tr>
+          </tbody>
         </table>
       </editor>
     );

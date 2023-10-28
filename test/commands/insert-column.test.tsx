@@ -2,7 +2,7 @@
 /** @jsx jsx */
 
 import assert from "assert";
-import { DEFAULT_TEST_WITH_TABLE_OPTIONS, jsx, withTest } from "../index";
+import { DEFAULT_TEST_WITH_TABLE_OPTIONS, jsx, withTest } from "../testutils";
 import { TableEditor } from "../../src/table-editor";
 import { withTable } from "../../src/with-table";
 

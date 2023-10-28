@@ -5,7 +5,7 @@ import assert from "assert";
 import normalizeTr from "../../src/normalization/normalize-tr";
 import { DEFAULT_WITH_TABLE_OPTIONS } from "../../src/options";
 import { Editor } from "slate";
-import { jsx, withTest } from "..";
+import { jsx, withTest } from "../testutils";
 import { EDITOR_TO_WITH_TABLE_OPTIONS } from "../../src/weak-maps";
 
 describe("normalize `tr` node", () => {

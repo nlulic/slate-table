@@ -5,7 +5,7 @@ import assert from "assert";
 import normalizeAttributes from "../../src/normalization/normalize-attributes";
 import { DEFAULT_WITH_TABLE_OPTIONS } from "../../src/options";
 import { Editor } from "slate";
-import { jsx, withTest } from "..";
+import { jsx, withTest } from "../testutils";
 
 describe("normalize attributes of the `td` and `th` nodes", () => {
   it("should remove other table nodes from content", () => {

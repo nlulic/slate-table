@@ -3,7 +3,7 @@
 
 import assert from "assert";
 import { TableEditor } from "../../src/table-editor";
-import { jsx, withTest, DEFAULT_TEST_WITH_TABLE_OPTIONS } from "../index";
+import { jsx, withTest, DEFAULT_TEST_WITH_TABLE_OPTIONS } from "../testutils";
 import { withTable } from "../../src/with-table";
 
 describe("insertTable", () => {

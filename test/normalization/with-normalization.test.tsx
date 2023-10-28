@@ -4,7 +4,7 @@
 import assert from "assert";
 import { DEFAULT_WITH_TABLE_OPTIONS } from "../../src/options";
 import { Editor } from "slate";
-import { jsx, withTest } from "../index";
+import { jsx, withTest } from "../testutils";
 import { withTable } from "../../src/with-table";
 
 describe("withNormalization", () => {

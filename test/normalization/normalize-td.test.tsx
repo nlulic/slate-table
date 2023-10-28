@@ -5,7 +5,7 @@ import assert from "assert";
 import normalizeTd from "../../src/normalization/normalize-td";
 import { DEFAULT_WITH_TABLE_OPTIONS } from "../../src/options";
 import { Editor } from "slate";
-import { jsx, withTest } from "..";
+import { jsx, withTest } from "../testutils";
 
 describe("normalize `td` and `th` nodes", () => {
   it("should wrap every inline node in a `content` node", () => {

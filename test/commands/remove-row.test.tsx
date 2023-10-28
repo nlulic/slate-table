@@ -3,7 +3,7 @@
 
 import assert from "assert";
 import { TableEditor } from "../../src/table-editor";
-import { DEFAULT_TEST_WITH_TABLE_OPTIONS, jsx, withTest } from "../index";
+import { DEFAULT_TEST_WITH_TABLE_OPTIONS, jsx, withTest } from "../testutils";
 import { withTable } from "../../src/with-table";
 
 describe("removeRow", () => {

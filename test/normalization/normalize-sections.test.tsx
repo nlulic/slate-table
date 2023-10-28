@@ -5,7 +5,7 @@ import assert from "assert";
 import normalizeSections from "../../src/normalization/normalize-sections";
 import { DEFAULT_WITH_TABLE_OPTIONS } from "../../src/options";
 import { Editor } from "slate";
-import { jsx, withTest } from "..";
+import { jsx, withTest } from "../testutils";
 
 describe("normalize `thead`, `tbody` and `tfoot` nodes", () => {
   it("should wrap every node in a `tr` node", () => {

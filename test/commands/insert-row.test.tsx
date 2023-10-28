@@ -4,7 +4,7 @@
 import assert from "assert";
 import { DEFAULT_WITH_TABLE_OPTIONS } from "../../src/options";
 import { TableEditor } from "../../src/table-editor";
-import { jsx, withTest } from "../index";
+import { jsx, withTest } from "../testutils";
 import { withTable } from "../../src/with-table";
 
 describe("insertRow", () => {
