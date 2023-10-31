@@ -696,4 +696,158 @@ export const TableEditor = {
       );
     });
   },
+  /**
+   * Splits either the cell at the current selection or a specified location. If a range
+   * selection is present, all cells within the range will be split.
+   * @param {Location} [options.at] - Splits the cell at the specified location. If no
+   * location is specified it will split the cell at the current selection
+   * @param {boolean} [options.all] - If true, splits all cells in the table
+   * @returns void
+   */
+  split(editor: Editor, options: { at?: Location; all?: boolean } = {}): void {
+    const editorOptions = EDITOR_TO_WITH_TABLE_OPTIONS.get(editor);
+    if (!editorOptions) {
+      return;
+    }
+
+    const [table, td] = Editor.nodes(editor, {
+      match: isOfType(editor, "table", "th", "td"),
+      at: options.at,
+    });
+
+    if (!table || !td) {
+      return;
+    }
+
+    const selection = EDITOR_TO_SELECTION.get(editor) || [];
+    const matrix = filledMatrix(editor, { at: options.at });
+
+    const { blocks } = editorOptions;
+
+    Editor.withoutNormalizing(editor, () => {
+      for (let x = matrix.length - 1; x >= 0; x--) {
+        for (let y = matrix[x].length - 1; y >= 0; y--) {
+          const [[, path], context] = matrix[x][y];
+          const { ltr: colSpan, rtl, btt: rowSpan, ttb } = context;
+
+          if (rtl > 1) {
+            // get to the start of the colspan
+            y -= rtl - 2;
+            continue;
+          }
+
+          if (ttb > 1) {
+            continue;
+          }
+
+          if (rowSpan === 1 && colSpan === 1) {
+            continue;
+          }
+
+          let found = !!options.all;
+
+          if (selection.length) {
+            outer: for (let i = 0; !options.all && i < selection.length; i++) {
+              for (let j = 0; j < selection[i].length; j++) {
+                const [[, tdPath]] = selection[i][j];
+
+                if (Path.equals(tdPath, path)) {
+                  found = true;
+                  break outer;
+                }
+              }
+            }
+          } else {
+            const [, tdPath] = td;
+            if (Path.equals(tdPath, path)) {
+              found = true;
+            }
+          }
+
+          if (!found) {
+            continue;
+          }
+
+          const [[section]] = Editor.nodes(editor, {
+            match: isOfType(editor, "thead", "tbody", "tfoot"),
+            at: path,
+          });
+
+          out: for (let r = 1; r < rowSpan; r++) {
+            for (let i = y; i >= 0; i--) {
+              const [[, path], { ttb }] = matrix[x + r][i];
+
+              if (ttb !== 1) {
+                continue;
+              }
+
+              for (let c = 0; c < colSpan; c++) {
+                Transforms.insertNodes(
+                  editor,
+                  {
+                    type: section.type === blocks.thead ? blocks.th : blocks.td,
+                    children: [
+                      {
+                        type: blocks.content,
+                        children: [{ text: "" }],
+                      } as Node,
+                    ],
+                  } as Node,
+                  { at: Path.next(path) }
+                );
+              }
+              continue out;
+            }
+
+            for (let i = y; i < matrix[x].length; i++) {
+              const [[, path], { ttb }] = matrix[x + r][i];
+
+              if (ttb !== 1) {
+                continue;
+              }
+
+              for (let c = 0; c < colSpan; c++) {
+                Transforms.insertNodes(
+                  editor,
+                  {
+                    type: section.type === blocks.thead ? blocks.th : blocks.td,
+                    children: [
+                      {
+                        type: blocks.content,
+                        children: [{ text: "" }],
+                      } as Node,
+                    ],
+                  } as Node,
+                  { at: [...Path.parent(path), 0] }
+                );
+              }
+              continue out;
+            }
+          }
+
+          for (let c = 1; c < colSpan; c++) {
+            Transforms.insertNodes(
+              editor,
+              {
+                type: section.type === blocks.thead ? blocks.th : blocks.td,
+                children: [
+                  {
+                    type: blocks.content,
+                    children: [{ text: "" }],
+                  } as Node,
+                ],
+              } as Node,
+              { at: Path.next(path) }
+            );
+          }
+
+          Transforms.setNodes<CellElement>(
+            editor,
+            { rowSpan: 1, colSpan: 1 },
+            { at: path }
+          );
+        }
+      }
+    });
+  },
 };

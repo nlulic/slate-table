@@ -2,10 +2,10 @@
 /** @jsx jsx */
 
 import assert from "assert";
+import { Range, SelectionOperation } from "slate";
 import { TableEditor } from "../../src/table-editor";
 import { jsx, withTest, DEFAULT_TEST_WITH_TABLE_OPTIONS } from "../testutils";
 import { withTable } from "../../src/with-table";
-import { Range, SelectionOperation } from "slate";
 
 describe("merge", () => {
   /*
