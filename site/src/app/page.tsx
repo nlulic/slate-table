@@ -54,14 +54,14 @@ export default function Home() {
               <span className="italic">rowspan</span> and{" "}
               <span className="italic">colspan</span> properties in mind can be
               tricky.{" "}
-              <code className="not-prose text-gray-800 font-semibold whitespace-nowrap">
+              <span className="text-gray-600 font-semibold whitespace-nowrap">
                 slate-table
-              </code>{" "}
+              </span>{" "}
               offers a set of utilities designed to make handling tables in your
               editor flexible and simple.
             </p>
             <p className="text-xl font-medium text-gray-500">
-              Go ahead and poke around 🕵️‍♂️
+              Go ahead and poke around. 🕵️‍♂️
             </p>
           </div>
           <Editor onChange={setValue} />

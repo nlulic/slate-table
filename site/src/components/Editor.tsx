@@ -1,5 +1,6 @@
 "use client";
 
+import isHotkey from "is-hotkey";
 import { BaseEditor, Descendant, createEditor } from "slate";
 import {
   Editable,
@@ -13,6 +14,7 @@ import { FC, useCallback, useMemo } from "react";
 import { HistoryEditor, withHistory } from "slate-history";
 import { Toolbar } from "./Toolbar";
 import { initialValue } from "../constants";
+import { toggleMark } from "../utils";
 import { withTable } from "slate-table";
 
 declare module "slate" {
@@ -23,9 +25,11 @@ declare module "slate" {
   }
 }
 
-export const Editor: FC<{ onChange: (v: Descendant[]) => void }> = ({
-  onChange,
-}) => {
+interface Props {
+  onChange: (v: Descendant[]) => void;
+}
+
+export const Editor: FC<Props> = ({ onChange }) => {
   const editor = useMemo(
     () =>
       withTable(withReact(withHistory(createEditor())), {
@@ -90,6 +94,15 @@ export const Editor: FC<{ onChange: (v: Descendant[]) => void }> = ({
     []
   );
 
+  const HOTKEYS = useMemo(
+    () => ({
+      BOLD: isHotkey("mod+b"),
+      ITALIC: isHotkey("mod+i"),
+      UNDERLINE: isHotkey("mod+u"),
+    }),
+    []
+  );
+
   return (
     <section className="mb-4 border border-gray-200 rounded-lg bg-gray-50">
       <Slate editor={editor} initialValue={initialValue} onChange={onChange}>
@@ -98,6 +111,19 @@ export const Editor: FC<{ onChange: (v: Descendant[]) => void }> = ({
           <Editable
             placeholder="👷 Start by creating a table and play around..."
             className="focus:outline-none"
+            onKeyDown={(event) => {
+              switch (true) {
+                case HOTKEYS.BOLD(event):
+                  event.preventDefault();
+                  return toggleMark(editor, "bold");
+                case HOTKEYS.ITALIC(event):
+                  event.preventDefault();
+                  return toggleMark(editor, "italic");
+                case HOTKEYS.UNDERLINE(event):
+                  event.preventDefault();
+                  return toggleMark(editor, "underline");
+              }
+            }}
             renderElement={renderElement}
             renderLeaf={renderLeaf}
           />
@@ -217,8 +243,23 @@ interface Paragraph {
 
 interface Text {
   text: string;
+  bold?: boolean;
+  italic?: boolean;
+  underline?: boolean;
 }
 
-const Text: FC<RenderLeafProps> = ({ attributes, children }) => (
-  <span {...attributes}>{children}</span>
-);
+const Text: FC<RenderLeafProps> = ({ attributes, children, leaf }) => {
+  if (leaf.bold) {
+    children = <strong>{children}</strong>;
+  }
+
+  if (leaf.italic) {
+    children = <em>{children}</em>;
+  }
+
+  if (leaf.underline) {
+    children = <u>{children}</u>;
+  }
+
+  return <span {...attributes}>{children}</span>;
+};

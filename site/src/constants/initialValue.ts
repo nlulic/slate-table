@@ -5,7 +5,14 @@ export const initialValue: Descendant[] = [
     type: "paragraph",
     children: [
       {
-        text: "Dive into slate-table now to effortlessly modify tables. Easily add, merge, split cells, and insert rows or columns for more flexibility. 😸",
+        text: "Dive into ",
+      },
+      {
+        text: "slate-table ",
+        bold: true,
+      },
+      {
+        text: "now to effortlessly modify tables. Easily add, merge, split cells, and insert rows or columns for more flexibility. 😸",
       },
     ],
   },

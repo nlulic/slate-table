@@ -1,32 +1,18 @@
 "use client";
 
-import { FC } from "react";
 import * as Icon from "./icons";
 import { DropdownButton } from "./Dropdown";
+import { FC } from "react";
+import { FormatButtons } from "./FormatButtons";
+import { HistoryEditor } from "slate-history";
+import { useSlate } from "slate-react";
 
 export const Toolbar: FC = () => {
+  const editor = useSlate();
+
   return (
-    <div className="flex p-2 border-b">
-      <ul className="flex border-r pr-1" role="group">
-        <li>
-          <button className="border-gray-400 p-2 text-gray-500 hover:text-gray-900 hover:bg-gray-100">
-            <Icon.Bold />
-            <span className="sr-only">Bold</span>
-          </button>
-        </li>
-        <li>
-          <button className="border-gray-400 p-2 text-gray-500 hover:text-gray-900 hover:bg-gray-100">
-            <Icon.Italic />
-            <span className="sr-only">Italic</span>
-          </button>
-        </li>
-        <li>
-          <button className="border-gray-400 p-2 text-gray-500 hover:text-gray-900 hover:bg-gray-100">
-            <Icon.Underline />
-            <span className="sr-only">Underline</span>
-          </button>
-        </li>
-      </ul>
+    <div className="flex border-b">
+      <FormatButtons />
 
       <ul className="pl-1 flex" role="group">
         <li>
@@ -174,7 +160,13 @@ export const Toolbar: FC = () => {
       </ul>
 
       <div className="ml-auto" role="group">
-        <button className="border-gray-400 p-2 text-gray-500 hover:text-gray-900 hover:bg-gray-100">
+        <button
+          onMouseDown={(event) => {
+            event.preventDefault();
+            HistoryEditor.undo(editor);
+          }}
+          className="border-gray-400 p-2 text-gray-500 hover:text-gray-900 hover:bg-gray-100"
+        >
           <Icon.Undo />
           <span className="sr-only">Undo</span>
         </button>
