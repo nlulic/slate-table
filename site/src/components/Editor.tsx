@@ -89,9 +89,13 @@ export const Editor: FC<Props> = ({ onChange }) => {
       case "table-row":
         return <tr {...props.attributes}>{props.children}</tr>;
       case "header-cell":
-        return <Th className="border border-gray-400" {...props} />;
+        return (
+          <Th className="border border-gray-400 align-middle	" {...props} />
+        );
       case "table-cell":
-        return <Td className="border border-gray-400" {...props} />;
+        return (
+          <Td className="border border-gray-400 align-middle	" {...props} />
+        );
       case "paragraph":
       default:
         return <p {...props.attributes}>{props.children}</p>;
@@ -133,6 +137,7 @@ export const Editor: FC<Props> = ({ onChange }) => {
           <Editable
             placeholder="👷 Start by creating a table and play around..."
             className="focus:outline-none"
+            spellCheck={false}
             onKeyDown={(event) => {
               if (TableCursor.isInTable(editor)) {
                 switch (true) {

@@ -15,7 +15,6 @@ export default function Home() {
   const [copied, setCopied] = useState(false);
 
   const toClipboard = async (value: string) => {
-    console.log("yolo");
     await navigator.clipboard.writeText(value);
     setTimeout(() => setCopied(false), 3000);
     setCopied(true);
@@ -45,8 +44,8 @@ export default function Home() {
         </div>
       </nav>
 
-      <main className="flex-1 mt-24">
-        <div className="max-w-screen-xl m-auto">
+      <main className="flex-1 mt-24 mx-auto p-4">
+        <div className="max-w-screen-xl ">
           <div className="prose max-w-none mb-4">
             <h1 className="my-4">Support tables in your domain editor.</h1>
             <p className="text-xl text-gray-500">
@@ -93,7 +92,7 @@ export default function Home() {
 
       <footer className="bg-white m-4">
         <div className="w-full max-w-screen-xl mx-auto p-4 md:py-8">
-          <span className="block text-sm text-gray-500 sm:text-center">
+          <span className="block text-sm text-gray-500 text-center">
             The source code is available on{" "}
             <a
               href="https://github.com/nlulic/slate-table"

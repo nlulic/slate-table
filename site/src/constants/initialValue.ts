@@ -32,7 +32,7 @@ export const initialValue: Descendant[] = [
                     type: "paragraph",
                     children: [
                       {
-                        text: "1",
+                        text: "Time",
                       },
                     ],
                   },
@@ -45,7 +45,7 @@ export const initialValue: Descendant[] = [
                     type: "paragraph",
                     children: [
                       {
-                        text: "2",
+                        text: "🎨 Frontend team",
                       },
                     ],
                   },
@@ -58,7 +58,7 @@ export const initialValue: Descendant[] = [
                     type: "paragraph",
                     children: [
                       {
-                        text: "3",
+                        text: "👷 Backend team ",
                       },
                     ],
                   },
@@ -76,56 +76,70 @@ export const initialValue: Descendant[] = [
             children: [
               {
                 type: "table-cell",
-                rowSpan: 2,
                 children: [
                   {
                     type: "paragraph",
                     children: [
                       {
-                        text: "1",
+                        text: "9:00 AM",
+                        bold: true,
                       },
                     ],
                   },
                 ],
               },
-              {
-                type: "table-cell",
-                children: [
-                  {
-                    type: "paragraph",
-                    children: [
-                      {
-                        text: "2",
-                      },
-                    ],
-                  },
-                ],
-              },
-              {
-                type: "table-cell",
-                children: [
-                  {
-                    type: "paragraph",
-                    children: [
-                      {
-                        text: "3",
-                      },
-                    ],
-                  },
-                ],
-              },
-            ],
-          },
-          {
-            type: "table-row",
-            children: [
               {
                 type: "table-cell",
                 colSpan: 2,
                 children: [
                   {
                     type: "paragraph",
-                    children: [{ text: "5" }],
+                    children: [
+                      {
+                        text: "Opening Keynote 🎉",
+                      },
+                    ],
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            type: "table-row",
+            children: [
+              {
+                type: "table-cell",
+                rowSpan: 2,
+                children: [
+                  {
+                    type: "paragraph",
+                    children: [
+                      {
+                        text: "10:30 AM",
+                        bold: true,
+                      },
+                    ],
+                  },
+                ],
+              },
+              {
+                type: "table-cell",
+                children: [
+                  {
+                    type: "paragraph",
+                    children: [{ text: "Introduction to 🅰️ngular" }],
+                  },
+                ],
+              },
+              {
+                type: "table-cell",
+                rowSpan: 2,
+                children: [
+                  {
+                    type: "paragraph",
+                    children: [
+                      { text: "Introduction to Gradle and Java 11 ☕" },
+                    ],
                   },
                 ],
               },
@@ -139,35 +153,12 @@ export const initialValue: Descendant[] = [
                 children: [
                   {
                     type: "paragraph",
-                    children: [{ text: "6" }],
-                  },
-                ],
-              },
-              {
-                type: "table-cell",
-                children: [
-                  {
-                    type: "paragraph",
-                    children: [{ text: "7" }],
-                  },
-                ],
-              },
-              {
-                type: "table-cell",
-                children: [
-                  {
-                    type: "paragraph",
-                    children: [{ text: "8" }],
+                    children: [{ text: "Strictly typed forms in v14" }],
                   },
                 ],
               },
             ],
           },
-        ],
-      },
-      {
-        type: "table-footer",
-        children: [
           {
             type: "table-row",
             children: [
@@ -178,7 +169,8 @@ export const initialValue: Descendant[] = [
                     type: "paragraph",
                     children: [
                       {
-                        text: "1",
+                        text: "1:00 PM",
+                        bold: true,
                       },
                     ],
                   },
@@ -186,25 +178,17 @@ export const initialValue: Descendant[] = [
               },
               {
                 type: "table-cell",
+                colSpan: 2,
                 children: [
                   {
                     type: "paragraph",
                     children: [
                       {
-                        text: "2",
+                        text: "Lunch Break",
+                        underline: true,
                       },
-                    ],
-                  },
-                ],
-              },
-              {
-                type: "table-cell",
-                children: [
-                  {
-                    type: "paragraph",
-                    children: [
                       {
-                        text: "3",
+                        text: " 🍱",
                       },
                     ],
                   },

@@ -66,7 +66,6 @@ export const Toolbar: FC<Props> = ({ canMerge }) => {
                     !canMerge ? "pointer-events-none text-gray-400" : ""
                   } flex justify-between px-4 py-2 cursor-pointer hover:bg-gray-100`}
                   onMouseDown={(event) => {
-                    console.log("merge");
                     TableEditor.merge(editor);
                     event.preventDefault();
                   }}
