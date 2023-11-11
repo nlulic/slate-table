@@ -1,13 +1,33 @@
 "use client";
 
-import * as Icon from "./icons";
+import {
+  Column,
+  ColumnInsertLeft,
+  ColumnInsertRight,
+  ColumnRemove,
+  MergeCell,
+  Row,
+  RowInsertBottom,
+  RowInsertTop,
+  RowRemove,
+  SplitCell,
+  Table,
+  TableMinus,
+  TablePlus,
+  Undo,
+} from "./icons";
 import { DropdownButton } from "./Dropdown";
 import { FC } from "react";
 import { FormatButtons } from "./FormatButtons";
 import { HistoryEditor } from "slate-history";
+import { TableEditor } from "slate-table";
 import { useSlate } from "slate-react";
 
-export const Toolbar: FC = () => {
+interface Props {
+  canMerge: boolean;
+}
+
+export const Toolbar: FC<Props> = ({ canMerge }) => {
   const editor = useSlate();
 
   return (
@@ -20,7 +40,7 @@ export const Toolbar: FC = () => {
             className="border-gray-400 p-2 text-gray-500 hover:text-gray-900 hover:bg-gray-100"
             buttonContent={
               <>
-                <Icon.Table />
+                <Table />
                 <span className="sr-only">Table</span>
               </>
             }
@@ -28,43 +48,58 @@ export const Toolbar: FC = () => {
             <ul className="py-2 text-sm text-gray-700">
               <li>
                 <a
-                  onClick={() => console.warn("insert")}
                   type="button"
                   className="flex justify-between px-4 py-2 cursor-pointer hover:bg-gray-100"
+                  onMouseDown={(event) => {
+                    TableEditor.insertTable(editor, { rows: 3, cols: 3 });
+                    event.preventDefault();
+                  }}
                 >
                   <span>Insert table</span>
-                  <Icon.TablePlus width={20} height={20} />
+                  <TablePlus width={20} height={20} />
                 </a>
               </li>
               <li>
                 <a
-                  onClick={() => console.warn("merge")}
                   type="button"
-                  className="flex justify-between px-4 py-2 cursor-pointer hover:bg-gray-100"
+                  className={`${
+                    !canMerge ? "pointer-events-none text-gray-400" : ""
+                  } flex justify-between px-4 py-2 cursor-pointer hover:bg-gray-100`}
+                  onMouseDown={(event) => {
+                    console.log("merge");
+                    TableEditor.merge(editor);
+                    event.preventDefault();
+                  }}
                 >
                   <span>Merge</span>
-                  <Icon.MergeCell width={20} height={20} />
+                  <MergeCell width={20} height={20} />
                 </a>
               </li>
               <li>
                 <a
-                  onClick={() => console.warn("split")}
                   type="button"
                   className="flex justify-between px-4 py-2 cursor-pointer hover:bg-gray-100"
+                  onMouseDown={(event) => {
+                    TableEditor.split(editor);
+                    event.preventDefault();
+                  }}
                 >
                   <span>Split</span>
-                  <Icon.SplitCell width={20} height={20} />
+                  <SplitCell width={20} height={20} />
                 </a>
               </li>
             </ul>
             <div className="py-1">
               <a
-                onClick={() => console.warn("delete")}
                 type="button"
                 className="flex justify-between px-4 py-2 text-sm text-gray-700 cursor-pointer hover:bg-gray-100"
+                onMouseDown={(event) => {
+                  TableEditor.removeTable(editor);
+                  event.preventDefault();
+                }}
               >
                 <span>Delete table</span>
-                <Icon.TableMinus width={20} height={20} />
+                <TableMinus width={20} height={20} />
               </a>
             </div>
           </DropdownButton>
@@ -74,7 +109,7 @@ export const Toolbar: FC = () => {
             className="border-gray-400 p-2 text-gray-500 hover:text-gray-900 hover:bg-gray-100"
             buttonContent={
               <>
-                <Icon.Row />
+                <Row />
                 <span className="sr-only">Row</span>
               </>
             }
@@ -82,33 +117,42 @@ export const Toolbar: FC = () => {
             <ul className="py-2 text-sm text-gray-700">
               <li>
                 <a
-                  onClick={() => console.warn("insert")}
                   type="button"
                   className="flex justify-between px-4 py-2 cursor-pointer hover:bg-gray-100"
+                  onMouseDown={(event) => {
+                    TableEditor.insertRow(editor, { above: true });
+                    event.preventDefault();
+                  }}
                 >
                   <span>Insert top</span>
-                  <Icon.RowInsertTop width={20} height={20} />
+                  <RowInsertTop width={20} height={20} />
                 </a>
               </li>
               <li>
                 <a
-                  onClick={() => console.warn("insert")}
                   type="button"
                   className="flex justify-between px-4 py-2 cursor-pointer hover:bg-gray-100"
+                  onMouseDown={(event) => {
+                    TableEditor.insertRow(editor);
+                    event.preventDefault();
+                  }}
                 >
                   <span>Insert bottom</span>
-                  <Icon.RowInsertBottom width={20} height={20} />
+                  <RowInsertBottom width={20} height={20} />
                 </a>
               </li>
             </ul>
             <div className="py-1">
               <a
-                onClick={() => console.warn("delete")}
                 type="button"
                 className="flex justify-between px-4 py-2 text-sm text-gray-700 cursor-pointer hover:bg-gray-100"
+                onMouseDown={(event) => {
+                  TableEditor.removeRow(editor);
+                  event.preventDefault();
+                }}
               >
                 <span>Delete row</span>
-                <Icon.RowRemove width={20} height={20} />
+                <RowRemove width={20} height={20} />
               </a>
             </div>
           </DropdownButton>
@@ -118,41 +162,50 @@ export const Toolbar: FC = () => {
             className="border-gray-400 p-2 text-gray-500 hover:text-gray-900 hover:bg-gray-100"
             buttonContent={
               <>
-                <Icon.Column />
-                <span className="sr-only">Row</span>
+                <Column />
+                <span className="sr-only">Column</span>
               </>
             }
           >
             <ul className="py-2 text-sm text-gray-700">
               <li>
                 <a
-                  onClick={() => console.warn("insert")}
                   type="button"
                   className="flex justify-between px-4 py-2 cursor-pointer hover:bg-gray-100"
+                  onMouseDown={(event) => {
+                    TableEditor.insertColumn(editor, { left: true });
+                    event.preventDefault();
+                  }}
                 >
                   <span>Insert to left</span>
-                  <Icon.ColumnInsertLeft width={20} height={20} />
+                  <ColumnInsertLeft width={20} height={20} />
                 </a>
               </li>
               <li>
                 <a
-                  onClick={() => console.warn("insert")}
                   type="button"
                   className="flex justify-between px-4 py-2 cursor-pointer hover:bg-gray-100"
+                  onMouseDown={(event) => {
+                    TableEditor.insertColumn(editor);
+                    event.preventDefault();
+                  }}
                 >
                   <span>Insert to right</span>
-                  <Icon.ColumnInsertRight width={20} height={20} />
+                  <ColumnInsertRight width={20} height={20} />
                 </a>
               </li>
             </ul>
             <div className="py-1">
               <a
-                onClick={() => console.warn("delete")}
                 type="button"
                 className="flex justify-between px-4 py-2 text-sm text-gray-700 cursor-pointer hover:bg-gray-100"
+                onMouseDown={(event) => {
+                  TableEditor.removeColumn(editor);
+                  event.preventDefault();
+                }}
               >
                 <span>Delete column</span>
-                <Icon.ColumnRemove width={20} height={20} />
+                <ColumnRemove width={20} height={20} />
               </a>
             </div>
           </DropdownButton>
@@ -161,14 +214,14 @@ export const Toolbar: FC = () => {
 
       <div className="ml-auto" role="group">
         <button
+          title="Undo"
           onMouseDown={(event) => {
             event.preventDefault();
             HistoryEditor.undo(editor);
           }}
           className="border-gray-400 p-2 text-gray-500 hover:text-gray-900 hover:bg-gray-100"
         >
-          <Icon.Undo />
-          <span className="sr-only">Undo</span>
+          <Undo />
         </button>
       </div>
     </div>

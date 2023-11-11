@@ -49,7 +49,7 @@ export default function Home() {
         <div className="max-w-screen-xl m-auto">
           <div className="prose max-w-none mb-4">
             <h1 className="my-4">Support tables in your domain editor.</h1>
-            <p className="text-xl font-medium text-gray-500">
+            <p className="text-xl text-gray-500">
               Supporting basic tables is easy, but implementing operations with{" "}
               <span className="italic">rowspan</span> and{" "}
               <span className="italic">colspan</span> properties in mind can be
@@ -60,7 +60,7 @@ export default function Home() {
               offers a set of utilities designed to make handling tables in your
               editor flexible and simple.
             </p>
-            <p className="text-xl font-medium text-gray-500">
+            <p className="text-xl text-gray-500">
               Go ahead and poke around. 🕵️‍♂️
             </p>
           </div>

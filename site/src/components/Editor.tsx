@@ -8,14 +8,16 @@ import {
   RenderElementProps,
   RenderLeafProps,
   Slate,
+  useSlateSelection,
+  useSlateStatic,
   withReact,
 } from "slate-react";
-import { FC, useCallback, useMemo } from "react";
+import { FC, useCallback, useMemo, useState } from "react";
 import { HistoryEditor, withHistory } from "slate-history";
+import { TableCursor, TableEditor, withTable } from "slate-table";
 import { Toolbar } from "./Toolbar";
 import { initialValue } from "../constants";
 import { toggleMark } from "../utils";
-import { withTable } from "slate-table";
 
 declare module "slate" {
   interface CustomTypes {
@@ -30,6 +32,13 @@ interface Props {
 }
 
 export const Editor: FC<Props> = ({ onChange }) => {
+  const [canMerge, setCanMerge] = useState(false);
+
+  const handleChange = (value: Descendant[]) => {
+    setCanMerge(TableEditor.canMerge(editor));
+    onChange(value);
+  };
+
   const editor = useMemo(
     () =>
       withTable(withReact(withHistory(createEditor())), {
@@ -59,7 +68,7 @@ export const Editor: FC<Props> = ({ onChange }) => {
       case "table-head":
         return (
           <thead
-            className="border-b text-sm uppercase bg-gray-50"
+            className="border-b text-sm uppercase bg-slate-100"
             {...props.attributes}
           >
             {props.children}
@@ -96,22 +105,66 @@ export const Editor: FC<Props> = ({ onChange }) => {
 
   const HOTKEYS = useMemo(
     () => ({
+      // Formatting
       BOLD: isHotkey("mod+b"),
       ITALIC: isHotkey("mod+i"),
       UNDERLINE: isHotkey("mod+u"),
+
+      // Navigation
+      ARROW_UP: isHotkey("up"),
+      ARROW_DOWN: isHotkey("down"),
+      ARROW_LEFT: isHotkey("left"),
+      ARROW_RIGHT: isHotkey("right"),
+      TAB: isHotkey("tab"),
+      SHIFT_TAB: isHotkey("shift+tab"),
     }),
     []
   );
 
   return (
     <section className="mb-4 border border-gray-200 rounded-lg bg-gray-50">
-      <Slate editor={editor} initialValue={initialValue} onChange={onChange}>
-        <Toolbar />
+      <Slate
+        editor={editor}
+        initialValue={initialValue}
+        onChange={handleChange}
+      >
+        <Toolbar canMerge={canMerge} />
         <div className="prose lg:prose-lg max-w-none bg-white p-4 rounded-b-lg">
           <Editable
             placeholder="👷 Start by creating a table and play around..."
             className="focus:outline-none"
             onKeyDown={(event) => {
+              if (TableCursor.isInTable(editor)) {
+                switch (true) {
+                  case HOTKEYS.ARROW_DOWN(event) &&
+                    TableCursor.isOnEdge(editor, "bottom"):
+                    event.preventDefault();
+                    return TableCursor.downward(editor);
+                  case HOTKEYS.ARROW_UP(event) &&
+                    TableCursor.isOnEdge(editor, "top"):
+                    event.preventDefault();
+                    return TableCursor.upward(editor);
+                  case HOTKEYS.ARROW_RIGHT(event) &&
+                    TableCursor.isOnEdge(editor, "end"):
+                    event.preventDefault();
+                    return TableCursor.forward(editor);
+                  case HOTKEYS.ARROW_LEFT(event) &&
+                    TableCursor.isOnEdge(editor, "start"):
+                    event.preventDefault();
+                    return TableCursor.backward(editor);
+                  case HOTKEYS.TAB(event):
+                    if (TableCursor.isInLastCell(editor)) {
+                      TableEditor.insertRow(editor);
+                    }
+                    event.preventDefault();
+                    return TableCursor.forward(editor, { mode: "all" });
+                  case HOTKEYS.SHIFT_TAB(event):
+                    event.preventDefault();
+                    return TableCursor.backward(editor, { mode: "all" });
+                }
+              }
+
+              // Formatting
               switch (true) {
                 case HOTKEYS.BOLD(event):
                   event.preventDefault();
@@ -152,11 +205,19 @@ const Table: FC<RenderElementProps & { className: string }> = ({
   attributes,
   children,
   className,
-}) => (
-  <table className={className} {...attributes}>
-    {children}
-  </table>
-);
+}) => {
+  const editor = useSlateStatic();
+  const [isSelecting] = TableCursor.selection(editor);
+
+  return (
+    <table
+      className={`${!!isSelecting ? "table-selection-none" : ""} ${className}`}
+      {...attributes}
+    >
+      {children}
+    </table>
+  );
+};
 
 interface TableHead {
   type: "table-head";
@@ -195,9 +256,13 @@ const Th: FC<RenderElementProps & { className: string }> = ({
     throw new Error('Element "Th" must be of type "header-cell"');
   }
 
+  useSlateSelection();
+  const editor = useSlateStatic();
+  const selected = TableCursor.isSelected(editor, element);
+
   return (
     <th
-      className={className}
+      className={`${selected ? "bg-sky-200" : ""} ${className}`}
       rowSpan={element.rowSpan}
       colSpan={element.colSpan}
       {...attributes}
@@ -224,9 +289,13 @@ const Td: FC<RenderElementProps & { className: string }> = ({
     throw new Error('Element "Td" must be of type "table-cell"');
   }
 
+  useSlateSelection();
+  const editor = useSlateStatic();
+  const selected = TableCursor.isSelected(editor, element);
+
   return (
     <td
-      className={className}
+      className={`${selected ? "bg-sky-200" : ""} ${className}`}
       rowSpan={element.rowSpan}
       colSpan={element.colSpan}
       {...attributes}
