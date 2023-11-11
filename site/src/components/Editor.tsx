@@ -90,11 +90,11 @@ export const Editor: FC<Props> = ({ onChange }) => {
         return <tr {...props.attributes}>{props.children}</tr>;
       case "header-cell":
         return (
-          <Th className="border border-gray-400 align-middle	" {...props} />
+          <Th className="border border-gray-400 p-2 align-middle	" {...props} />
         );
       case "table-cell":
         return (
-          <Td className="border border-gray-400 align-middle	" {...props} />
+          <Td className="border border-gray-400 p-2 align-middle	" {...props} />
         );
       case "paragraph":
       default:

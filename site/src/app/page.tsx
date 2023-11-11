@@ -38,7 +38,12 @@ export default function Home() {
             href="https://github.com/nlulic/slate-table"
             className="text-white bg-black hover:bg-black/90 font-semibold rounded-lg px-5 py-2.5 text-center inline-flex items-center gap-2"
           >
-            <BrandGithub />
+            <span className="sm:hidden block">
+              <BrandGithub width={16} height={16} />
+            </span>
+            <span className="sm:block hidden">
+              <BrandGithub />
+            </span>
             <span className="sm:block hidden">GitHub</span>
           </a>
         </div>
@@ -47,24 +52,23 @@ export default function Home() {
       <main className="flex-1 mt-24 mx-auto p-4">
         <div className="max-w-screen-xl ">
           <div className="prose max-w-none mb-4">
-            <h1 className="my-4">Support tables in your domain editor.</h1>
-            <p className="text-xl text-gray-500">
-              Supporting basic tables is easy, but implementing operations with{" "}
-              <span className="italic">rowspan</span> and{" "}
-              <span className="italic">colspan</span> properties in mind can be
-              tricky.{" "}
-              <span className="text-gray-600 font-semibold whitespace-nowrap">
-                slate-table
-              </span>{" "}
-              offers a set of utilities designed to make handling tables in your
-              editor flexible and simple.
-            </p>
-            <p className="text-xl text-gray-500">
-              Go ahead and poke around. 🕵️‍♂️
-            </p>
+            <h1 className="sm:my-4">Support tables in your domain editor.</h1>
+
+            <article className="sm:text-cl text-gray-500">
+              <p>
+                Supporting basic tables is easy, but implementing operations
+                with rowspan and colspan attributes in mind can be tricky.{" "}
+                <span className="text-gray-600 font-semibold whitespace-nowrap">
+                  slate-table
+                </span>{" "}
+                offers a set of utilities designed to make handling tables in
+                your editor flexible and simple.
+              </p>
+              <p>Go ahead and poke around. 🕵️‍♂️</p>
+            </article>
           </div>
           <Editor onChange={setValue} />
-          <aside className="prose max-w-none">
+          <aside className="prose max-w-none sm:flex hidden">
             <details>
               <summary className="select-none uppercase font-semibold text-sm cursor-pointer">
                 Editor value
