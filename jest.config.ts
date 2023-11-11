@@ -17,6 +17,12 @@ export default {
     ],
   },
 
+  // An array of regexp pattern strings that are matched towards all test paths, matched tests are skipped
+  testPathIgnorePatterns: ["/site/"],
+
+  // An array of regexp pattern strings used to skip the test coverage collection
+  coveragePathIgnorePatterns: ["/test/"],
+
   // An array of regexp pattern strings that are matched against all source file paths, matched files will skip transformation
   transformIgnorePatterns: ["/node_modules/"],
 };

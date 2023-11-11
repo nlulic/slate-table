@@ -4,3 +4,15 @@ npm-debug.log*
 coverage/
 dist/
 node_modules/
+
+# site
+site/build
+site/.next/
+site/out/
+site/next-env.d.ts
+
+# vercel
+.vercel
+
+# typescript
+*.tsbuildinfo
