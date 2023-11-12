@@ -5,7 +5,7 @@
   "main": "dist/index.js",
   "scripts": {
     "start": "npm-run-all --parallel --print-label watch:package watch:site",
-    "build": "npm-run-all --parallel --print-label build:package build:site",
+    "build": "npm-run-all --print-label build:package build:site",
     "lint": "npm-run-all --parallel --print-label lint:package lint:site",
     "clean": "npm-run-all --parallel clean:package clean:site",
     "watch:package": "tsc -p . --watch",

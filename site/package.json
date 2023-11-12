@@ -15,7 +15,7 @@
     "slate": "0.100.0",
     "slate-history": "0.100.0",
     "slate-react": "0.100.1",
-    "slate-table": "^0.1.0"
+    "slate-table": "../."
   },
   "devDependencies": {
     "@types/is-hotkey": "0.1.9",
