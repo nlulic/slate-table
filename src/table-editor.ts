@@ -500,18 +500,14 @@ export const TableEditor = {
     const [, trPath] = tr;
     const [, tdPath] = td;
 
-    const [, sibling] = Editor.nodes(editor, {
-      match: isOfType(editor, "th", "td"),
-      at: trPath,
-    });
+    const matrix = filledMatrix(editor, { at: options.at });
 
+    const [, sibling] = matrix[0];
     if (!sibling) {
       return Transforms.removeNodes(editor, {
         at: tablePath,
       });
     }
-
-    const matrix = filledMatrix(editor, { at: options.at });
 
     let tdIndex = 0;
     out: for (let x = 0; x < matrix.length; x++) {

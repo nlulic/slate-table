@@ -1900,11 +1900,10 @@ describe("removeColumn", () => {
    * + 1 +---+   +      + 1 +   +
    * |   | 4*| 3 |      |   | 3 |
    * +---+---+   +      +---+   +
-   * | 5 | 6 |   |      | 5 |   |
+   * | 5 | 6 |   |      |*5 |   |
    * +---+---+---+      +---+---+
    */
-  // TODO: fix
-  xit('should remove column when cell with selection has no "real" sibling', () => {
+  it('should remove column when cell with selection has no "real" sibling', () => {
     const actual = (
       <editor>
         <table>
@@ -1971,7 +1970,9 @@ describe("removeColumn", () => {
             <tr>
               <td>
                 <paragraph>
-                  <text>5</text>
+                  <text>
+                    <cursor />5
+                  </text>
                 </paragraph>
               </td>
             </tr>
