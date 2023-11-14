@@ -16,9 +16,8 @@ export const withSelection = <T extends Editor>(
   const { apply } = editor;
 
   editor.apply = (op: Operation): void => {
-    TableCursor.unselect(editor);
-
     if (!Operation.isSelectionOperation(op) || !op.newProperties) {
+      TableCursor.unselect(editor);
       return apply(op);
     }
 
@@ -28,6 +27,7 @@ export const withSelection = <T extends Editor>(
     };
 
     if (!Range.isRange(selection)) {
+      TableCursor.unselect(editor);
       return apply(op);
     }
 
@@ -42,6 +42,7 @@ export const withSelection = <T extends Editor>(
     });
 
     if (!fromEntry || !toEntry) {
+      TableCursor.unselect(editor);
       return apply(op);
     }
 
@@ -52,6 +53,7 @@ export const withSelection = <T extends Editor>(
       Path.equals(fromPath, toPath) ||
       !hasCommon(editor, fromPath, toPath, "table")
     ) {
+      TableCursor.unselect(editor);
       return apply(op);
     }
 
