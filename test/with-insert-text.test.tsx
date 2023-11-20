@@ -309,4 +309,97 @@ describe("withInsertText", () => {
     assert.deepEqual(editor.children, expected.children);
     assert.deepEqual(editor.selection, expected.selection);
   });
+
+  /*
+   * Actual:              Expected:
+   * +------+------+      +------+------+
+   * |<Pear>| Lime |  =>  | e*   | Lime |
+   * +------+------+      +------+------+
+   * | Plum | Kiwi |      | Plum | Kiwi |
+   * +------+------+      +------+------+
+   */
+  it("should not collapse range when range is in common cell", () => {
+    const actual = (
+      <editor>
+        <table>
+          <thead>
+            <tr>
+              <th>
+                <paragraph>
+                  <text>
+                    <anchor />
+                    Pear
+                    <focus />
+                  </text>
+                </paragraph>
+              </th>
+              <th>
+                <paragraph>
+                  <text>Lime</text>
+                </paragraph>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>
+                <paragraph>
+                  <text>Plum</text>
+                </paragraph>
+              </td>
+              <td>
+                <paragraph>
+                  <text>Kiwi</text>
+                </paragraph>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </editor>
+    );
+
+    const expected = (
+      <editor>
+        <table>
+          <thead>
+            <tr>
+              <th>
+                <paragraph>
+                  <text>
+                    e<cursor />
+                  </text>
+                </paragraph>
+              </th>
+              <th>
+                <paragraph>
+                  <text>Lime</text>
+                </paragraph>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>
+                <paragraph>
+                  <text>Plum</text>
+                </paragraph>
+              </td>
+              <td>
+                <paragraph>
+                  <text>Kiwi</text>
+                </paragraph>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </editor>
+    );
+
+    const editor = withTest(withTable(actual, DEFAULT_WITH_TABLE_OPTIONS));
+
+    editor.insertText("e");
+
+    assert.deepEqual(editor.children, expected.children);
+    assert.deepEqual(editor.selection, expected.selection);
+  });
 });

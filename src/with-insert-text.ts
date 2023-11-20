@@ -1,5 +1,6 @@
 import { Editor, Range, Transforms } from "slate";
 import { TableCursor } from "./table-cursor";
+import { hasCommon } from "./utils";
 
 export function withInsertText<T extends Editor>(editor: T): T {
   const { insertText } = editor;
@@ -10,7 +11,13 @@ export function withInsertText<T extends Editor>(editor: T): T {
     if (
       selection &&
       Range.isExpanded(selection) &&
-      TableCursor.isInTable(editor, { at: selection })
+      TableCursor.isInTable(editor, { at: selection }) &&
+      !hasCommon(
+        editor,
+        [selection.anchor.path, selection.focus.path],
+        "th",
+        "td"
+      )
     ) {
       Transforms.collapse(editor, { edge: "focus" });
     }
