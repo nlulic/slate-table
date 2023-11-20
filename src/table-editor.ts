@@ -481,23 +481,21 @@ export const TableEditor = {
    * @returns void
    */
   removeColumn(editor: Editor, options: { at?: Location } = {}): void {
-    const [table, tr, td] = Editor.nodes(editor, {
+    const [table, td] = Editor.nodes(editor, {
       match: isOfType(
         editor,
         "table", // table
-        "tr", // tr
         "td", // cell
         "th"
       ),
       at: options.at,
     });
 
-    if (!table || !tr || !td) {
+    if (!table || !td) {
       return;
     }
 
     const [, tablePath] = table;
-    const [, trPath] = tr;
     const [, tdPath] = td;
 
     const matrix = filledMatrix(editor, { at: options.at });
@@ -582,7 +580,7 @@ export const TableEditor = {
     const [[, firstPath]] = matrix[0][0];
 
     // cannot merge when selection is not in common section
-    if (!hasCommon(editor, firstPath, lastPath, "thead", "tbody", "tfoot")) {
+    if (!hasCommon(editor, [firstPath, lastPath], "thead", "tbody", "tfoot")) {
       return false;
     }
 

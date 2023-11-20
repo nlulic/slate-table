@@ -1,4 +1,4 @@
-import { Editor, Node, Path } from "slate";
+import { Editor, Node, Span } from "slate";
 import { WithTableOptions } from "../options";
 import { isOfType } from "./is-of-type";
 
@@ -8,8 +8,7 @@ import { isOfType } from "./is-of-type";
  */
 export function hasCommon(
   editor: Editor,
-  path: Path,
-  another: Path,
+  [path, another]: Span,
   ...types: Array<keyof WithTableOptions["blocks"]>
 ) {
   const [node, commonPath] = Node.common(editor, path, another);

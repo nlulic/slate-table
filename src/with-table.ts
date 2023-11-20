@@ -3,7 +3,7 @@ import { Editor } from "slate";
 import { WithTableOptions, DEFAULT_WITH_TABLE_OPTIONS } from "./options";
 import { withDeletion } from "./with-deletion";
 import { withNormalization } from "./normalization";
-import { withSelection } from "./selection";
+import { withSelection, withSelectionAdjustment } from "./selection";
 
 export const withTable = <T extends Editor>(
   editor: T,
@@ -18,6 +18,7 @@ export const withTable = <T extends Editor>(
 
   editor = withNormalization(editor, optionsWithDefaults);
   editor = withSelection(editor, optionsWithDefaults);
+  editor = withSelectionAdjustment(editor, optionsWithDefaults);
   editor = withDeletion(editor);
 
   return editor;

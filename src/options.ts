@@ -15,6 +15,7 @@ export interface WithTableOptions {
   };
   withNormalization: boolean;
   withSelection: boolean;
+  withSelectionAdjustment: boolean;
 }
 
 export const DEFAULT_WITH_TABLE_OPTIONS = {
@@ -30,6 +31,7 @@ export const DEFAULT_WITH_TABLE_OPTIONS = {
   },
   withNormalization: true,
   withSelection: true,
+  withSelectionAdjustment: true,
 } as const satisfies WithTableOptions;
 
 export interface InsertTableOptions {

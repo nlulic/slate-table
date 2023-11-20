@@ -5,10 +5,10 @@ import { Point, filledMatrix, hasCommon, isOfType } from "../utils";
 import { TableCursor } from "../table-cursor";
 import { WithTableOptions } from "../options";
 
-export const withSelection = <T extends Editor>(
+export function withSelection<T extends Editor>(
   editor: T,
   { withSelection }: WithTableOptions
-) => {
+) {
   if (!withSelection) {
     return editor;
   }
@@ -51,7 +51,7 @@ export const withSelection = <T extends Editor>(
 
     if (
       Path.equals(fromPath, toPath) ||
-      !hasCommon(editor, fromPath, toPath, "table")
+      !hasCommon(editor, [fromPath, toPath], "table")
     ) {
       TableCursor.unselect(editor);
       return apply(op);
@@ -126,4 +126,4 @@ export const withSelection = <T extends Editor>(
   };
 
   return editor;
-};
+}

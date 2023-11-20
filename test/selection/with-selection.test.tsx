@@ -1825,7 +1825,9 @@ describe("withSelection", () => {
   function applySelection(editor: Editor): void {
     const { selection } = editor;
 
-    if (!Range.isRange(selection)) return;
+    if (!Range.isRange(selection)) {
+      return;
+    }
 
     const operation: SelectionOperation = {
       type: "set_selection",
