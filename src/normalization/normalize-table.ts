@@ -6,10 +6,10 @@ import { isElement, isOfType } from "../utils";
  * Normalizes the given `table` node by wrapping invalid
  * nodes into a `tbody`.
  */
-const normalizeTable = <T extends Editor>(
+function normalizeTable<T extends Editor>(
   editor: T,
   { table, thead, tbody, tfoot }: WithTableOptions["blocks"]
-): T => {
+): T {
   const ALLOWED_CHILDREN = new Set([thead, tbody, tfoot]);
 
   const { normalizeNode } = editor;
@@ -55,7 +55,7 @@ const normalizeTable = <T extends Editor>(
   };
 
   return editor;
-};
+}
 
 /**
  * @returns {NodeEntry<Element> | undefined} The immediate child `tbody` element of the `table`, or `undefined` if it does not exist.

@@ -7,10 +7,10 @@ import { isElement } from "../utils";
  * Normalizes the `rowspan` and `colspan` attributes of the `td` elements
  * by removing the attributes when their values is equal to 1.
  */
-const normalizeAttributes = <T extends Editor>(
+function normalizeAttributes<T extends Editor>(
   editor: T,
   { td, th }: WithTableOptions["blocks"]
-) => {
+) {
   const { normalizeNode } = editor;
 
   editor.normalizeNode = ([node, path]) => {
@@ -35,6 +35,6 @@ const normalizeAttributes = <T extends Editor>(
   };
 
   return editor;
-};
+}
 
 export default normalizeAttributes;

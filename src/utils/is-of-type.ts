@@ -5,13 +5,13 @@ import { WithType } from "./types";
 import { isElement } from "./is-element";
 
 /** @returns a `NodeMatch` function which is used to match the elements of a specific `type`. */
-export const isOfType = <T extends WithType<Element>>(
+export function isOfType<T extends WithType<Element>>(
   editor: Editor,
   ...types: Array<keyof WithTableOptions["blocks"]>
-): NodeMatch<T> => {
+): NodeMatch<T> {
   const options = EDITOR_TO_WITH_TABLE_OPTIONS.get(editor),
     elementTypes = types.map((type) => options?.blocks?.[type]);
 
   return (node: Node): boolean =>
     isElement(node) && elementTypes.includes(node.type);
-};
+}

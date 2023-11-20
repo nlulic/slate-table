@@ -6,10 +6,10 @@ import { isElement, isOfType } from "../utils";
  * Normalizes the `tr` node by wrapping each of its child nodes within a td or th
  * element, depending on whether the row is inside the thead section or not.
  */
-const normalizeTr = <T extends Editor>(
+function normalizeTr<T extends Editor>(
   editor: T,
   { tr, td, th }: WithTableOptions["blocks"]
-): T => {
+): T {
   const { normalizeNode } = editor;
 
   editor.normalizeNode = ([node, path]) => {
@@ -38,6 +38,6 @@ const normalizeTr = <T extends Editor>(
   };
 
   return editor;
-};
+}
 
 export default normalizeTr;

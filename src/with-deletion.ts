@@ -1,7 +1,7 @@
 import { Editor, Point, Range, Transforms } from "slate";
 import { isOfType } from "./utils";
 
-export const withDeletion = <T extends Editor>(editor: T): T => {
+export function withDeletion<T extends Editor>(editor: T): T {
   const { deleteBackward, deleteForward } = editor;
 
   editor.deleteBackward = (unit) => {
@@ -78,4 +78,4 @@ export const withDeletion = <T extends Editor>(editor: T): T => {
   };
 
   return editor;
-};
+}

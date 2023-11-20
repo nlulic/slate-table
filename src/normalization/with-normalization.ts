@@ -7,10 +7,10 @@ import normalizeTr from "./normalize-tr";
 import { Editor } from "slate";
 import { WithTableOptions } from "../options";
 
-export const withNormalization = <T extends Editor>(
+export function withNormalization<T extends Editor>(
   editor: T,
   { blocks, withNormalization }: WithTableOptions
-): T => {
+): T {
   if (!withNormalization) {
     return editor;
   }
@@ -23,4 +23,4 @@ export const withNormalization = <T extends Editor>(
   editor = normalizeContent(editor, blocks);
 
   return editor;
-};
+}

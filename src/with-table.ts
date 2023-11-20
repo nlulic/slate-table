@@ -6,10 +6,10 @@ import { withInsertText } from "./with-insert-text";
 import { withNormalization } from "./normalization";
 import { withSelection, withSelectionAdjustment } from "./selection";
 
-export const withTable = <T extends Editor>(
+export function withTable<T extends Editor>(
   editor: T,
   options: Partial<WithTableOptions>
-): T => {
+): T {
   const optionsWithDefaults: WithTableOptions = {
     ...DEFAULT_WITH_TABLE_OPTIONS,
     ...options,
@@ -24,4 +24,4 @@ export const withTable = <T extends Editor>(
   editor = withDeletion(editor);
 
   return editor;
-};
+}

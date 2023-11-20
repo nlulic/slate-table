@@ -6,10 +6,10 @@ import { isElement } from "../utils";
  * Normalizes the given `td` (and `th`) node by wrapping every inline
  * and text node inside a `content` node.
  */
-const normalizeTd = <T extends Editor>(
+function normalizeTd<T extends Editor>(
   editor: T,
   { content, td, th }: WithTableOptions["blocks"]
-): T => {
+): T {
   const { normalizeNode } = editor;
 
   editor.normalizeNode = ([node, path]) => {
@@ -33,6 +33,6 @@ const normalizeTd = <T extends Editor>(
   };
 
   return editor;
-};
+}
 
 export default normalizeTd;

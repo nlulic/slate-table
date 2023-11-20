@@ -6,10 +6,10 @@ import { Editor, Node, Transforms } from "slate";
  * Will normalize the `content` node. It will remove
  * table-related elements and unwrap their children.
  */
-const normalizeContent = <T extends Editor>(
+function normalizeContent<T extends Editor>(
   editor: T,
   blocks: WithTableOptions["blocks"]
-): T => {
+): T {
   const { normalizeNode } = editor;
 
   const { content, table, tbody, td, tfoot, th, thead, tr } = blocks;
@@ -39,6 +39,6 @@ const normalizeContent = <T extends Editor>(
   };
 
   return editor;
-};
+}
 
 export default normalizeContent;
