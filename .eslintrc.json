@@ -32,6 +32,7 @@
     ],
     "import/no-mutable-exports": "error",
     "import/no-named-as-default": "error",
-    "import/no-named-as-default-member": "error"
+    "import/no-named-as-default-member": "error",
+    "no-console": "error"
   }
 }
