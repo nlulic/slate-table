@@ -1,8 +1,16 @@
 import { Editor, Range, Transforms } from "slate";
 import { TableCursor } from "./table-cursor";
+import { WithTableOptions } from "./options";
 import { hasCommon } from "./utils";
 
-export function withInsertText<T extends Editor>(editor: T): T {
+export function withInsertText<T extends Editor>(
+  editor: T,
+  { withInsertText }: WithTableOptions
+): T {
+  if (!withInsertText) {
+    return editor;
+  }
+
   const { insertText, insertBreak, insertSoftBreak } = editor;
 
   editor.insertText = (text, options) => {

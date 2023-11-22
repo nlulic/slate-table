@@ -5,8 +5,12 @@ import { hasCommon, isOfType } from "./utils";
 
 export function withDelete<T extends Editor>(
   editor: T,
-  { withSelection, blocks }: WithTableOptions
+  { withDelete, withSelection, blocks }: WithTableOptions
 ): T {
+  if (!withDelete) {
+    return editor;
+  }
+
   const { deleteBackward, deleteForward, deleteFragment } = editor;
 
   editor.deleteBackward = (unit): void => {

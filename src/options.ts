@@ -13,6 +13,8 @@ export interface WithTableOptions {
     tfoot: ElementType;
     thead: ElementType;
   };
+  withDelete: boolean;
+  withInsertText: boolean;
   withNormalization: boolean;
   withSelection: boolean;
   withSelectionAdjustment: boolean;
@@ -29,6 +31,8 @@ export const DEFAULT_WITH_TABLE_OPTIONS = {
     tfoot: "table-footer",
     thead: "table-head",
   },
+  withDelete: true,
+  withInsertText: true,
   withNormalization: true,
   withSelection: true,
   withSelectionAdjustment: true,
