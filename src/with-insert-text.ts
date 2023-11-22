@@ -3,27 +3,47 @@ import { TableCursor } from "./table-cursor";
 import { hasCommon } from "./utils";
 
 export function withInsertText<T extends Editor>(editor: T): T {
-  const { insertText } = editor;
+  const { insertText, insertBreak, insertSoftBreak } = editor;
 
   editor.insertText = (text, options) => {
-    const { selection } = editor;
-
-    if (
-      selection &&
-      Range.isExpanded(selection) &&
-      TableCursor.isInTable(editor, { at: selection }) &&
-      !hasCommon(
-        editor,
-        [selection.anchor.path, selection.focus.path],
-        "th",
-        "td"
-      )
-    ) {
+    if (shouldCollapse(editor)) {
       Transforms.collapse(editor, { edge: "focus" });
     }
 
     insertText(text, options);
   };
 
+  editor.insertBreak = () => {
+    if (shouldCollapse(editor)) {
+      Transforms.collapse(editor, { edge: "focus" });
+    }
+
+    insertBreak();
+  };
+
+  editor.insertSoftBreak = () => {
+    if (shouldCollapse(editor)) {
+      Transforms.collapse(editor, { edge: "focus" });
+    }
+
+    insertSoftBreak();
+  };
+
   return editor;
+}
+
+// collapse when selection is in table and not in common cell
+function shouldCollapse(editor: Editor): boolean {
+  const { selection } = editor;
+
+  if (!selection || Range.isCollapsed(selection)) {
+    return false;
+  }
+
+  const [startPoint, endPoint] = Range.edges(selection);
+
+  return (
+    TableCursor.isInTable(editor, { at: selection }) &&
+    !hasCommon(editor, [startPoint.path, endPoint.path], "th", "td")
+  );
 }
