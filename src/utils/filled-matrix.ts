@@ -1,59 +1,53 @@
-import { CellElement, NodeEntryWithContext } from "./types";
-import { Editor, Location, NodeEntry } from "slate";
-import { matrix as matrixGenerator } from "./matrix";
+import { Editor, Location } from "slate";
+import { NodeEntryWithContext } from "./types";
+import { matrices } from "./matrices";
 
-// TODO: should replace the current `matrix` function
 export function filledMatrix(
   editor: Editor,
-  options: { at?: Location }
+  options: { at?: Location } = {}
 ): NodeEntryWithContext[][] {
-  const [...matrix] = matrixGenerator(editor, { at: options?.at });
+  const filled: NodeEntryWithContext[][] = [];
 
-  const rowLen = matrix.length;
-  const colLen = colLength(matrix);
+  // Expand each section separately to avoid sections collapsing into each other.
+  for (const matrix of matrices(editor, { at: options.at })) {
+    const filledSection: NodeEntryWithContext[][] = [];
 
-  const filled: NodeEntryWithContext[][] = Array.from({ length: rowLen });
-  for (let i = 0; i < filled.length; i++) {
-    filled[i] = Array.from({ length: colLen });
-  }
-
-  // fill matrix
-  for (let x = 0; x < matrix.length; x++) {
-    for (let y = 0, offset = 0; y < matrix[x].length; y++) {
-      const [{ rowSpan = 1, colSpan = 1 }] = matrix[x][y];
-
-      for (let c = 0, occupied = 0; c < colSpan + occupied; c++) {
-        if (filled[x][y + c + offset]) {
-          occupied++;
-          continue;
-        }
-
-        for (let r = 0; r < rowSpan; r++) {
-          filled[x + r][y + c + offset] = [
-            matrix[x][y], // entry
-            {
-              rtl: c - occupied + 1,
-              ltr: colSpan - c + occupied,
-              ttb: r + 1,
-              btt: rowSpan - r,
-            },
-          ];
-        }
+    for (let x = 0; x < matrix.length; x++) {
+      if (!filledSection[x]) {
+        filledSection[x] = [];
       }
 
-      offset += colSpan - 1;
+      for (let y = 0, offset = 0; y < matrix[x].length; y++) {
+        const [{ rowSpan = 1, colSpan = 1 }] = matrix[x][y];
+
+        for (let c = 0, occupied = 0; c < colSpan + occupied; c++) {
+          if (filledSection[x][y + c + offset]) {
+            occupied++;
+            continue;
+          }
+
+          for (let r = 0; r < rowSpan; r++) {
+            if (!filledSection[x + r]) {
+              filledSection[x + r] = [];
+            }
+
+            filledSection[x + r][y + c + offset] = [
+              matrix[x][y], // entry
+              {
+                rtl: c - occupied + 1,
+                ltr: colSpan - c + occupied,
+                ttb: r + 1,
+                btt: rowSpan - r,
+              },
+            ];
+          }
+        }
+        offset += colSpan - 1;
+      }
     }
+
+    filled.push(...filledSection);
   }
 
   return filled;
-}
-
-function colLength(rows: NodeEntry<CellElement>[][]): number {
-  let length = 0;
-
-  for (const [{ colSpan = 1 }] of rows[0]) {
-    length += colSpan;
-  }
-
-  return length;
 }

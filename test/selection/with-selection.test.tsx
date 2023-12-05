@@ -1254,30 +1254,28 @@ describe("withSelection", () => {
     const actual = (
       <editor>
         <table>
-          <thead>
+          <tbody>
             <tr>
-              <th rowSpan={2}>
+              <td rowSpan={2}>
                 <paragraph>
                   <text>
                     <anchor />1
                   </text>
                 </paragraph>
-              </th>
-              <th>
+              </td>
+              <td>
                 <paragraph>
                   <text>
                     2<focus />
                   </text>
                 </paragraph>
-              </th>
-              <th>
+              </td>
+              <td>
                 <paragraph>
                   <text>3</text>
                 </paragraph>
-              </th>
+              </td>
             </tr>
-          </thead>
-          <tbody>
             <tr>
               <td rowSpan={2}>
                 <paragraph>
@@ -1290,8 +1288,6 @@ describe("withSelection", () => {
                 </paragraph>
               </td>
             </tr>
-          </tbody>
-          <tfoot>
             <tr>
               <td>
                 <paragraph>
@@ -1304,7 +1300,7 @@ describe("withSelection", () => {
                 </paragraph>
               </td>
             </tr>
-          </tfoot>
+          </tbody>
         </table>
       </editor>
     );
@@ -1312,30 +1308,28 @@ describe("withSelection", () => {
     const expected = (
       <editor>
         <table>
-          <thead>
+          <tbody>
             <tr>
-              <th rowSpan={2} data={{ selected: true }}>
+              <td rowSpan={2} data={{ selected: true }}>
                 <paragraph>
                   <text>
                     <anchor />1
                   </text>
                 </paragraph>
-              </th>
-              <th data={{ selected: true }}>
+              </td>
+              <td data={{ selected: true }}>
                 <paragraph>
                   <text>
                     2<focus />
                   </text>
                 </paragraph>
-              </th>
-              <th>
+              </td>
+              <td>
                 <paragraph>
                   <text>3</text>
                 </paragraph>
-              </th>
+              </td>
             </tr>
-          </thead>
-          <tbody>
             <tr>
               <td rowSpan={2} data={{ selected: true }}>
                 <paragraph>
@@ -1348,8 +1342,6 @@ describe("withSelection", () => {
                 </paragraph>
               </td>
             </tr>
-          </tbody>
-          <tfoot>
             <tr>
               <td data={{ selected: true }}>
                 <paragraph>
@@ -1362,7 +1354,7 @@ describe("withSelection", () => {
                 </paragraph>
               </td>
             </tr>
-          </tfoot>
+          </tbody>
         </table>
       </editor>
     );

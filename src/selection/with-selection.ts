@@ -57,6 +57,7 @@ export function withSelection<T extends Editor>(
       return apply(op);
     }
 
+    // TODO: perf: could be improved by passing a Span [fromPath, toPath]
     const filled = filledMatrix(editor, { at: fromPath });
     // find initial bounds
     const from = Point.valueOf(0, 0);

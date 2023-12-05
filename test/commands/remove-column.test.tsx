@@ -612,8 +612,6 @@ describe("removeColumn", () => {
                 </paragraph>
               </td>
             </tr>
-          </tbody>
-          <tfoot>
             <tr>
               <td>
                 <paragraph>
@@ -626,7 +624,7 @@ describe("removeColumn", () => {
                 </paragraph>
               </td>
             </tr>
-          </tfoot>
+          </tbody>
         </table>
       </editor>
     );
@@ -663,8 +661,6 @@ describe("removeColumn", () => {
                 </paragraph>
               </td>
             </tr>
-          </tbody>
-          <tfoot>
             <tr>
               <td>
                 <paragraph>
@@ -677,7 +673,7 @@ describe("removeColumn", () => {
                 </paragraph>
               </td>
             </tr>
-          </tfoot>
+          </tbody>
         </table>
       </editor>
     );

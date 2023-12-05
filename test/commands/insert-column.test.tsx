@@ -1599,8 +1599,6 @@ describe("insertColumn", () => {
                 </paragraph>
               </td>
             </tr>
-          </tbody>
-          <tfoot>
             <tr>
               <td colSpan={2}>
                 <paragraph>
@@ -1613,7 +1611,7 @@ describe("insertColumn", () => {
                 </paragraph>
               </td>
             </tr>
-          </tfoot>
+          </tbody>
         </table>
       </editor>
     );
@@ -1680,8 +1678,6 @@ describe("insertColumn", () => {
                 </paragraph>
               </td>
             </tr>
-          </tbody>
-          <tfoot>
             <tr>
               <td colSpan={2}>
                 <paragraph>
@@ -1699,7 +1695,7 @@ describe("insertColumn", () => {
                 </paragraph>
               </td>
             </tr>
-          </tfoot>
+          </tbody>
         </table>
       </editor>
     );
@@ -1775,8 +1771,6 @@ describe("insertColumn", () => {
                 </paragraph>
               </td>
             </tr>
-          </tbody>
-          <tfoot>
             <tr>
               <td colSpan={2}>
                 <paragraph>
@@ -1789,7 +1783,7 @@ describe("insertColumn", () => {
                 </paragraph>
               </td>
             </tr>
-          </tfoot>
+          </tbody>
         </table>
       </editor>
     );
@@ -1856,8 +1850,6 @@ describe("insertColumn", () => {
                 </paragraph>
               </td>
             </tr>
-          </tbody>
-          <tfoot>
             <tr>
               <td colSpan={2}>
                 <paragraph>
@@ -1875,7 +1867,7 @@ describe("insertColumn", () => {
                 </paragraph>
               </td>
             </tr>
-          </tfoot>
+          </tbody>
         </table>
       </editor>
     );
