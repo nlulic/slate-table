@@ -12,7 +12,7 @@ export const initialValue: Descendant[] = [
         bold: true,
       },
       {
-        text: "now to effortlessly modify tables. Easily add, merge, split cells, and insert rows or columns for more flexibility. 😸",
+        text: "now to effortlessly modify tables. Easily merge, split cells, and insert rows or columns for more flexibility. 😸",
       },
     ],
   },
@@ -204,7 +204,7 @@ export const initialValue: Descendant[] = [
     type: "paragraph",
     children: [
       {
-        text: "Encountered a bug 🐞? Create a GitHub issue and help enhance your experience!",
+        text: "Encountered a bug 🐞? Help improve slate-table by opening a GitHub issue!",
       },
     ],
   },

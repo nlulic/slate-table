@@ -34,11 +34,6 @@ interface Props {
 export const Editor: FC<Props> = ({ onChange }) => {
   const [canMerge, setCanMerge] = useState(false);
 
-  const handleChange = (value: Descendant[]) => {
-    setCanMerge(TableEditor.canMerge(editor));
-    onChange(value);
-  };
-
   const editor = useMemo(
     () =>
       withTable(withReact(withHistory(createEditor())), {
@@ -130,14 +125,21 @@ export const Editor: FC<Props> = ({ onChange }) => {
       <Slate
         editor={editor}
         initialValue={initialValue}
-        onChange={handleChange}
+        onSelectionChange={() => setCanMerge(TableEditor.canMerge(editor))}
+        onChange={(value) => onChange(value)}
       >
         <Toolbar canMerge={canMerge} />
         <div className="prose lg:prose-lg max-w-none bg-white p-4 rounded-b-lg">
           <Editable
             placeholder="👷 Start by creating a table and play around..."
             className="focus:outline-none"
-            spellCheck={false}
+            onDragStart={() => {
+              // mark onDragStart as handled if the selection is in a table
+              if (TableCursor.isInTable(editor)) {
+                return true;
+              }
+              return false;
+            }}
             onKeyDown={(event) => {
               if (TableCursor.isInTable(editor)) {
                 switch (true) {
@@ -184,6 +186,7 @@ export const Editor: FC<Props> = ({ onChange }) => {
             }}
             renderElement={renderElement}
             renderLeaf={renderLeaf}
+            spellCheck={false}
           />
         </div>
       </Slate>

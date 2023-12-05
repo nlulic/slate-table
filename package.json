@@ -8,7 +8,7 @@
     "build": "npm-run-all --print-label build:package build:site",
     "lint": "npm-run-all --parallel --print-label lint:package lint:site",
     "clean": "npm-run-all --parallel clean:package clean:site",
-    "install:package": "npm install --prefix site/",
+    "install:site": "npm install --prefix site/",
     "watch:package": "tsc -p . --watch",
     "watch:site": "npm start --prefix site/",
     "build:package": "npm run clean:package && tsc",
