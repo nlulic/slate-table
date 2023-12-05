@@ -2,11 +2,11 @@
 /** @jsx jsx */
 
 import assert from "assert";
-import normalizeTr from "../../src/normalization/normalize-tr";
 import { DEFAULT_WITH_TABLE_OPTIONS } from "../../src/options";
+import { EDITOR_TO_WITH_TABLE_OPTIONS } from "../../src/weak-maps";
 import { Editor } from "slate";
 import { jsx, withTest } from "../testutils";
-import { EDITOR_TO_WITH_TABLE_OPTIONS } from "../../src/weak-maps";
+import { normalizeTr } from "../../src/normalization/normalize-tr";
 
 describe("normalize `tr` node", () => {
   it("should wrap every inline node in a `content` node", () => {
@@ -60,9 +60,7 @@ describe("normalize `tr` node", () => {
       </editor>
     );
 
-    const editor = withTest(
-      normalizeTr(actual, DEFAULT_WITH_TABLE_OPTIONS.blocks)
-    );
+    const editor = withTest(normalizeTr(actual, DEFAULT_WITH_TABLE_OPTIONS));
 
     // needed for `isOfType` to work
     EDITOR_TO_WITH_TABLE_OPTIONS.set(editor, DEFAULT_WITH_TABLE_OPTIONS);

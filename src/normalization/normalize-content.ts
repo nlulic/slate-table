@@ -1,44 +1,32 @@
+import { Editor, Node, Transforms } from "slate";
 import { WithTableOptions } from "../options";
 import { isElement } from "../utils";
-import { Editor, Node, Transforms } from "slate";
 
 /**
  * Will normalize the `content` node. It will remove
  * table-related elements and unwrap their children.
  */
-function normalizeContent<T extends Editor>(
+export function normalizeContent<T extends Editor>(
   editor: T,
-  blocks: WithTableOptions["blocks"]
+  { blocks }: WithTableOptions
 ): T {
+  const { table, thead, tbody, tfoot, tr, th, td, content } = blocks;
+  const FORBIDDEN = [table, thead, tbody, tfoot, tr, th, td, content];
+
   const { normalizeNode } = editor;
 
-  const { content, table, tbody, td, tfoot, th, thead, tr } = blocks;
-
-  const FORBIDDEN_CHILDREN = new Set([
-    table,
-    thead,
-    tbody,
-    tfoot,
-    tr,
-    th,
-    td,
-    content,
-  ]);
-
-  editor.normalizeNode = ([node, path]) => {
+  editor.normalizeNode = (entry, options) => {
+    const [node, path] = entry;
     if (isElement(node) && node.type === content) {
       for (const [child, childPath] of Node.children(editor, path)) {
-        if (isElement(child) && FORBIDDEN_CHILDREN.has(child.type)) {
-          Transforms.unwrapNodes(editor, { at: childPath });
-          return;
+        if (isElement(child) && FORBIDDEN.includes(child.type)) {
+          return Transforms.unwrapNodes(editor, { at: childPath });
         }
       }
     }
 
-    normalizeNode([node, path]);
+    normalizeNode(entry, options);
   };
 
   return editor;
 }
-
-export default normalizeContent;

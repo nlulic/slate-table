@@ -6,13 +6,14 @@ import { isElement, isOfType } from "../utils";
  * Normalizes the `tr` node by wrapping each of its child nodes within a td or th
  * element, depending on whether the row is inside the thead section or not.
  */
-function normalizeTr<T extends Editor>(
+export function normalizeTr<T extends Editor>(
   editor: T,
-  { tr, td, th }: WithTableOptions["blocks"]
+  { blocks: { tr, td, th } }: WithTableOptions
 ): T {
   const { normalizeNode } = editor;
 
-  editor.normalizeNode = ([node, path]) => {
+  editor.normalizeNode = (entry, options) => {
+    const [node, path] = entry;
     if (isElement(node) && node.type === tr) {
       for (const [child, childPath] of Node.children(editor, path)) {
         if (!isElement(child) || (child.type !== td && child.type !== th)) {
@@ -21,7 +22,7 @@ function normalizeTr<T extends Editor>(
             at: path,
           });
 
-          Transforms.wrapNodes(
+          return Transforms.wrapNodes(
             editor,
             {
               type: thead ? th : td,
@@ -29,15 +30,12 @@ function normalizeTr<T extends Editor>(
             } as Element,
             { at: childPath }
           );
-          return;
         }
       }
     }
 
-    normalizeNode([node, path]);
+    normalizeNode(entry, options);
   };
 
   return editor;
 }
-
-export default normalizeTr;

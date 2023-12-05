@@ -6,19 +6,18 @@ import { isElement } from "../utils";
  * Normalizes the `thead`, `tbody` and `tfoot` nodes by wrapping each of its
  * child nodes within a `tr` element.
  */
-function normalizeSections<T extends Editor>(
+export function normalizeSections<T extends Editor>(
   editor: T,
-  { thead, tbody, tfoot, tr }: WithTableOptions["blocks"]
+  { blocks: { thead, tbody, tfoot, tr } }: WithTableOptions
 ): T {
   const { normalizeNode } = editor;
 
-  const SECTIONS = [thead, tbody, tfoot];
-
-  editor.normalizeNode = ([node, path]) => {
-    if (isElement(node) && SECTIONS.includes(node.type)) {
+  editor.normalizeNode = (entry, options) => {
+    const [node, path] = entry;
+    if (isElement(node) && [thead, tbody, tfoot].includes(node.type)) {
       for (const [child, childPath] of Node.children(editor, path)) {
         if (!isElement(child) || child.type !== tr) {
-          Transforms.wrapNodes(
+          return Transforms.wrapNodes(
             editor,
             {
               type: tr,
@@ -26,15 +25,12 @@ function normalizeSections<T extends Editor>(
             } as Element,
             { at: childPath }
           );
-          return;
         }
       }
     }
 
-    normalizeNode([node, path]);
+    normalizeNode(entry, options);
   };
 
   return editor;
 }
-
-export default normalizeSections;

@@ -2,10 +2,10 @@
 /** @jsx jsx */
 
 import assert from "assert";
-import normalizeSections from "../../src/normalization/normalize-sections";
 import { DEFAULT_WITH_TABLE_OPTIONS } from "../../src/options";
 import { Editor } from "slate";
 import { jsx, withTest } from "../testutils";
+import { normalizeSections } from "../../src/normalization/normalize-sections";
 
 describe("normalize `thead`, `tbody` and `tfoot` nodes", () => {
   it("should wrap every node in a `tr` node", () => {
@@ -64,7 +64,7 @@ describe("normalize `thead`, `tbody` and `tfoot` nodes", () => {
     );
 
     const editor = withTest(
-      normalizeSections(actual, DEFAULT_WITH_TABLE_OPTIONS.blocks)
+      normalizeSections(actual, DEFAULT_WITH_TABLE_OPTIONS)
     );
 
     Editor.normalize(editor, { force: true });

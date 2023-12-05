@@ -2,10 +2,10 @@
 /** @jsx jsx */
 
 import assert from "assert";
-import normalizeContent from "../../src/normalization/normalize-content";
 import { DEFAULT_WITH_TABLE_OPTIONS } from "../../src/options";
 import { Editor } from "slate";
 import { jsx, withTest } from "../testutils";
+import { normalizeContent } from "../../src/normalization/normalize-content";
 
 describe("normalize `content` node", () => {
   it("should remove other table nodes from content", () => {
@@ -51,7 +51,7 @@ describe("normalize `content` node", () => {
     );
 
     const editor = withTest(
-      normalizeContent(actual, DEFAULT_WITH_TABLE_OPTIONS.blocks)
+      normalizeContent(actual, DEFAULT_WITH_TABLE_OPTIONS)
     );
 
     Editor.normalize(editor, { force: true });

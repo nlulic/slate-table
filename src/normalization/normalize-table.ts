@@ -2,31 +2,25 @@ import { Editor, Element, Node, NodeEntry, Path, Transforms } from "slate";
 import { WithTableOptions } from "../options";
 import { isElement, isOfType } from "../utils";
 
-/**
- * Normalizes the given `table` node by wrapping invalid
- * nodes into a `tbody`.
- */
-function normalizeTable<T extends Editor>(
+/** Normalizes the given `table` node by wrapping invalid nodes into a `tbody`. */
+export function normalizeTable<T extends Editor>(
   editor: T,
-  { table, thead, tbody, tfoot }: WithTableOptions["blocks"]
+  { blocks: { table, thead, tbody, tfoot } }: WithTableOptions
 ): T {
-  const ALLOWED_CHILDREN = new Set([thead, tbody, tfoot]);
-
   const { normalizeNode } = editor;
 
-  editor.normalizeNode = (entry) => {
+  editor.normalizeNode = (entry, options) => {
     const [node, path] = entry;
-
     if (isElement(node) && node.type === table) {
       for (const [child, childPath] of Node.children(editor, path)) {
-        if (isElement(child) && ALLOWED_CHILDREN.has(child.type)) {
+        if (isElement(child) && [thead, tbody, tfoot].includes(child.type)) {
           continue;
         }
 
         const tbodyEntry = immediateTbody(editor, path);
 
         if (!tbodyEntry) {
-          Transforms.wrapNodes(
+          return Transforms.wrapNodes(
             editor,
             {
               type: tbody,
@@ -34,7 +28,6 @@ function normalizeTable<T extends Editor>(
             } as Element,
             { at: childPath }
           );
-          return;
         }
 
         const [tbodyElement, tbodyPath] = tbodyEntry;
@@ -43,22 +36,22 @@ function normalizeTable<T extends Editor>(
           (n) => isElement(n) && !editor.isInline(n)
         );
 
-        Transforms.moveNodes(editor, {
+        return Transforms.moveNodes(editor, {
           at: childPath,
           to: [...tbodyPath, elements.length],
         });
-        return;
       }
     }
 
-    normalizeNode(entry);
+    normalizeNode(entry, options);
   };
 
   return editor;
 }
 
 /**
- * @returns {NodeEntry<Element> | undefined} The immediate child `tbody` element of the `table`, or `undefined` if it does not exist.
+ * @returns {NodeEntry<Element> | undefined} The immediate child `tbody` element
+ * of the `table`, or `undefined` if it does not exist.
  */
 const immediateTbody = (
   editor: Editor,
@@ -81,5 +74,3 @@ const immediateTbody = (
 
   return tbody;
 };
-
-export default normalizeTable;

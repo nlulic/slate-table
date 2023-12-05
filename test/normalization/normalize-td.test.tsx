@@ -2,10 +2,10 @@
 /** @jsx jsx */
 
 import assert from "assert";
-import normalizeTd from "../../src/normalization/normalize-td";
 import { DEFAULT_WITH_TABLE_OPTIONS } from "../../src/options";
 import { Editor } from "slate";
 import { jsx, withTest } from "../testutils";
+import { normalizeTd } from "../../src/normalization/normalize-td";
 
 describe("normalize `td` and `th` nodes", () => {
   it("should wrap every inline node in a `content` node", () => {
@@ -47,9 +47,7 @@ describe("normalize `td` and `th` nodes", () => {
       </editor>
     );
 
-    const editor = withTest(
-      normalizeTd(actual, DEFAULT_WITH_TABLE_OPTIONS.blocks)
-    );
+    const editor = withTest(normalizeTd(actual, DEFAULT_WITH_TABLE_OPTIONS));
 
     Editor.normalize(editor, { force: true });
 

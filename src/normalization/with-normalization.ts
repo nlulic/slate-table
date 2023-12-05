@@ -1,26 +1,26 @@
-import normalizeAttributes from "./normalize-attributes";
-import normalizeContent from "./normalize-content";
-import normalizeSections from "./normalize-sections";
-import normalizeTable from "./normalize-table";
-import normalizeTd from "./normalize-td";
-import normalizeTr from "./normalize-tr";
 import { Editor } from "slate";
 import { WithTableOptions } from "../options";
+import { normalizeAttributes } from "./normalize-attributes";
+import { normalizeContent } from "./normalize-content";
+import { normalizeSections } from "./normalize-sections";
+import { normalizeTable } from "./normalize-table";
+import { normalizeTd } from "./normalize-td";
+import { normalizeTr } from "./normalize-tr";
 
 export function withNormalization<T extends Editor>(
   editor: T,
-  { blocks, withNormalization }: WithTableOptions
+  options: WithTableOptions
 ): T {
-  if (!withNormalization) {
+  if (!options.withNormalization) {
     return editor;
   }
 
-  editor = normalizeTable(editor, blocks);
-  editor = normalizeSections(editor, blocks);
-  editor = normalizeTr(editor, blocks);
-  editor = normalizeAttributes(editor, blocks);
-  editor = normalizeTd(editor, blocks);
-  editor = normalizeContent(editor, blocks);
+  editor = normalizeAttributes(editor, options);
+  editor = normalizeContent(editor, options);
+  editor = normalizeSections(editor, options);
+  editor = normalizeTable(editor, options);
+  editor = normalizeTd(editor, options);
+  editor = normalizeTr(editor, options);
 
   return editor;
 }

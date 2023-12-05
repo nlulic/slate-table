@@ -1,4 +1,4 @@
-import { Editor, Element, Node, Text, Transforms } from "slate";
+import { Editor, Element, Node, Transforms } from "slate";
 import { WithTableOptions } from "../options";
 import { isElement } from "../utils";
 
@@ -6,33 +6,33 @@ import { isElement } from "../utils";
  * Normalizes the given `td` (and `th`) node by wrapping every inline
  * and text node inside a `content` node.
  */
-function normalizeTd<T extends Editor>(
+export function normalizeTd<T extends Editor>(
   editor: T,
-  { content, td, th }: WithTableOptions["blocks"]
+  { blocks: { content, td, th } }: WithTableOptions
 ): T {
   const { normalizeNode } = editor;
 
-  editor.normalizeNode = ([node, path]) => {
-    if (isElement(node) && (node.type === th || node.type === td)) {
+  editor.normalizeNode = (entry, options) => {
+    const [node, path] = entry;
+    if (isElement(node) && [th, td].includes(node.type)) {
       for (const [child, childPath] of Node.children(editor, path)) {
-        if (Text.isText(child) || Editor.isInline(editor, child)) {
-          Transforms.wrapNodes(
-            editor,
-            {
-              type: content,
-              children: [child],
-            } as Element,
-            { at: childPath }
-          );
-          return;
+        if (isElement(child) && content === child.type) {
+          continue;
         }
+
+        return Transforms.wrapNodes(
+          editor,
+          {
+            type: content,
+            children: [child],
+          } as Element,
+          { at: childPath }
+        );
       }
     }
 
-    normalizeNode([node, path]);
+    normalizeNode(entry, options);
   };
 
   return editor;
 }
-
-export default normalizeTd;

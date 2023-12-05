@@ -2,11 +2,11 @@
 /** @jsx jsx */
 
 import assert from "assert";
-import normalizeTable from "../../src/normalization/normalize-table";
 import { DEFAULT_WITH_TABLE_OPTIONS } from "../../src/options";
+import { EDITOR_TO_WITH_TABLE_OPTIONS } from "../../src/weak-maps";
 import { Editor } from "slate";
 import { jsx, withTest } from "../testutils";
-import { EDITOR_TO_WITH_TABLE_OPTIONS } from "../../src/weak-maps";
+import { normalizeTable } from "../../src/normalization/normalize-table";
 
 describe("normalize `table` node", () => {
   it("should wrap invalid nodes into a `tbody` node", () => {
@@ -40,9 +40,7 @@ describe("normalize `table` node", () => {
       </editor>
     );
 
-    const editor = withTest(
-      normalizeTable(actual, DEFAULT_WITH_TABLE_OPTIONS.blocks)
-    );
+    const editor = withTest(normalizeTable(actual, DEFAULT_WITH_TABLE_OPTIONS));
 
     EDITOR_TO_WITH_TABLE_OPTIONS.set(editor, DEFAULT_WITH_TABLE_OPTIONS);
 
@@ -98,9 +96,7 @@ describe("normalize `table` node", () => {
       </editor>
     );
 
-    const editor = withTest(
-      normalizeTable(actual, DEFAULT_WITH_TABLE_OPTIONS.blocks)
-    );
+    const editor = withTest(normalizeTable(actual, DEFAULT_WITH_TABLE_OPTIONS));
 
     EDITOR_TO_WITH_TABLE_OPTIONS.set(editor, DEFAULT_WITH_TABLE_OPTIONS);
 
