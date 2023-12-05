@@ -14,6 +14,7 @@ export interface WithTableOptions {
     thead: ElementType;
   };
   withDelete: boolean;
+  withFragments: boolean;
   withInsertText: boolean;
   withNormalization: boolean;
   withSelection: boolean;
@@ -32,6 +33,7 @@ export const DEFAULT_WITH_TABLE_OPTIONS = {
     thead: "table-head",
   },
   withDelete: true,
+  withFragments: true,
   withInsertText: true,
   withNormalization: true,
   withSelection: true,

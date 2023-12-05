@@ -2,6 +2,7 @@ import { EDITOR_TO_WITH_TABLE_OPTIONS } from "./weak-maps";
 import { Editor } from "slate";
 import { WithTableOptions, DEFAULT_WITH_TABLE_OPTIONS } from "./options";
 import { withDelete } from "./with-delete";
+import { withFragments } from "./with-fragments";
 import { withInsertText } from "./with-insert-text";
 import { withNormalization } from "./normalization";
 import { withSelection, withSelectionAdjustment } from "./selection";
@@ -29,6 +30,7 @@ export function withTable<T extends Editor>(editor: T, options: Options): T {
   EDITOR_TO_WITH_TABLE_OPTIONS.set(editor, optionsWithDefaults);
 
   editor = withDelete(editor, optionsWithDefaults);
+  editor = withFragments(editor, optionsWithDefaults);
   editor = withInsertText(editor, optionsWithDefaults);
   editor = withNormalization(editor, optionsWithDefaults);
   editor = withSelection(editor, optionsWithDefaults);
