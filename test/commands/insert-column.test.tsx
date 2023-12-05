@@ -15,7 +15,7 @@ describe("insertColumn", () => {
    * | 3 | 4 |      | 3 | X | 4 |
    * +---+---+      +---+---+---+
    */
-  it("should insert to the right", () => {
+  it("should insert after the selection", () => {
     const actual = (
       <editor>
         <table>
@@ -116,7 +116,7 @@ describe("insertColumn", () => {
    * | 3 | 4 |      | 3 | X | 4 |
    * +---+---+      +---+---+---+
    */
-  it("should insert to the left", () => {
+  it("should insert before the selection", () => {
     const actual = (
       <editor>
         <table>
@@ -203,7 +203,7 @@ describe("insertColumn", () => {
 
     const editor = withTest(withTable(actual, DEFAULT_TEST_WITH_TABLE_OPTIONS));
 
-    TableEditor.insertColumn(editor, { left: true });
+    TableEditor.insertColumn(editor, { before: true });
 
     assert.deepEqual(editor.children, expected.children);
     assert.deepEqual(editor.selection, expected.selection);
@@ -217,7 +217,7 @@ describe("insertColumn", () => {
    * | 3 | 4 |      | 3 | 4 | X |
    * +---+---+      +---+---+---+
    */
-  it("should insert to the right at a specified location", () => {
+  it("should insert after the specified location", () => {
     const actual = (
       <editor>
         <table>
@@ -504,7 +504,7 @@ describe("insertColumn", () => {
 
     const editor = withTest(withTable(actual, DEFAULT_TEST_WITH_TABLE_OPTIONS));
 
-    TableEditor.insertColumn(editor, { left: true });
+    TableEditor.insertColumn(editor, { before: true });
 
     assert.deepEqual(editor.children, expected.children);
     assert.deepEqual(editor.selection, expected.selection);
@@ -520,7 +520,7 @@ describe("insertColumn", () => {
    * | 7 | 8 | 9 | 0 |      | 7 | 8 | 9 | X | 0 |
    * +---+---+---+---+      +---+---+---+---+---+
    */
-  it("should insert to the right at the end of a colspan", () => {
+  it("should insert after the end of a colspan", () => {
     const actual = (
       <editor>
         <table>
@@ -696,7 +696,7 @@ describe("insertColumn", () => {
    * | 7 | 8 | 9 | 0 |      | X | 7 | 8 | 9 | 0 |
    * +---+---+---+---+      +---+---+---+---+---+
    */
-  it("should insert to the left at the start of a colspan", () => {
+  it("should insert before the start of a colspan", () => {
     const actual = (
       <editor>
         <table>
@@ -856,7 +856,7 @@ describe("insertColumn", () => {
 
     const editor = withTest(withTable(actual, DEFAULT_TEST_WITH_TABLE_OPTIONS));
 
-    TableEditor.insertColumn(editor, { left: true });
+    TableEditor.insertColumn(editor, { before: true });
 
     assert.deepEqual(editor.children, expected.children);
     assert.deepEqual(editor.selection, expected.selection);
@@ -872,7 +872,7 @@ describe("insertColumn", () => {
    * | 7 | 8 | 9 | 0 |      | 7 | X | 8 | 9 | 0 |
    * +---+---+---+---+      +---+---+---+---+---+
    */
-  it("should insert to the right when right sibling has colspan", () => {
+  it("should insert after the selection when sibling has colspan", () => {
     const actual = (
       <editor>
         <table>
@@ -1048,7 +1048,7 @@ describe("insertColumn", () => {
    * | 7 | 8 | 9 | 0 |      | 7 | 8 | 9 | X | 0 |
    * +---+---+---+---+      +---+---+---+---+---+
    */
-  it("should insert to the left when left sibling has colspan", () => {
+  it("should insert before the selection when sibling has colspan", () => {
     const actual = (
       <editor>
         <table>
@@ -1208,7 +1208,7 @@ describe("insertColumn", () => {
 
     const editor = withTest(withTable(actual, DEFAULT_TEST_WITH_TABLE_OPTIONS));
 
-    TableEditor.insertColumn(editor, { left: true });
+    TableEditor.insertColumn(editor, { before: true });
 
     assert.deepEqual(editor.children, expected.children);
     assert.deepEqual(editor.selection, expected.selection);
@@ -1224,7 +1224,7 @@ describe("insertColumn", () => {
    * |   7   | 8 | 9 |      |   7   | X | 8 | 9 |
    * +---+---+---+---+      +---+---+---+---+---+
    */
-  it("should insert to the right when column has colspan and increase it", () => {
+  it("should insert after the selection when column has colspan and increase it", () => {
     const actual = (
       <editor>
         <table>
@@ -1385,7 +1385,7 @@ describe("insertColumn", () => {
    * |   7   | 8 | 9 |      |   7   | X | 8 | 9 |
    * +---+---+---+---+      +---+---+---+---+---+
    */
-  it("should insert to the left when column has colspan and increase it", () => {
+  it("should insert before the selection when column has colspan and increase it", () => {
     const actual = (
       <editor>
         <table>
@@ -1530,7 +1530,7 @@ describe("insertColumn", () => {
 
     const editor = withTest(withTable(actual, DEFAULT_TEST_WITH_TABLE_OPTIONS));
 
-    TableEditor.insertColumn(editor, { left: true });
+    TableEditor.insertColumn(editor, { before: true });
 
     assert.deepEqual(editor.children, expected.children);
     assert.deepEqual(editor.selection, expected.selection);
@@ -1546,7 +1546,7 @@ describe("insertColumn", () => {
    * |   9   |   | 0 |      |   9   |   | X | 0 |
    * +---+---+---+---+      +---+---+---+---+---+
    */
-  it("should insert to the right when column has a rowspan", () => {
+  it("should insert after the selection when column has a rowspan", () => {
     const actual = (
       <editor>
         <table>
@@ -1722,7 +1722,7 @@ describe("insertColumn", () => {
    * |   9   |   | 0 |      |   9   | X |   | 0 |
    * +---+---+---+---+      +---+---+---+---+---+
    */
-  it("should insert to the left when column has a rowspan", () => {
+  it("should insert before the selection when column has a rowspan", () => {
     const actual = (
       <editor>
         <table>
@@ -1882,7 +1882,7 @@ describe("insertColumn", () => {
 
     const editor = withTest(withTable(actual, DEFAULT_TEST_WITH_TABLE_OPTIONS));
 
-    TableEditor.insertColumn(editor, { left: true });
+    TableEditor.insertColumn(editor, { before: true });
 
     assert.deepEqual(editor.children, expected.children);
     assert.deepEqual(editor.selection, expected.selection);
@@ -2098,7 +2098,7 @@ describe("insertColumn", () => {
 
     const editor = withTest(withTable(actual, DEFAULT_TEST_WITH_TABLE_OPTIONS));
 
-    TableEditor.insertColumn(editor, { left: true });
+    TableEditor.insertColumn(editor, { before: true });
 
     assert.deepEqual(editor.children, expected.children);
     assert.deepEqual(editor.selection, expected.selection);
@@ -2384,7 +2384,7 @@ describe("insertColumn", () => {
 
     const editor = withTest(withTable(actual, DEFAULT_TEST_WITH_TABLE_OPTIONS));
 
-    TableEditor.insertColumn(editor, { left: true });
+    TableEditor.insertColumn(editor, { before: true });
 
     assert.deepEqual(editor.children, expected.children);
     assert.deepEqual(editor.selection, expected.selection);
@@ -2404,7 +2404,7 @@ describe("insertColumn", () => {
    * | 8 | 9 | 0 | 1 |      | 8 | 9 | 0 | X | 1 |
    * +---+---+---+---+      +---+---+---+---+---+
    */
-  it("should insert to the right when column has rowspan and colspan and increase its colspan correctly", () => {
+  it("should insert after the selection when column has rowspan and colspan and increase its colspan correctly", () => {
     const actual = (
       <editor>
         <table>
@@ -2638,7 +2638,7 @@ describe("insertColumn", () => {
    * | 8 | 9 | 0 | 1 |      | 8 | 9 | X | 0 | 1 |
    * +---+---+---+---+      +---+---+---+---+---+
    */
-  it("should insert to the left when column has rowspan and colspan and increase its colspan correctly", () => {
+  it("should insert before the selection when column has rowspan and colspan and increase its colspan correctly", () => {
     const actual = (
       <editor>
         <table>
@@ -2852,7 +2852,7 @@ describe("insertColumn", () => {
 
     const editor = withTest(withTable(actual, DEFAULT_TEST_WITH_TABLE_OPTIONS));
 
-    TableEditor.insertColumn(editor, { left: true });
+    TableEditor.insertColumn(editor, { before: true });
 
     assert.deepEqual(editor.children, expected.children);
     assert.deepEqual(editor.selection, expected.selection);

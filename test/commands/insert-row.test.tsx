@@ -20,7 +20,7 @@ describe("insertRow", () => {
    *                    | 7 | 8 | 9 |
    *                    +---+---+---+
    */
-  it("should insert to the top", () => {
+  it("should insert before the selection", () => {
     const actual = (
       <editor>
         <table>
@@ -164,7 +164,7 @@ describe("insertRow", () => {
 
     const editor = withTest(withTable(actual, DEFAULT_WITH_TABLE_OPTIONS));
 
-    TableEditor.insertRow(editor, { above: true });
+    TableEditor.insertRow(editor, { before: true });
 
     assert.deepEqual(editor.children, expected.children);
     assert.deepEqual(editor.selection, expected.selection);
@@ -182,7 +182,7 @@ describe("insertRow", () => {
    *                    | 7 | 8 | 9 |
    *                    +---+---+---+
    */
-  it("should insert to the bottom", () => {
+  it("should insert after the selection", () => {
     const actual = (
       <editor>
         <table>
@@ -492,7 +492,7 @@ describe("insertRow", () => {
 
     const editor = withTest(withTable(actual, DEFAULT_WITH_TABLE_OPTIONS));
 
-    TableEditor.insertRow(editor, { above: true });
+    TableEditor.insertRow(editor, { before: true });
 
     assert.deepEqual(editor.children, expected.children);
     assert.deepEqual(editor.selection, expected.selection);
@@ -676,7 +676,7 @@ describe("insertRow", () => {
    *                    | X | X | X |
    *                    +---+---+---+
    */
-  it("should insert below a specified location", () => {
+  it("should insert after a specified location", () => {
     const actual = (
       <editor>
         <table>
@@ -840,7 +840,7 @@ describe("insertRow", () => {
    *                    | 8 | 9 | 0 |
    *                    +---+---+---+
    */
-  it("should insert above row with multiple rowspan cols and increase them", () => {
+  it("should insert before a row with multiple rowspan cols and increase them", () => {
     const actual = (
       <editor>
         <table>
@@ -992,7 +992,7 @@ describe("insertRow", () => {
 
     const editor = withTest(withTable(actual, DEFAULT_WITH_TABLE_OPTIONS));
 
-    TableEditor.insertRow(editor, { above: true });
+    TableEditor.insertRow(editor, { before: true });
 
     assert.deepEqual(editor.children, expected.children);
     assert.deepEqual(editor.selection, expected.selection);
@@ -1012,7 +1012,7 @@ describe("insertRow", () => {
    *                    | 8 | 9 | 0 |
    *                    +---+---+---+
    */
-  it("should insert below row with multiple rowspan cols and increase them", () => {
+  it("should insert after a row with multiple rowspan cols and increase them", () => {
     const actual = (
       <editor>
         <table>
@@ -1184,7 +1184,7 @@ describe("insertRow", () => {
    *                    | 8 | 9 | 0 |
    *                    +---+---+---+
    */
-  it("should insert above rowspan without increasing rowspan", () => {
+  it("should insert before the selection when row has rowspan without increasing rowspan", () => {
     const actual = (
       <editor>
         <table>
@@ -1346,7 +1346,7 @@ describe("insertRow", () => {
 
     const editor = withTest(withTable(actual, DEFAULT_WITH_TABLE_OPTIONS));
 
-    TableEditor.insertRow(editor, { above: true });
+    TableEditor.insertRow(editor, { before: true });
 
     assert.deepEqual(editor.children, expected.children);
     assert.deepEqual(editor.selection, expected.selection);
@@ -1366,7 +1366,7 @@ describe("insertRow", () => {
    *                    | 8 | 9 | 0 |
    *                    +---+---+---+
    */
-  it("should insert below rowspan without increasing rowspan", () => {
+  it("should insert after the selection when row has rowspan without increasing rowspan", () => {
     const actual = (
       <editor>
         <table>
@@ -1544,7 +1544,7 @@ describe("insertRow", () => {
    *                    | 8 | 9 | 0 |
    *                    +---+---+---+
    */
-  it("should insert above rowspan with selection", () => {
+  it("should insert before a rowspan with selection", () => {
     const actual = (
       <editor>
         <table>
@@ -1702,7 +1702,7 @@ describe("insertRow", () => {
 
     const editor = withTest(withTable(actual, DEFAULT_WITH_TABLE_OPTIONS));
 
-    TableEditor.insertRow(editor, { above: true });
+    TableEditor.insertRow(editor, { before: true });
 
     assert.deepEqual(editor.children, expected.children);
     assert.deepEqual(editor.selection, expected.selection);
@@ -1722,7 +1722,7 @@ describe("insertRow", () => {
    *                    | 8 | 9 | 0 |
    *                    +---+---+---+
    */
-  it("should insert below rowspan with selection", () => {
+  it("should insert after a rowspan with selection", () => {
     const actual = (
       <editor>
         <table>
@@ -2032,7 +2032,7 @@ describe("insertRow", () => {
 
     const editor = withTest(withTable(actual, DEFAULT_WITH_TABLE_OPTIONS));
 
-    TableEditor.insertRow(editor, { above: true });
+    TableEditor.insertRow(editor, { before: true });
 
     assert.deepEqual(editor.children, expected.children);
     assert.deepEqual(editor.selection, expected.selection);

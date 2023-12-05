@@ -84,13 +84,13 @@ export const TableEditor = {
    * Inserts a new row at the specified location. If no location
    * is specified it will insert the row at the current selection.
    * @param options The `at` specifies the location of the base row
-   * on which the new row will be inserted. Depending on the `above`
-   * property the row will be inserted above or below the base row.
+   * on which the new row will be inserted. Depending on the `before`
+   * property the row will be inserted before or after the base row.
    * @returns void
    */
   insertRow(
     editor: Editor,
-    options: { at?: Location; above?: boolean } = {}
+    options: { at?: Location; before?: boolean } = {}
   ): void {
     const editorOptions = EDITOR_TO_WITH_TABLE_OPTIONS.get(editor);
 
@@ -132,7 +132,7 @@ export const TableEditor = {
         // When determining the exit condition, we consider two scenarios:
         // 1. If a row will be added above the current selection, we seek the first match.
         // 2. Otherwise, if cells have a rowspan, we aim to find the last match.
-        if (options.above || btt < 2) {
+        if (options.before || btt < 2) {
           break outer;
         }
       }
@@ -144,7 +144,7 @@ export const TableEditor = {
     });
 
     Editor.withoutNormalizing(editor, () => {
-      const destIndex = options.above ? trIndex - 1 : trIndex + 1;
+      const destIndex = options.before ? trIndex - 1 : trIndex + 1;
       const isWithinBounds = destIndex >= 0 && destIndex < matrix.length;
 
       let increasedRowspan = 0;
@@ -152,7 +152,7 @@ export const TableEditor = {
         const [[element, path], { ltr, ttb, btt }] = matrix[destIndex][y];
         const rowSpan = element.rowSpan || 1;
 
-        if (options.above ? btt > 1 : ttb > 1) {
+        if (options.before ? btt > 1 : ttb > 1) {
           increasedRowspan += ltr;
 
           Transforms.setNodes<CellElement>(
@@ -190,7 +190,7 @@ export const TableEditor = {
           ),
         } as Node,
         {
-          at: options.above ? currentPath : Path.next(currentPath),
+          at: options.before ? currentPath : Path.next(currentPath),
         }
       );
     });
@@ -358,7 +358,7 @@ export const TableEditor = {
    */
   insertColumn(
     editor: Editor,
-    options: { at?: Location; left?: boolean } = {}
+    options: { at?: Location; before?: boolean } = {}
   ): void {
     const editorOptions = EDITOR_TO_WITH_TABLE_OPTIONS.get(editor);
 
@@ -391,7 +391,7 @@ export const TableEditor = {
 
         if (Path.equals(tdPath, path)) {
           tdIndex = y;
-          if (options.left) {
+          if (options.before) {
             break out;
           }
         }
@@ -406,7 +406,7 @@ export const TableEditor = {
 
         // when inserting left and the right-to-left is greater than 1, the colspan is increased
         // when inserting right and the left-to-right is greater than 1, the colspan is increased
-        if (options.left ? rtl > 1 : ltr > 1) {
+        if (options.before ? rtl > 1 : ltr > 1) {
           Transforms.setNodes<CellElement>(
             editor,
             { colSpan: colSpan + 1 },
@@ -441,7 +441,7 @@ export const TableEditor = {
 
         // if the cell has no rowspan, just insert:
         if (ttb === 1) {
-          insertTd(options.left ? path : Path.next(path));
+          insertTd(options.before ? path : Path.next(path));
           continue;
         }
 
