@@ -119,7 +119,7 @@ export const Toolbar: FC<Props> = ({ canMerge }) => {
                   type="button"
                   className="flex justify-between px-4 py-2 cursor-pointer hover:bg-gray-100"
                   onMouseDown={(event) => {
-                    TableEditor.insertRow(editor, { above: true });
+                    TableEditor.insertRow(editor, { before: true });
                     event.preventDefault();
                   }}
                 >
@@ -172,7 +172,7 @@ export const Toolbar: FC<Props> = ({ canMerge }) => {
                   type="button"
                   className="flex justify-between px-4 py-2 cursor-pointer hover:bg-gray-100"
                   onMouseDown={(event) => {
-                    TableEditor.insertColumn(editor, { left: true });
+                    TableEditor.insertColumn(editor, { before: true });
                     event.preventDefault();
                   }}
                 >
