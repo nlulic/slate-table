@@ -8,7 +8,7 @@ import { filledMatrix, hasCommon, isElement, isOfType } from "./utils";
 export const TableEditor = {
   /**
    * Inserts a table at the specified location with the specified number of
-   * rows. If no location is specified it will be inserted at the current
+   * rows and columns. If no location is specified it will be inserted at the current
    * selection.
    * @param options The `rows` and `cols` specify the number of rows and
    * columns in the table, if not provided, they default to 2. The `at`
@@ -58,7 +58,7 @@ export const TableEditor = {
           } as Node,
         ],
       } as Node,
-      { at }
+      { at },
     );
   },
   /**
@@ -90,7 +90,7 @@ export const TableEditor = {
    */
   insertRow(
     editor: Editor,
-    options: { at?: Location; before?: boolean } = {}
+    options: { at?: Location; before?: boolean } = {},
   ): void {
     const editorOptions = EDITOR_TO_WITH_TABLE_OPTIONS.get(editor);
 
@@ -107,7 +107,7 @@ export const TableEditor = {
         "tfoot",
         "tr", // current row
         "td", // current cell
-        "th"
+        "th",
       ),
       at: options.at,
     });
@@ -160,7 +160,7 @@ export const TableEditor = {
             {
               rowSpan: rowSpan + 1,
             },
-            { at: path }
+            { at: path },
           );
         }
 
@@ -186,12 +186,12 @@ export const TableEditor = {
                   children: [{ text: "" }],
                 },
               ],
-            })
+            }),
           ),
         } as Node,
         {
           at: options.before ? currentPath : Path.next(currentPath),
-        }
+        },
       );
     });
   },
@@ -216,7 +216,7 @@ export const TableEditor = {
         "tfoot",
         "tr", // row
         "td", // cell
-        "th"
+        "th",
       ),
       at: options.at,
     });
@@ -305,7 +305,7 @@ export const TableEditor = {
         Transforms.setNodes<CellElement>(
           editor,
           { rowSpan: rowSpan - 1 },
-          { at: path }
+          { at: path },
         );
       }
 
@@ -335,7 +335,7 @@ export const TableEditor = {
               return element;
             }),
           } as Node,
-          { at: Path.next(trPath) }
+          { at: Path.next(trPath) },
         );
       }
 
@@ -358,7 +358,7 @@ export const TableEditor = {
    */
   insertColumn(
     editor: Editor,
-    options: { at?: Location; before?: boolean } = {}
+    options: { at?: Location; before?: boolean } = {},
   ): void {
     const editorOptions = EDITOR_TO_WITH_TABLE_OPTIONS.get(editor);
 
@@ -371,7 +371,7 @@ export const TableEditor = {
         editor,
         "table", // table
         "td", // cell
-        "th"
+        "th",
       ),
       at: options.at,
     });
@@ -410,7 +410,7 @@ export const TableEditor = {
           Transforms.setNodes<CellElement>(
             editor,
             { colSpan: colSpan + 1 },
-            { at: path }
+            { at: path },
           );
 
           // skip increasing the colspan for the same cell if it has a rowspan
@@ -436,7 +436,7 @@ export const TableEditor = {
                 } as Node,
               ],
             } as Node,
-            { at: path }
+            { at: path },
           );
 
         // if the cell has no rowspan, just insert:
@@ -486,7 +486,7 @@ export const TableEditor = {
         editor,
         "table", // table
         "td", // cell
-        "th"
+        "th",
       ),
       at: options.at,
     });
@@ -555,7 +555,7 @@ export const TableEditor = {
           : Transforms.setNodes<CellElement>(
               editor,
               { colSpan: colSpan - 1 },
-              { at: path }
+              { at: path },
             );
 
         x -= ttb - 1;
@@ -668,7 +668,7 @@ export const TableEditor = {
               Transforms.setNodes<CellElement>(
                 editor,
                 { rowSpan: rowSpan - 1 },
-                { at: tdPath }
+                { at: tdPath },
               );
             }
           }
@@ -686,7 +686,7 @@ export const TableEditor = {
       Transforms.setNodes<CellElement>(
         editor,
         { rowSpan, colSpan },
-        { at: basePath }
+        { at: basePath },
       );
     });
   },
@@ -787,7 +787,7 @@ export const TableEditor = {
                       } as Node,
                     ],
                   } as Node,
-                  { at: Path.next(path) }
+                  { at: Path.next(path) },
                 );
               }
               continue out;
@@ -812,7 +812,7 @@ export const TableEditor = {
                       } as Node,
                     ],
                   } as Node,
-                  { at: [...Path.parent(path), 0] }
+                  { at: [...Path.parent(path), 0] },
                 );
               }
               continue out;
@@ -831,14 +831,14 @@ export const TableEditor = {
                   } as Node,
                 ],
               } as Node,
-              { at: Path.next(path) }
+              { at: Path.next(path) },
             );
           }
 
           Transforms.setNodes<CellElement>(
             editor,
             { rowSpan: 1, colSpan: 1 },
-            { at: path }
+            { at: path },
           );
         }
       }

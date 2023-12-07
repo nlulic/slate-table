@@ -85,7 +85,7 @@ export const TableCursor = {
           editor,
           options.mode === "start"
             ? Editor.start(editor, path)
-            : Editor.end(editor, path)
+            : Editor.end(editor, path),
         );
 
     return true;
@@ -149,7 +149,7 @@ export const TableCursor = {
           editor,
           options.mode === "start"
             ? Editor.start(editor, path)
-            : Editor.end(editor, path)
+            : Editor.end(editor, path),
         );
 
     return true;
@@ -208,7 +208,7 @@ export const TableCursor = {
           editor,
           options.mode === "start"
             ? Editor.start(editor, nextPath)
-            : Editor.end(editor, nextPath)
+            : Editor.end(editor, nextPath),
         );
 
     return true;
@@ -267,7 +267,7 @@ export const TableCursor = {
           editor,
           options.mode === "start"
             ? Editor.start(editor, previousPath)
-            : Editor.end(editor, previousPath)
+            : Editor.end(editor, previousPath),
         );
 
     return true;
@@ -388,7 +388,7 @@ export const TableCursor = {
     return Path.equals(first[1], trPath);
   },
   /**
-   * Checks if the cursor is in the first row of the table
+   * Checks if the cursor is in the last row of the table
    * @returns {boolean} `true` if the cursor is in the first row, otherwise `false`.
    */
   isInLastRow(editor: Editor): boolean {
@@ -402,7 +402,7 @@ export const TableCursor = {
     const editorOptions = EDITOR_TO_WITH_TABLE_OPTIONS.get(editor);
     if (!editorOptions?.withSelection) {
       throw new Error(
-        "The `selection` command must be used with the `withSelection` option."
+        "The `selection` command must be used with the `withSelection` option.",
       );
     }
 
@@ -425,7 +425,7 @@ export const TableCursor = {
     const editorOptions = EDITOR_TO_WITH_TABLE_OPTIONS.get(editor);
     if (!editorOptions?.withSelection) {
       throw new Error(
-        "The `unselect` command must be used with the `withSelection` option."
+        "The `unselect` command must be used with the `withSelection` option.",
       );
     }
 
@@ -465,7 +465,7 @@ export const TableCursor = {
     const editorOptions = EDITOR_TO_WITH_TABLE_OPTIONS.get(editor);
     if (!editorOptions?.withSelection) {
       throw new Error(
-        "The `isSelected` command must be used with the `withSelection` option."
+        "The `isSelected` command must be used with the `withSelection` option.",
       );
     }
 
