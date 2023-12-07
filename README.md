@@ -1,8 +1,9 @@
 <section align="middle">
-<h1 style="border: none">
-  <img src="site/public/table-filled.svg" alt="logo" height="40" style="vertical-align: middle;" />
-  slate-table
-</h1>
+
+<div style="display: flex; align-items: center;justify-content:center">
+  <img src="site/public/table-filled.svg" alt="logo" height="40" />
+  <h1 style="margin-left: 10px; border: none">slate-table</h1>
+</div>
 
 <p>A set of utilities for simple and flexible table editing in your <a href="https://github.com/ianstormtaylor/slate"><em>slate</em></a> editor.</p>
 
