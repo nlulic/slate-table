@@ -1,6 +1,6 @@
 <section align="middle">
 <h1 style="border: none">
-  <img src="site/public/table-filled.svg" alt="logo" height="40" style="vertical-align: middle; margin-top: -9px" />
+  <img src="site/public/table-filled.svg" alt="logo" height="40" style="vertical-align: middle;" />
   slate-table
 </h1>
 
