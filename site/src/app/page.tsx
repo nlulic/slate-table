@@ -29,10 +29,15 @@ export default function Home() {
             target="_blank"
             className="flex space-x-2"
           >
-            <TableFilled width={32} height={32} />
-            <span className="text-2xl font-semibold whitespace-nowrap">
-              slate-table
-            </span>
+            <TableFilled width={48} height={48} />
+            <div className="flex flex-col">
+              <span className="text-2xl font-semibold whitespace-nowrap">
+                slate-table
+              </span>
+              <span className="text-sm font-semibold leading-3">
+                v{process.env.PACKAGE_VERSION}
+              </span>
+            </div>
           </a>
           <a
             href="https://github.com/nlulic/slate-table"
