@@ -13,12 +13,9 @@
 </p>
 
 <p align="center">
-  <a href="./package.json">
-    <img src="https://img.shields.io/npm/v/slate-table.svg?maxAge=3600&label=version&colorB=007ec6">
-  </a>
-  <a href="./LICENSE">
-    <img src="https://img.shields.io/github/license/nlulic/slate-table">
-  </a>
+  <img src="https://img.shields.io/npm/v/slate-table.svg?maxAge=3600&label=version&colorB=007ec6">
+  <img src="https://img.shields.io/github/license/nlulic/slate-table">
+  <img src="https://img.shields.io/codecov/c/github/nlulic/slate-table">
 </p>
 <br/>
 </section>
@@ -29,7 +26,7 @@ Rendering tables in slate is easy, but incorporating the functionality to work w
 
 ## Features 
 
-Take a look at some of the basic features that `slate-table` currently supports:
+Some fundamental features that are currently available:
 
 | Feature                        |     Implemented    |
 |--------------------------------|--------------------|
@@ -44,12 +41,12 @@ Support for nested tables is expected in future updates.
 
 ## Documentation
 
-`slate-table` is view-layer agnostic, so it doesn't ship with any predefined components. This means that you will have to implement your own components but it also gives you the freedom to shape the table experience that your domain editor needs. 
+`slate-table` is view-layer agnostic, so it doesn't ship with any predefined components. While this means that you'll need to create your own components, it also gives you the freedom to shape the table experience your domain editor needs.
 
-However, `slate-table` does make *some assumptions* about your schema:
+It is also important to note that `slate-table` makes *some assumptions* about your schema:
 
 1. **A required `type` property:** Make sure to specify a `type` property for *every* table block in your schema.
-2. **Cell children restriction:** Cells can only contain blocks of the  type "content". Stick to this rule when organizing the content within your table.
+2. **Cell children restriction:** Cells ("th" & "td" block) can only contain blocks of the  type "content". Stick to this rule when organizing the content within your table.
 3. **Merge and split:** "th" & "td" blocks will receive  `rowSpan` and `colSpan` properties. Make sure to expect them in your components.
 
 > 💡 **You can refer to the [source code](https://github.com/nlulic/slate-table/blob/main/site/src/components/Editor.tsx#L34)** of the example implementation for further insights.
@@ -193,7 +190,7 @@ TableEditor.removeColumn(editor);
 
 Checks if the current selection can be merged. Merging is not possible when any of the following conditions are met:
 - The selection is empty.
-- The selection is not within the same "thead", "tbody," or "tfoot" section.
+- The selection is not within the same "thead," "tbody," or "tfoot" section.
 
 ###### Usage
 
@@ -232,7 +229,7 @@ TableEditor.split(editor, { all: true });
 
 #### `TableCursor`
 
-The TableCursor offers a set of static methods for manipulating the cursor within the table and retrieving the table selection.
+The `TableCursor` offers a set of static methods for manipulating the cursor within the table and retrieving the table selection.
 
 ##### `isInTable(editor: Editor, options?: { at?: Location }): boolean`
 
