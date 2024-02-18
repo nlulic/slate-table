@@ -25,11 +25,12 @@ export const TableEditor = {
 
     const {
       blocks: { content, table, tbody, td, tr },
+      withNestedTables,
     } = editorOptions;
 
     const { rows, cols, at } = { ...DEFAULT_INSERT_TABLE_OPTIONS, ...options };
 
-    if (TableCursor.isInTable(editor, { at })) {
+    if (TableCursor.isInTable(editor, { at }) && !withNestedTables) {
       return;
     }
 

@@ -16,6 +16,7 @@ export interface WithTableOptions {
   withDelete: boolean;
   withFragments: boolean;
   withInsertText: boolean;
+  withNestedTables: boolean;
   withNormalization: boolean;
   withSelection: boolean;
   withSelectionAdjustment: boolean;
@@ -35,6 +36,7 @@ export const DEFAULT_WITH_TABLE_OPTIONS = {
   withDelete: true,
   withFragments: true,
   withInsertText: true,
+  withNestedTables: false,
   withNormalization: true,
   withSelection: true,
   withSelectionAdjustment: true,
