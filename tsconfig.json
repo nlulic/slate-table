@@ -14,7 +14,7 @@
     "declarationMap": true,
     "allowSyntheticDefaultImports": true,
     "rootDir": "./src",
-    "outDir": "dist"
+    "noEmit": true
   },
   "files": ["src/index.ts"]
 }
